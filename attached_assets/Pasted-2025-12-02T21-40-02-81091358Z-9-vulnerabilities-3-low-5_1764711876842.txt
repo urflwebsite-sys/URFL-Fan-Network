@@ -1,0 +1,130 @@
+2025-12-02T21:40:02.81091358Z 9 vulnerabilities (3 low, 5 moderate, 1 high)
+2025-12-02T21:40:02.810919651Z 
+2025-12-02T21:40:02.810924121Z To address issues that do not require attention, run:
+2025-12-02T21:40:02.810928151Z   npm audit fix
+2025-12-02T21:40:02.810931461Z 
+2025-12-02T21:40:02.810934872Z To address all issues (including breaking changes), run:
+2025-12-02T21:40:02.810938952Z   npm audit fix --force
+2025-12-02T21:40:02.810942262Z 
+2025-12-02T21:40:02.810946442Z Run `npm audit` for details.
+2025-12-02T21:40:03.043875444Z 
+2025-12-02T21:40:03.043921387Z > rest-express@1.0.0 build
+2025-12-02T21:40:03.043929768Z > vite build && esbuild server/index-prod.ts --platform=node --packages=external --bundle --format=esm --outfile=dist/index.js
+2025-12-02T21:40:03.043935338Z 
+2025-12-02T21:40:03.373548157Z vite v5.4.20 building for production...
+2025-12-02T21:40:03.435528079Z transforming...
+2025-12-02T21:40:05.021975687Z 
+2025-12-02T21:40:05.022004509Z A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+2025-12-02T21:40:09.370886094Z ✓ 2061 modules transformed.
+2025-12-02T21:40:09.777838356Z rendering chunks...
+2025-12-02T21:40:09.787860806Z computing gzip size...
+2025-12-02T21:40:09.864097447Z ../dist/public/index.html                   2.58 kB │ gzip:   0.95 kB
+2025-12-02T21:40:09.864149711Z ../dist/public/assets/index-Bnftp_GC.css  112.68 kB │ gzip:  16.84 kB
+2025-12-02T21:40:09.864366685Z ../dist/public/assets/index-Ds2BjzVH.js   480.64 kB │ gzip: 143.66 kB
+2025-12-02T21:40:09.864794393Z ✓ built in 6.46s
+2025-12-02T21:40:10.577436038Z 
+2025-12-02T21:40:10.57746246Z   dist/index.js  46.0kb
+2025-12-02T21:40:10.57746755Z 
+2025-12-02T21:40:10.577472071Z ⚡ Done in 95ms
+2025-12-02T21:40:27.38535802Z ==> Uploading build...
+2025-12-02T21:41:18.616302903Z ==> Uploaded in 9.6s. Compression took 41.6s
+2025-12-02T21:41:18.67033605Z ==> Build successful 🎉
+2025-12-02T21:41:55.119682823Z ==> Deploying...
+2025-12-02T21:42:20.312637828Z ==> Running 'npm run start'
+2025-12-02T21:42:21.412673161Z 
+2025-12-02T21:42:21.412701323Z > rest-express@1.0.0 start
+2025-12-02T21:42:21.412705833Z > NODE_ENV=production node dist/index.js
+2025-12-02T21:42:21.412708723Z 
+2025-12-02T21:42:30.712062374Z Initializing database schema...
+2025-12-02T21:42:30.845668889Z Database initialization warning: SSL/TLS required
+2025-12-02T21:42:32.412899024Z 9:42:32 PM [express] serving on port 10000
+2025-12-02T21:42:32.510884614Z Discord bot logged in as URFL Website Bot#1508
+2025-12-02T21:42:32.511228385Z (node:67) DeprecationWarning: The ready event has been renamed to clientReady to distinguish it from the gateway READY event and will only emit under that name in v15. Please use clientReady instead.
+2025-12-02T21:42:32.511248776Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-12-02T21:42:36.008146958Z ==> Your service is live 🎉
+2025-12-02T21:42:36.037123774Z ==> 
+2025-12-02T21:42:36.064676229Z ==> ///////////////////////////////////////////////////////////
+2025-12-02T21:42:36.092859244Z ==> 
+2025-12-02T21:42:36.12152221Z ==> Available at your primary URL https://test123423.onrender.com
+2025-12-02T21:42:36.149025175Z ==> 
+2025-12-02T21:42:36.196870617Z ==> ///////////////////////////////////////////////////////////
+2025-12-02T21:43:13.707725586Z 9:43:13 PM [express] GET /api/auth/user 401 in 2ms :: {"message":"Unauthorized"}
+2025-12-02T21:43:13.876592733Z Error fetching current week games: PostgresError: SSL/TLS required
+2025-12-02T21:43:13.876612684Z     at ErrorResponse (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:794:26)
+2025-12-02T21:43:13.876620945Z     at handle (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:480:6)
+2025-12-02T21:43:13.876624655Z     at Socket.data (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:315:9)
+2025-12-02T21:43:13.876628975Z     at Socket.emit (node:events:518:28)
+2025-12-02T21:43:13.876632996Z     at addChunk (node:internal/streams/readable:561:12)
+2025-12-02T21:43:13.876636776Z     at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+2025-12-02T21:43:13.876640146Z     at Readable.push (node:internal/streams/readable:392:5)
+2025-12-02T21:43:13.876643586Z     at TCP.onStreamRead (node:internal/stream_base_commons:189:23) {
+2025-12-02T21:43:13.876647636Z   severity_local: 'FATAL',
+2025-12-02T21:43:13.876651137Z   code: '28000'
+2025-12-02T21:43:13.876654517Z }
+2025-12-02T21:43:13.877257633Z 9:43:13 PM [express] GET /api/games/current 500 in 40ms :: {"message":"Failed to fetch games"}
+2025-12-02T21:43:13.887944327Z Error fetching news: PostgresError: SSL/TLS required
+2025-12-02T21:43:13.888851791Z 9:43:13 PM [express] GET /api/news 500 in 35ms :: {"message":"Failed to fetch news"}
+2025-12-02T21:43:13.947763258Z     at ErrorResponse (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:794:26)
+2025-12-02T21:43:13.947777769Z     at handle (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:480:6)
+2025-12-02T21:43:13.947783589Z     at Socket.data (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:315:9)
+2025-12-02T21:43:13.94779017Z     at Socket.emit (node:events:518:28)
+2025-12-02T21:43:13.94779661Z     at addChunk (node:internal/streams/readable:561:12)
+2025-12-02T21:43:13.947801151Z     at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+2025-12-02T21:43:13.947804621Z     at Readable.push (node:internal/streams/readable:392:5)
+2025-12-02T21:43:13.947808081Z     at TCP.onStreamRead (node:internal/stream_base_commons:189:23) {
+2025-12-02T21:43:13.947813371Z   severity_local: 'FATAL',
+2025-12-02T21:43:13.947819052Z   code: '28000'
+2025-12-02T21:43:13.947824552Z }
+2025-12-02T21:43:18.13096705Z Error fetching current week games: PostgresError: SSL/TLS required
+2025-12-02T21:43:18.130991101Z     at ErrorResponse (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:794:26)
+2025-12-02T21:43:18.131005242Z     at handle (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:480:6)
+2025-12-02T21:43:18.131007502Z     at Socket.data (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:315:9)
+2025-12-02T21:43:18.131010082Z     at Socket.emit (node:events:518:28)
+2025-12-02T21:43:18.131012513Z     at addChunk (node:internal/streams/readable:561:12)
+2025-12-02T21:43:18.131014293Z     at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+2025-12-02T21:43:18.131016113Z     at Readable.push (node:internal/streams/readable:392:5)
+2025-12-02T21:43:18.131017943Z     at TCP.onStreamRead (node:internal/stream_base_commons:189:23) {
+2025-12-02T21:43:18.131020633Z   severity_local: 'FATAL',
+2025-12-02T21:43:18.131022383Z   code: '28000'
+2025-12-02T21:43:18.131024083Z }
+2025-12-02T21:43:18.131890135Z 9:43:18 PM [express] GET /api/games/current 500 in 34ms :: {"message":"Failed to fetch games"}
+2025-12-02T21:44:18.53910232Z Error fetching current week games: PostgresError: SSL/TLS required
+2025-12-02T21:44:18.539127912Z     at ErrorResponse (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:794:26)
+2025-12-02T21:44:18.539133912Z     at handle (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:480:6)
+2025-12-02T21:44:18.539139472Z     at Socket.data (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:315:9)
+2025-12-02T21:44:18.539145983Z     at Socket.emit (node:events:518:28)
+2025-12-02T21:44:18.539152213Z     at addChunk (node:internal/streams/readable:561:12)
+2025-12-02T21:44:18.539158303Z     at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+2025-12-02T21:44:18.539163674Z     at Readable.push (node:internal/streams/readable:392:5)
+2025-12-02T21:44:18.539168504Z     at TCP.onStreamRead (node:internal/stream_base_commons:189:23) {
+2025-12-02T21:44:18.539174924Z   severity_local: 'FATAL',
+2025-12-02T21:44:18.539178675Z   code: '28000'
+2025-12-02T21:44:18.539182205Z }
+2025-12-02T21:44:18.539843005Z 9:44:18 PM [express] GET /api/games/current 500 in 38ms :: {"message":"Failed to fetch games"}
+2025-12-02T21:44:18.91766247Z 9:44:18 PM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+2025-12-02T21:44:19.093261341Z Error fetching current week games: PostgresError: SSL/TLS required
+2025-12-02T21:44:19.093288073Z     at ErrorResponse (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:794:26)
+2025-12-02T21:44:19.093293383Z     at handle (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:480:6)
+2025-12-02T21:44:19.093297163Z     at Socket.data (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:315:9)
+2025-12-02T21:44:19.093301433Z     at Socket.emit (node:events:518:28)
+2025-12-02T21:44:19.093305774Z     at addChunk (node:internal/streams/readable:561:12)
+2025-12-02T21:44:19.093309234Z     at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+2025-12-02T21:44:19.093313104Z     at Readable.push (node:internal/streams/readable:392:5)
+2025-12-02T21:44:19.093316654Z     at TCP.onStreamRead (node:internal/stream_base_commons:189:23) {
+2025-12-02T21:44:19.093320724Z   severity_local: 'FATAL',
+2025-12-02T21:44:19.093324265Z   code: '28000'
+2025-12-02T21:44:19.093327815Z }
+2025-12-02T21:44:19.093982084Z 9:44:19 PM [express] GET /api/games/current 500 in 35ms :: {"message":"Failed to fetch games"}
+2025-12-02T21:44:20.351745512Z Error fetching all games: PostgresError: SSL/TLS required
+2025-12-02T21:44:20.351771143Z     at ErrorResponse (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:794:26)
+2025-12-02T21:44:20.351775234Z     at handle (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:480:6)
+2025-12-02T21:44:20.351777964Z     at Socket.data (file:///opt/render/project/go/src/github.com/popfork1/test123423/node_modules/postgres/src/connection.js:315:9)
+2025-12-02T21:44:20.351781404Z     at Socket.emit (node:events:518:28)
+2025-12-02T21:44:20.351784444Z     at addChunk (node:internal/streams/readable:561:12)
+2025-12-02T21:44:20.351787104Z     at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+2025-12-02T21:44:20.351788775Z     at Readable.push (node:internal/streams/readable:392:5)
+2025-12-02T21:44:20.351790515Z     at TCP.onStreamRead (node:internal/stream_base_commons:189:23) {
+2025-12-02T21:44:20.351792725Z   severity_local: 'FATAL',
+2025-12-02T21:44:20.351794475Z   code: '28000'
+2025-12-02T21:44:20.351796185Z }
+2025-12-02T21:44:20.352402501Z 9:44:20 PM [express] GET /api/games/all 500 in 31ms :: {"message":"Failed to fetch games"}
