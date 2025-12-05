@@ -176,22 +176,21 @@ export function calculateWinProbability(
 
     const quarterWeight = quarterMap[game.quarter] || 0.5;
 
-    // Enhanced score impact - larger leads have exponentially more impact
-    const baseScoreImpact = (scoreDifference / 7) * 15;
+    // Calculate score impact - moderate sensitivity
+    const baseScoreImpact = (scoreDifference / 7) * 10;
     
-    // For blowouts (>21 point difference), add extra weight
-    const blowoutMultiplier = Math.abs(scoreDifference) > 21 ? 1.5 : 1.0;
+    // Slight boost for significant leads (>21 points)
+    const blowoutMultiplier = Math.abs(scoreDifference) > 21 ? 1.3 : 1.0;
     const scoreImpact = baseScoreImpact * blowoutMultiplier;
 
-    // Adjust quarter weight based on score differential
-    // Large leads early in the game should have more impact
+    // Moderate quarter weight adjustment for large score differentials
     let adjustedQuarterWeight = quarterWeight;
-    if (Math.abs(scoreDifference) > 28) {
-      adjustedQuarterWeight = Math.min(0.85, quarterWeight + 0.3);
-    } else if (Math.abs(scoreDifference) > 21) {
+    if (Math.abs(scoreDifference) > 35) {
       adjustedQuarterWeight = Math.min(0.75, quarterWeight + 0.2);
-    } else if (Math.abs(scoreDifference) > 14) {
+    } else if (Math.abs(scoreDifference) > 28) {
       adjustedQuarterWeight = Math.min(0.65, quarterWeight + 0.15);
+    } else if (Math.abs(scoreDifference) > 21) {
+      adjustedQuarterWeight = Math.min(0.60, quarterWeight + 0.1);
     }
 
     const preGameWeight = 1 - adjustedQuarterWeight;
