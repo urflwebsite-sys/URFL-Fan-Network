@@ -126,37 +126,37 @@ export function calculateWinProbability(
   const team1RankScore = (totalTeams - team1Analysis.ranking + 1) / totalTeams;
   const team2RankScore = (totalTeams - team2Analysis.ranking + 1) / totalTeams;
   const rankingDiff = team1RankScore - team2RankScore;
-  const rankingImpact = rankingDiff * 25;
+  const rankingImpact = rankingDiff * 30;
 
   const pdDifference = team1Analysis.pointDifferential - team2Analysis.pointDifferential;
-  const pdImpact = pdDifference / 15;
+  const pdImpact = (pdDifference / 20) * 25;
 
   const winPctDiff = team1Analysis.winPercentage - team2Analysis.winPercentage;
-  const recordImpact = winPctDiff * 30;
+  const recordImpact = winPctDiff * 35;
 
   const team1SOS = team1Analysis.scheduleStrength;
   const team2SOS = team2Analysis.scheduleStrength;
 
-  const team1AdjustedStrength = team1Analysis.winPercentage * (0.8 + team1SOS * 0.4);
-  const team2AdjustedStrength = team2Analysis.winPercentage * (0.8 + team2SOS * 0.4);
+  const team1AdjustedStrength = team1Analysis.winPercentage * (0.7 + team1SOS * 0.6);
+  const team2AdjustedStrength = team2Analysis.winPercentage * (0.7 + team2SOS * 0.6);
   const sosAdjustedDiff = team1AdjustedStrength - team2AdjustedStrength;
-  const sosImpact = sosAdjustedDiff * 15;
+  const sosImpact = sosAdjustedDiff * 20;
 
   const hasGames1 = team1Analysis.totalGamesPlayed > 0;
   const hasGames2 = team2Analysis.totalGamesPlayed > 0;
 
   if (hasGames1 && hasGames2) {
-    probability += rankingImpact * 0.25;
+    probability += rankingImpact * 0.30;
     probability += pdImpact * 0.25;
     probability += recordImpact * 0.25;
-    probability += sosImpact * 0.25;
+    probability += sosImpact * 0.20;
   } else if (hasGames1 || hasGames2) {
-    probability += rankingImpact * 0.4;
-    probability += pdImpact * 0.3;
-    probability += recordImpact * 0.3;
+    probability += rankingImpact * 0.40;
+    probability += pdImpact * 0.30;
+    probability += recordImpact * 0.30;
   } else {
-    probability += rankingImpact * 0.5;
-    probability += pdImpact * 0.5;
+    probability += rankingImpact * 0.60;
+    probability += pdImpact * 0.40;
   }
 
   if (game.quarter && game.quarter !== "Scheduled") {

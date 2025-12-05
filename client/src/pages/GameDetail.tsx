@@ -386,9 +386,38 @@ export default function GameDetail() {
                   const team1PD = team1Standing?.pointDifferential || 0;
                   const team2PD = team2Standing?.pointDifferential || 0;
                   
-                  // Calculate dynamic win probability
-                  const team1Percent = calculateWinProbability(game, "team1", standings);
-                  const team2Percent = calculateWinProbability(game, "team2", standings);
+                  // Get all games for schedule strength calculation
+                  const allGames = standings ? [] : undefined;
+                  
+                  // Calculate dynamic win probability using all factors
+                  const team1Percent = calculateWinProbability(game, "team1", standings, allGames);
+                  const team2Percent = calculateWinProbability(game, "team2", standings, allGames);
+                  
+                  // Get detailed factors for display
+                  const factors = standings ? (() => {
+                    const rankings = new Map<string, number>();
+                    const sortedStandings = [...standings].sort((a, b) => {
+                      if (a.manualOrder !== null && b.manualOrder !== null && 
+                          a.manualOrder !== undefined && b.manualOrder !== undefined) {
+                        return a.manualOrder - b.manualOrder;
+                      }
+                      const aWins = a.wins || 0;
+                      const bWins = b.wins || 0;
+                      const aLosses = a.losses || 0;
+                      const bLosses = b.losses || 0;
+                      const aWinPct = aWins + aLosses > 0 ? aWins / (aWins + aLosses) : 0;
+                      const bWinPct = bWins + bLosses > 0 ? bWins / (bWins + bLosses) : 0;
+                      if (bWinPct !== aWinPct) return bWinPct - aWinPct;
+                      return (b.pointDifferential || 0) - (a.pointDifferential || 0);
+                    });
+                    sortedStandings.forEach((standing, index) => {
+                      rankings.set(standing.team, index + 1);
+                    });
+                    return {
+                      team1Rank: rankings.get(game.team1) || standings.length,
+                      team2Rank: rankings.get(game.team2) || standings.length,
+                    };
+                  })() : { team1Rank: 0, team2Rank: 0 };
                   
                   return (
                     <div className="mb-6 space-y-3">
@@ -404,7 +433,9 @@ export default function GameDetail() {
                             data-testid={`winprob-bar-${game.team1}`}
                           />
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">{team1Standing?.wins || 0}-{team1Standing?.losses || 0} (PD: {team1PD > 0 ? '+' : ''}{team1PD})</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          #{factors.team1Rank} • {team1Standing?.wins || 0}-{team1Standing?.losses || 0} • PD: {team1PD > 0 ? '+' : ''}{team1PD}
+                        </p>
                       </div>
                       
                       <div>
@@ -419,11 +450,13 @@ export default function GameDetail() {
                             data-testid={`winprob-bar-${game.team2}`}
                           />
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">{team2Standing?.wins || 0}-{team2Standing?.losses || 0} (PD: {team2PD > 0 ? '+' : ''}{team2PD})</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          #{factors.team2Rank} • {team2Standing?.wins || 0}-{team2Standing?.losses || 0} • PD: {team2PD > 0 ? '+' : ''}{team2PD}
+                        </p>
                       </div>
                       
                       <p className="text-xs text-muted-foreground text-center mt-3 pt-2 border-t">
-                        {game.isLive ? `Updated live during ${game.quarter}` : 'Based on Point Differential'}
+                        {game.isLive ? `Updated live during ${game.quarter}` : 'Based on ranking, record, point differential & schedule strength'}
                       </p>
                     </div>
                   );
