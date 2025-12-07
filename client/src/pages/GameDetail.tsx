@@ -499,10 +499,10 @@ export default function GameDetail() {
                               
                               <div className="text-left text-muted-foreground">Schedule</div>
                               <div className={`text-center ${factorData.factors.schedule.advantage === game.team1 ? 'text-primary font-semibold' : ''}`}>
-                                {factorData.factors.schedule.team1SOS > 0 ? `${factorData.factors.schedule.team1SOS}%` : 'N/A'}
+                                {factorData.factors.schedule.team1SOS >= 0 ? `${factorData.factors.schedule.team1SOS}%` : 'N/A'}
                               </div>
                               <div className={`text-center ${factorData.factors.schedule.advantage === game.team2 ? 'text-primary font-semibold' : ''}`}>
-                                {factorData.factors.schedule.team2SOS > 0 ? `${factorData.factors.schedule.team2SOS}%` : 'N/A'}
+                                {factorData.factors.schedule.team2SOS >= 0 ? `${factorData.factors.schedule.team2SOS}%` : 'N/A'}
                               </div>
                             </div>
                             

@@ -58,7 +58,7 @@ function calculateScheduleStrength(
     g => g.isFinal && (g.team1 === teamName || g.team2 === teamName)
   );
 
-  if (completedGames.length === 0) return 0;
+  if (completedGames.length === 0) return -1; // Return -1 to indicate no data
 
   let totalOpponentWinPct = 0;
 
@@ -143,7 +143,7 @@ export function calculateWinProbability(
 
   // Only apply SOS adjustment if both teams have played games
   let sosImpact = 0;
-  if (team1Analysis.totalGamesPlayed > 0 && team2Analysis.totalGamesPlayed > 0) {
+  if (team1SOS >= 0 && team2SOS >= 0) {
     const sosDiff = team1SOS - team2SOS;
     // Reduced impact from 20 to 10
     sosImpact = sosDiff * 10;
@@ -270,10 +270,11 @@ export function getWinProbabilityFactors(
                    team2Analysis.pointDifferential > team1Analysis.pointDifferential ? game.team2 : "Even"
       },
       schedule: {
-        team1SOS: Math.round(team1Analysis.scheduleStrength * 100),
-        team2SOS: Math.round(team2Analysis.scheduleStrength * 100),
-        advantage: team1Analysis.scheduleStrength > team2Analysis.scheduleStrength ? game.team1 :
-                   team2Analysis.scheduleStrength > team1Analysis.scheduleStrength ? game.team2 : "Even"
+        team1SOS: team1Analysis.scheduleStrength >= 0 ? Math.round(team1Analysis.scheduleStrength * 100) : -1,
+        team2SOS: team2Analysis.scheduleStrength >= 0 ? Math.round(team2Analysis.scheduleStrength * 100) : -1,
+        advantage: team1Analysis.scheduleStrength >= 0 && team2Analysis.scheduleStrength >= 0 ?
+                   (team1Analysis.scheduleStrength > team2Analysis.scheduleStrength ? game.team1 :
+                    team2Analysis.scheduleStrength > team1Analysis.scheduleStrength ? game.team2 : "Even") : "Even"
       }
     }
   };
