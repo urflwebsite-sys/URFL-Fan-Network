@@ -58,7 +58,7 @@ function calculateScheduleStrength(
     g => g.isFinal && (g.team1 === teamName || g.team2 === teamName)
   );
 
-  if (completedGames.length === 0) return 0.5;
+  if (completedGames.length === 0) return 0;
 
   let totalOpponentWinPct = 0;
 
@@ -126,30 +126,38 @@ export function calculateWinProbability(
   const team1RankScore = (totalTeams - team1Analysis.ranking + 1) / totalTeams;
   const team2RankScore = (totalTeams - team2Analysis.ranking + 1) / totalTeams;
   const rankingDiff = team1RankScore - team2RankScore;
-  const rankingImpact = rankingDiff * 30;
+  // Reduced from 30 to 20 for more balanced impact
+  const rankingImpact = rankingDiff * 20;
 
   const pdDifference = team1Analysis.pointDifferential - team2Analysis.pointDifferential;
-  const pdImpact = (pdDifference / 20) * 25;
+  // Cap point differential impact to prevent extreme swings
+  const cappedPdDiff = Math.max(-100, Math.min(100, pdDifference));
+  const pdImpact = (cappedPdDiff / 30) * 15; // Reduced from /20 * 25
 
   const winPctDiff = team1Analysis.winPercentage - team2Analysis.winPercentage;
-  const recordImpact = winPctDiff * 35;
+  // Reduced from 35 to 25 for more realistic probabilities
+  const recordImpact = winPctDiff * 25;
 
   const team1SOS = team1Analysis.scheduleStrength;
   const team2SOS = team2Analysis.scheduleStrength;
 
-  const team1AdjustedStrength = team1Analysis.winPercentage * (0.7 + team1SOS * 0.6);
-  const team2AdjustedStrength = team2Analysis.winPercentage * (0.7 + team2SOS * 0.6);
-  const sosAdjustedDiff = team1AdjustedStrength - team2AdjustedStrength;
-  const sosImpact = sosAdjustedDiff * 20;
+  // Only apply SOS adjustment if both teams have played games
+  let sosImpact = 0;
+  if (team1Analysis.totalGamesPlayed > 0 && team2Analysis.totalGamesPlayed > 0) {
+    const sosDiff = team1SOS - team2SOS;
+    // Reduced impact from 20 to 10
+    sosImpact = sosDiff * 10;
+  }
 
   const hasGames1 = team1Analysis.totalGamesPlayed > 0;
   const hasGames2 = team2Analysis.totalGamesPlayed > 0;
 
   if (hasGames1 && hasGames2) {
-    probability += rankingImpact * 0.30;
+    // More balanced weights
+    probability += rankingImpact * 0.35;
+    probability += recordImpact * 0.30;
     probability += pdImpact * 0.25;
-    probability += recordImpact * 0.25;
-    probability += sosImpact * 0.20;
+    probability += sosImpact * 0.10;
   } else if (hasGames1 || hasGames2) {
     probability += rankingImpact * 0.40;
     probability += pdImpact * 0.30;
@@ -197,7 +205,13 @@ export function calculateWinProbability(
     probability = (probability * preGameWeight) + (50 + scoreImpact) * adjustedQuarterWeight;
   }
 
-  probability = Math.max(1, Math.min(99, Math.round(probability)));
+  // Keep probabilities between 5-95% for pre-game to avoid extreme predictions
+  if (!game.quarter || game.quarter === "Scheduled") {
+    probability = Math.max(5, Math.min(95, Math.round(probability)));
+  } else {
+    // Allow more extreme probabilities during live games
+    probability = Math.max(1, Math.min(99, Math.round(probability)));
+  }
 
   if (team === "team1") {
     return probability;
