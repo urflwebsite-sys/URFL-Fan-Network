@@ -59,43 +59,45 @@ function calculateScheduleStrength(
     g => g.team1 === teamName || g.team2 === teamName
   );
 
-  // If no games in the array but team exists in standings, return based on standings only
-  if (relevantGames.length === 0) {
-    // Check if team has a standing (meaning they have played or will play games)
-    const teamStanding = standings.find(s => s.team === teamName);
-    if (teamStanding && (teamStanding.wins || 0) + (teamStanding.losses || 0) === 0) {
-      // Team exists but hasn't played any games - use average strength
-      const avgWinPct = standings
-        .filter(s => (s.wins || 0) + (s.losses || 0) > 0)
-        .reduce((sum, s) => sum + ((s.wins || 0) / ((s.wins || 0) + (s.losses || 0))), 0) / 
-        standings.filter(s => (s.wins || 0) + (s.losses || 0) > 0).length;
-      return isNaN(avgWinPct) ? 0.5 : avgWinPct;
-    }
-    return -1; // Return -1 to indicate no data
-  }
+  // If we have games, calculate SOS from them
+  if (relevantGames.length > 0) {
+    let totalOpponentWinPct = 0;
 
-  let totalOpponentWinPct = 0;
+    relevantGames.forEach(game => {
+      const opponent = game.team1 === teamName ? game.team2 : game.team1;
+      const opponentStanding = standings.find(s => s.team === opponent);
 
-  relevantGames.forEach(game => {
-    const opponent = game.team1 === teamName ? game.team2 : game.team1;
-    const opponentStanding = standings.find(s => s.team === opponent);
+      if (opponentStanding) {
+        const wins = opponentStanding.wins || 0;
+        const losses = opponentStanding.losses || 0;
+        const totalGames = wins + losses;
 
-    if (opponentStanding) {
-      const wins = opponentStanding.wins || 0;
-      const losses = opponentStanding.losses || 0;
-      const totalGames = wins + losses;
-
-      if (totalGames > 0) {
-        totalOpponentWinPct += wins / totalGames;
+        if (totalGames > 0) {
+          totalOpponentWinPct += wins / totalGames;
+        } else {
+          totalOpponentWinPct += 0.5;
+        }
       } else {
         totalOpponentWinPct += 0.5;
       }
-    } else {
-      totalOpponentWinPct += 0.5;
-    }
-  });
+    });
 
-  return totalOpponentWinPct / relevantGames.length;
+    return totalOpponentWinPct / relevantGames.length;
+  }
+
+  // If no games in array, use average league strength as fallback
+  // This allows scheduled games to show a default SOS even before games are in the array
+  const teamsWithGames = standings.filter(s => (s.wins || 0) + (s.losses || 0) > 0);
+  if (teamsWithGames.length === 0) {
+    return 0.5; // Default to 50% if no teams have played
+  }
+
+  const avgWinPct = teamsWithGames.reduce(
+    (sum, s) => sum + ((s.wins || 0) / ((s.wins || 0) + (s.losses || 0))),
+    0
+  ) / teamsWithGames.length;
+
+  return isNaN(avgWinPct) ? 0.5 : avgWinPct;
 }
 
 function analyzeTeam(
