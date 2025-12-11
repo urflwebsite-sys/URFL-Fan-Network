@@ -55,7 +55,7 @@ export default function GameDetail() {
   });
 
   const { data: allGames } = useQuery<Game[]>({
-    queryKey: ["/api/games"],
+    queryKey: ["/api/games/all"],
   });
 
   const voteMutation = useMutation({
