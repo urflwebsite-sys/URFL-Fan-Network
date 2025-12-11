@@ -54,15 +54,15 @@ function calculateScheduleStrength(
   games: Game[],
   standings: Standings[]
 ): number {
-  // First try to calculate from completed games
-  const completedGames = games.filter(
-    g => g.isFinal && (g.team1 === teamName || g.team2 === teamName)
-  );
+  // Get all games for this team (completed or upcoming)
+  const relevantGames = games && games.length > 0
+    ? games.filter(g => g.team1 === teamName || g.team2 === teamName)
+    : [];
 
-  if (completedGames.length > 0) {
+  if (relevantGames.length > 0) {
     let totalOpponentWinPct = 0;
 
-    completedGames.forEach(game => {
+    relevantGames.forEach(game => {
       const opponent = game.team1 === teamName ? game.team2 : game.team1;
       const opponentStanding = standings.find(s => s.team === opponent);
 
@@ -81,40 +81,20 @@ function calculateScheduleStrength(
       }
     });
 
-    return totalOpponentWinPct / completedGames.length;
+    return totalOpponentWinPct / relevantGames.length;
   }
 
-  // If no completed games, try upcoming/scheduled games
-  const allRelevantGames = games.filter(
-    g => g.team1 === teamName || g.team2 === teamName
-  );
+  // Fallback: use league average win percentage
+  const leagueAvg = standings.length > 0
+    ? standings.reduce((sum, s) => {
+        const wins = s.wins || 0;
+        const losses = s.losses || 0;
+        const total = wins + losses;
+        return sum + (total > 0 ? wins / total : 0.5);
+      }, 0) / standings.length
+    : 0.5;
 
-  if (allRelevantGames.length > 0) {
-    let totalOpponentWinPct = 0;
-
-    allRelevantGames.forEach(game => {
-      const opponent = game.team1 === teamName ? game.team2 : game.team1;
-      const opponentStanding = standings.find(s => s.team === opponent);
-
-      if (opponentStanding) {
-        const wins = opponentStanding.wins || 0;
-        const losses = opponentStanding.losses || 0;
-        const totalGames = wins + losses;
-
-        if (totalGames > 0) {
-          totalOpponentWinPct += wins / totalGames;
-        } else {
-          totalOpponentWinPct += 0.5;
-        }
-      } else {
-        totalOpponentWinPct += 0.5;
-      }
-    });
-
-    return totalOpponentWinPct / allRelevantGames.length;
-  }
-
-  return -1; // Return -1 to indicate no data
+  return leagueAvg;
 }
 
 function analyzeTeam(
