@@ -54,47 +54,34 @@ function calculateScheduleStrength(
   games: Game[],
   standings: Standings[]
 ): number {
-  // Get all games for this team (completed or upcoming)
-  const relevantGames = games && games.length > 0
-    ? games.filter(g => g.team1 === teamName || g.team2 === teamName)
-    : [];
-
-  if (relevantGames.length > 0) {
-    let totalOpponentWinPct = 0;
-
-    relevantGames.forEach(game => {
-      const opponent = game.team1 === teamName ? game.team2 : game.team1;
-      const opponentStanding = standings.find(s => s.team === opponent);
-
-      if (opponentStanding) {
-        const wins = opponentStanding.wins || 0;
-        const losses = opponentStanding.losses || 0;
-        const totalGames = wins + losses;
-
-        if (totalGames > 0) {
-          totalOpponentWinPct += wins / totalGames;
-        } else {
-          totalOpponentWinPct += 0.5;
-        }
+  const completedGames = games.filter(
+    g => g.isFinal && (g.team1 === teamName || g.team2 === teamName)
+  );
+  
+  if (completedGames.length === 0) return 0.5;
+  
+  let totalOpponentWinPct = 0;
+  
+  completedGames.forEach(game => {
+    const opponent = game.team1 === teamName ? game.team2 : game.team1;
+    const opponentStanding = standings.find(s => s.team === opponent);
+    
+    if (opponentStanding) {
+      const wins = opponentStanding.wins || 0;
+      const losses = opponentStanding.losses || 0;
+      const totalGames = wins + losses;
+      
+      if (totalGames > 0) {
+        totalOpponentWinPct += wins / totalGames;
       } else {
         totalOpponentWinPct += 0.5;
       }
-    });
-
-    return totalOpponentWinPct / relevantGames.length;
-  }
-
-  // Fallback: use league average win percentage
-  const leagueAvg = standings.length > 0
-    ? standings.reduce((sum, s) => {
-        const wins = s.wins || 0;
-        const losses = s.losses || 0;
-        const total = wins + losses;
-        return sum + (total > 0 ? wins / total : 0.5);
-      }, 0) / standings.length
-    : 0.5;
-
-  return leagueAvg;
+    } else {
+      totalOpponentWinPct += 0.5;
+    }
+  });
+  
+  return totalOpponentWinPct / completedGames.length;
 }
 
 function analyzeTeam(
