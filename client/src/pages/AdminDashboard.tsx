@@ -1447,9 +1447,29 @@ function StreamRequestsManager() {
 
 function UsersManager() {
   const { toast } = useToast();
+  const [newUsername, setNewUsername] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [newRole, setNewRole] = useState<"admin" | "streamer">("admin");
 
   const { data: users = [], refetch } = useQuery<User[]>({
     queryKey: ["/api/users"],
+  });
+
+  const createUserMutation = useMutation({
+    mutationFn: async ({ username, password, role }: { username: string; password: string; role: string }) => {
+      const res = await apiRequest("POST", "/api/users", { username, password, role });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({ title: "Success", description: "User created successfully" });
+      setNewUsername("");
+      setNewPassword("");
+      setNewRole("admin");
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message || "Failed to create user", variant: "destructive" });
+    },
   });
 
   const updateRoleMutation = useMutation({
@@ -1466,11 +1486,71 @@ function UsersManager() {
     },
   });
 
+  const handleCreateUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUsername.trim() || !newPassword.trim()) {
+      toast({ title: "Error", description: "Username and password are required", variant: "destructive" });
+      return;
+    }
+    createUserMutation.mutate({ username: newUsername, password: newPassword, role: newRole });
+  };
+
   return (
     <div className="space-y-6">
       <Card>
         <div className="p-6">
-          <h2 className="text-2xl font-bold mb-4">User Management</h2>
+          <h2 className="text-2xl font-bold mb-4">Add New User</h2>
+          <form onSubmit={handleCreateUser} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="username">Username</Label>
+                <Input 
+                  id="username"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                  placeholder="Enter username"
+                  disabled={createUserMutation.isPending}
+                />
+              </div>
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input 
+                  id="password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter password"
+                  disabled={createUserMutation.isPending}
+                />
+              </div>
+              <div>
+                <Label htmlFor="role">Role</Label>
+                <Select value={newRole} onValueChange={(value: any) => setNewRole(value)}>
+                  <SelectTrigger id="role">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="streamer">Streamer</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full gap-2" 
+              disabled={createUserMutation.isPending || !newUsername.trim() || !newPassword.trim()}
+            >
+              <Plus className="w-4 h-4" />
+              {createUserMutation.isPending ? "Creating..." : "Create User"}
+            </Button>
+          </form>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="p-6">
+          <h2 className="text-2xl font-bold mb-4">Existing Users</h2>
           <p className="text-muted-foreground mb-4">
             Manage user roles. <strong>Admin</strong> users have full access. <strong>Streamer</strong> users can only request and post stream links.
           </p>
@@ -1490,7 +1570,7 @@ function UsersManager() {
                         ? `${user.firstName || ''} ${user.lastName || ''}`.trim() 
                         : 'Unknown User'}
                     </p>
-                    <p className="text-sm text-muted-foreground">{user.email || 'No email'}</p>
+                    <p className="text-sm text-muted-foreground">{user.email || user.username || 'No email'}</p>
                     <p className="text-xs text-muted-foreground">ID: {user.id}</p>
                   </div>
                   
