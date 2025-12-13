@@ -16,33 +16,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { Game, News as NewsType, Pickem, PickemRules, Changelog, InsertChangelog, StreamRequest, User } from "@shared/schema";
 import { format } from "date-fns";
 import { Plus, Trash2, Edit, Save } from "lucide-react";
+import { TEAMS } from "@/lib/teams";
 
-const AVAILABLE_TEAMS = [
-  "Denver Broncos",
-  "Minnesota Vikings",
-  "Agartha Mammoths",
-  "Seattle Seahawks",
-  "Las Vegas Raiders",
-  "Alaska Ice Dragons",
-  "Boise Bucks",
-  "Carolina Panthers",
-  "San Francisco 49ers",
-  "New England Patriots",
-  "Los Angeles Rams",
-  "Atlanta Falcons",
-  "Houston Texans",
-  "Indianapolis Colts",
-  "Cleveland Browns",
-  "Roman Gladiators",
-  "Pittsburgh Steelers",
-  "Kansas City Chiefs",
-  "Arizona Cardinals",
-  "New Orleans Saints",
-  "Buffalo Bills",
-  "Baltimore Ravens",
-  "Dallas Cowboys",
-  "Philadelphia Eagles",
-];
+const AVAILABLE_TEAMS = Object.keys(TEAMS);
 
 export default function AdminDashboard() {
   const { toast } = useToast();
