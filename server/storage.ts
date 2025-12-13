@@ -413,14 +413,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUserWithPassword(username: string, password: string, role: string): Promise<User> {
-    const [user] = await db.insert(users).values({
+    const [user] = await db.insert(users).values(cleanObject({
       username,
       password,
       email: `${username}@urfl.com`,
       firstName: username,
       lastName: "",
       role,
-    }).returning();
+    }) as any).returning();
     return user;
   }
 
@@ -436,9 +436,9 @@ export class DatabaseStorage implements IStorage {
   async setSetting(key: string, value: string): Promise<void> {
     const existing = await this.getSetting(key);
     if (existing) {
-      await db.update(settings).set({ value, updatedAt: new Date() }).where(eq(settings.key, key));
+      await db.update(settings).set(cleanObject({ value, updatedAt: new Date() }) as any).where(eq(settings.key, key));
     } else {
-      await db.insert(settings).values({ key, value });
+      await db.insert(settings).values(cleanObject({ key, value }) as any);
     }
   }
 }
