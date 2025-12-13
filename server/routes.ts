@@ -612,6 +612,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Maintenance mode endpoints
+  app.get("/api/settings/maintenance-mode", async (req, res) => {
+    try {
+      const value = await storage.getSetting("maintenance_mode");
+      res.json({ enabled: value === "true" });
+    } catch (error) {
+      console.error("Error getting maintenance mode:", error);
+      res.status(500).json({ message: "Failed to get maintenance mode" });
+    }
+  });
+
+  app.post("/api/settings/maintenance-mode", isAuthenticated, async (req: any, res) => {
+    try {
+      const sessionRole = req.session?.role;
+      if (sessionRole !== "admin") {
+        return res.status(403).json({ message: "Only admins can change maintenance mode" });
+      }
+      
+      const { enabled } = req.body;
+      await storage.setSetting("maintenance_mode", enabled ? "true" : "false");
+      res.json({ success: true, enabled });
+    } catch (error) {
+      console.error("Error setting maintenance mode:", error);
+      res.status(400).json({ message: "Failed to set maintenance mode" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });

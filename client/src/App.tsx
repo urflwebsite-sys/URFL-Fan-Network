@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -21,7 +21,8 @@ import SocialLinks from "@/pages/SocialLinks";
 import Changelogs from "@/pages/Changelogs";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 function ChristmasDecorations() {
   const snowflakes = useMemo(() => {
@@ -59,6 +60,24 @@ function ChristmasDecorations() {
 function MainContent() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { collapsed } = useSidebar();
+  const [location, setLocation] = useLocation();
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+
+  const { data: maintenanceStatus } = useQuery<{ enabled: boolean }>({
+    queryKey: ["/api/settings/maintenance-mode"],
+  });
+
+  useEffect(() => {
+    if (maintenanceStatus?.enabled) {
+      setMaintenanceMode(true);
+      // Redirect non-home pages to home when maintenance mode is on
+      if (location !== "/" && location !== "/login") {
+        setLocation("/");
+      }
+    } else {
+      setMaintenanceMode(false);
+    }
+  }, [maintenanceStatus, location, setLocation]);
 
   if (isLoading) {
     return (
@@ -71,7 +90,7 @@ function MainContent() {
     );
   }
 
-  const isAdmin = isAuthenticated && user?.role === "admin";
+  const isAdmin = isAuthenticated && (user as any)?.role === "admin";
 
   return (
     <div className="min-h-screen bg-background">
@@ -83,20 +102,24 @@ function MainContent() {
       }`}>
         <Switch>
           <Route path="/" component={Landing} />
-          <Route path="/login" component={Login} />
-          <Route path="/scores" component={LiveScores} />
-          <Route path="/game/:id" component={GameDetail} />
-          <Route path="/previous-weeks" component={PreviousWeeks} />
-          <Route path="/schedule" component={Schedule} />
-          <Route path="/playoffs" component={Playoffs} />
-          <Route path="/standings" component={Standings} />
-          <Route path="/news" component={News} />
-          <Route path="/news/:id" component={NewsDetail} />
-          <Route path="/pickems" component={Pickems} />
-          <Route path="/social" component={SocialLinks} />
-          <Route path="/changelogs" component={Changelogs} />
+          {!maintenanceMode && (
+            <>
+              <Route path="/login" component={Login} />
+              <Route path="/scores" component={LiveScores} />
+              <Route path="/game/:id" component={GameDetail} />
+              <Route path="/previous-weeks" component={PreviousWeeks} />
+              <Route path="/schedule" component={Schedule} />
+              <Route path="/playoffs" component={Playoffs} />
+              <Route path="/standings" component={Standings} />
+              <Route path="/news" component={News} />
+              <Route path="/news/:id" component={NewsDetail} />
+              <Route path="/pickems" component={Pickems} />
+              <Route path="/social" component={SocialLinks} />
+              <Route path="/changelogs" component={Changelogs} />
+            </>
+          )}
           {isAdmin && <Route path="/admin" component={AdminDashboard} />}
-          <Route component={NotFound} />
+          {!maintenanceMode && <Route component={NotFound} />}
         </Switch>
       </main>
     </div>

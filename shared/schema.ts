@@ -257,3 +257,19 @@ export const insertStreamRequestSchema = createInsertSchema(streamRequests).omit
 
 export type InsertStreamRequest = z.infer<typeof insertStreamRequestSchema>;
 export type StreamRequest = typeof streamRequests.$inferSelect;
+
+// Settings table (for maintenance mode and other app settings)
+export const settings = pgTable("settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  key: varchar("key", { length: 100 }).notNull().unique(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertSettingsSchema = createInsertSchema(settings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export type InsertSettings = z.infer<typeof insertSettingsSchema>;
+export type Settings = typeof settings.$inferSelect;

@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { GameCard } from "@/components/GameCard";
 import type { Game, News as NewsType } from "@shared/schema";
 import { useLocation, Link } from "wouter";
-import { ArrowRight, Trophy, Newspaper, Zap, Calendar, BarChart3, Target, Sparkles, Gift, Star, Snowflake } from "lucide-react";
+import { ArrowRight, Trophy, Newspaper, Zap, Calendar, BarChart3, Target, Sparkles, Gift, Star, Snowflake, Wrench } from "lucide-react";
 import { format } from "date-fns";
 
 export default function Landing() {
@@ -20,6 +20,10 @@ export default function Landing() {
     queryKey: ["/api/news"],
   });
 
+  const { data: maintenanceStatus } = useQuery<{ enabled: boolean }>({
+    queryKey: ["/api/settings/maintenance-mode"],
+  });
+
   const currentWeek = games && games.length > 0 ? games[0].week : 1;
   const featuredNews = news?.slice(0, 2) || [];
   const liveGames = games?.filter(g => g.isLive) || [];
@@ -27,6 +31,17 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen p-4 md:p-6 lg:p-8">
+      {maintenanceStatus?.enabled && (
+        <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+          <div className="flex items-center gap-3">
+            <Wrench className="w-5 h-5 text-yellow-600" />
+            <div>
+              <h3 className="font-semibold text-yellow-900">Website Under Maintenance</h3>
+              <p className="text-sm text-yellow-800">We're currently updating the website. Please check back soon!</p>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <div className="flex items-center gap-2">

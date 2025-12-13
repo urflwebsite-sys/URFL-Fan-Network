@@ -15,7 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Game, News as NewsType, Pickem, PickemRules, Changelog, InsertChangelog, StreamRequest, User } from "@shared/schema";
 import { format } from "date-fns";
-import { Plus, Trash2, Edit, Save } from "lucide-react";
+import { Plus, Trash2, Edit, Save, Wrench } from "lucide-react";
 import { TEAMS } from "@/lib/teams";
 
 const AVAILABLE_TEAMS = Object.keys(TEAMS);
@@ -25,7 +25,7 @@ export default function AdminDashboard() {
   const { user, isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && (!isAuthenticated || user?.role !== "admin")) {
+    if (!isLoading && (!isAuthenticated || (user as any)?.role !== "admin")) {
       toast({
         title: "Unauthorized",
         description: "Admin access only. Redirecting...",
@@ -36,9 +36,9 @@ export default function AdminDashboard() {
       }, 500);
       return;
     }
-  }, [isAuthenticated, user?.role, isLoading, toast]);
+  }, [isAuthenticated, (user as any)?.role, isLoading, toast]);
 
-  if (!isAuthenticated || user?.role !== "admin") {
+  if (!isAuthenticated || (user as any)?.role !== "admin") {
     return null;
   }
 
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
       </h1>
 
       <Tabs defaultValue="games" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-10">
           <TabsTrigger value="games" data-testid="tab-games">Games</TabsTrigger>
           <TabsTrigger value="scores" data-testid="tab-scores">Scores</TabsTrigger>
           <TabsTrigger value="news" data-testid="tab-news">News</TabsTrigger>
@@ -59,6 +59,7 @@ export default function AdminDashboard() {
           <TabsTrigger value="changelogs" data-testid="tab-changelogs">Changelogs</TabsTrigger>
           <TabsTrigger value="streams" data-testid="tab-streams">Streams</TabsTrigger>
           <TabsTrigger value="users" data-testid="tab-users">Users</TabsTrigger>
+          <TabsTrigger value="settings" data-testid="tab-settings">Settings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="games">
@@ -95,6 +96,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="users">
           <UsersManager />
+        </TabsContent>
+
+        <TabsContent value="settings">
+          <SettingsManager />
         </TabsContent>
       </Tabs>
     </div>
@@ -699,8 +704,8 @@ function NewsManager() {
       toast({ title: "Error", description: "Excerpt is required", variant: "destructive" });
       return;
     }
-    const authorId = user?.id || "anonymous";
-    createMutation.mutate({ title: formData.title, content: formData.excerpt, authorId });
+    const authorId = (user as any)?.id || "anonymous";
+    createMutation.mutate({ title: formData.title, content: formData.excerpt, excerpt: formData.excerpt, authorId });
   };
 
   return (
@@ -1204,7 +1209,7 @@ function BracketManager() {
   const { toast } = useToast();
   const [imageUrl, setImageUrl] = useState("");
 
-  const { data: bracketImage } = useQuery({
+  const { data: bracketImage } = useQuery<{ imageUrl?: string }>({
     queryKey: ["/api/bracket-image"],
   });
 
@@ -1598,6 +1603,82 @@ function UsersManager() {
           )}
         </div>
       </Card>
+    </div>
+  );
+}
+
+function SettingsManager() {
+  const { toast } = useToast();
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  
+  const { data: maintenanceStatus } = useQuery<{ enabled: boolean }>({
+    queryKey: ["/api/settings/maintenance-mode"],
+  });
+
+  const maintenanceMutation = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      await apiRequest("POST", "/api/settings/maintenance-mode", { enabled });
+    },
+    onSuccess: (_, enabled) => {
+      setMaintenanceMode(enabled);
+      toast({
+        title: "Success",
+        description: `Maintenance mode ${enabled ? "enabled" : "disabled"}`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/settings/maintenance-mode"] });
+    },
+    onError: (error: Error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => window.location.href = "/api/login", 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to update maintenance mode",
+        variant: "destructive",
+      });
+    },
+  });
+
+  useEffect(() => {
+    if (maintenanceStatus?.enabled !== undefined) {
+      setMaintenanceMode(maintenanceStatus.enabled);
+    }
+  }, [maintenanceStatus]);
+
+  return (
+    <div className="space-y-6">
+      <Card className="p-6">
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Wrench className="w-5 h-5 text-primary" />
+              <h2 className="text-2xl font-bold">Maintenance Mode</h2>
+            </div>
+            <p className="text-muted-foreground max-w-lg">
+              When enabled, users will only see the home page with a maintenance notification. All other pages will be locked. Admins can still access the admin panel.
+            </p>
+          </div>
+          <Switch
+            checked={maintenanceMode}
+            onCheckedChange={(checked) => maintenanceMutation.mutate(checked)}
+            disabled={maintenanceMutation.isPending}
+          />
+        </div>
+      </Card>
+
+      {maintenanceMode && (
+        <Card className="p-4 border-yellow-500/20 bg-yellow-500/5">
+          <p className="text-sm text-yellow-800">
+            ⚠️ Maintenance mode is currently <span className="font-semibold">ENABLED</span>. Users will see a maintenance message on the home page.
+          </p>
+        </Card>
+      )}
     </div>
   );
 }

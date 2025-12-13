@@ -11,6 +11,7 @@ import {
   predictions,
   bracketImages,
   streamRequests,
+  settings,
   type User,
   type UpsertUser,
   type Game,
@@ -35,6 +36,8 @@ import {
   type InsertBracketImage,
   type StreamRequest,
   type InsertStreamRequest,
+  type Settings,
+  type InsertSettings,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -98,6 +101,9 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUserWithPassword(username: string, password: string, role: string): Promise<User>;
   deleteUser(id: string): Promise<void>;
+  
+  getSetting(key: string): Promise<string | null>;
+  setSetting(key: string, value: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -397,6 +403,20 @@ export class DatabaseStorage implements IStorage {
 
   async deleteUser(id: string): Promise<void> {
     await db.delete(users).where(eq(users.id, id));
+  }
+
+  async getSetting(key: string): Promise<string | null> {
+    const [result] = await db.select().from(settings).where(eq(settings.key, key));
+    return result?.value || null;
+  }
+
+  async setSetting(key: string, value: string): Promise<void> {
+    const existing = await this.getSetting(key);
+    if (existing) {
+      await db.update(settings).set({ value, updatedAt: new Date() }).where(eq(settings.key, key));
+    } else {
+      await db.insert(settings).values({ key, value });
+    }
   }
 }
 
