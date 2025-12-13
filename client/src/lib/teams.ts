@@ -1,5 +1,5 @@
 export const TEAMS = {
-  "Roman Gladiators": "https://a.espncdn.com/i/teamlogos/nfl/500/nyj.png",
+  "Roman Gladiators": "/roman-gladiators-logo.webp",
   "Georgia Gators": "https://a.espncdn.com/i/teamlogos/college-football/500/30.png",
   "Alaska Ice Dragons": "https://a.espncdn.com/i/teamlogos/nfl/500/det.png",
   "Agartha Mammoths": "https://a.espncdn.com/i/teamlogos/nfl/500/nyg.png",
