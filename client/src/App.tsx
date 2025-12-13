@@ -67,17 +67,19 @@ function MainContent() {
     queryKey: ["/api/settings/maintenance-mode"],
   });
 
+  const isAdmin = isAuthenticated && (user as any)?.role === "admin";
+
   useEffect(() => {
     if (maintenanceStatus?.enabled) {
       setMaintenanceMode(true);
-      // Redirect non-home pages to home when maintenance mode is on
-      if (location !== "/" && location !== "/login") {
+      // Redirect non-home pages to home when maintenance mode is on (unless user is admin)
+      if (!isAdmin && location !== "/" && location !== "/login") {
         setLocation("/");
       }
     } else {
       setMaintenanceMode(false);
     }
-  }, [maintenanceStatus, location, setLocation]);
+  }, [maintenanceStatus, location, setLocation, isAdmin]);
 
   if (isLoading) {
     return (
@@ -90,7 +92,6 @@ function MainContent() {
     );
   }
 
-  const isAdmin = isAuthenticated && (user as any)?.role === "admin";
   const showSidebar = !maintenanceMode || isAdmin;
 
   return (
@@ -104,7 +105,7 @@ function MainContent() {
         <Switch>
           <Route path="/" component={Landing} />
           <Route path="/login" component={Login} />
-          {!maintenanceMode && (
+          {(!maintenanceMode || isAdmin) && (
             <>
               <Route path="/scores" component={LiveScores} />
               <Route path="/game/:id" component={GameDetail} />
@@ -120,7 +121,7 @@ function MainContent() {
             </>
           )}
           {isAdmin && <Route path="/admin" component={AdminDashboard} />}
-          {!maintenanceMode && <Route component={NotFound} />}
+          {(!maintenanceMode || isAdmin) && <Route component={NotFound} />}
         </Switch>
       </main>
     </div>
