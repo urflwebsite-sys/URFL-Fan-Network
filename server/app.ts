@@ -88,10 +88,13 @@ export default async function runApp(
       await rawSql`
         CREATE TABLE IF NOT EXISTS users (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          username VARCHAR(100) UNIQUE,
+          password VARCHAR(255),
           email VARCHAR UNIQUE,
           first_name VARCHAR,
           last_name VARCHAR,
           profile_image_url VARCHAR,
+          role VARCHAR(20) DEFAULT 'admin',
           created_at TIMESTAMP DEFAULT NOW(),
           updated_at TIMESTAMP DEFAULT NOW()
         )
@@ -111,6 +114,7 @@ export default async function runApp(
           location VARCHAR(200),
           is_final BOOLEAN DEFAULT false,
           is_live BOOLEAN DEFAULT false,
+          stream_link TEXT,
           created_at TIMESTAMP DEFAULT NOW(),
           updated_at TIMESTAMP DEFAULT NOW()
         )
@@ -194,6 +198,44 @@ export default async function runApp(
         // Column might already exist - that's fine, ignore silently
       }
       
+      // Add missing columns to users table
+      try {
+        await rawSql`
+          ALTER TABLE users ADD COLUMN username VARCHAR(100) UNIQUE
+        `;
+        console.log('Added username column to users table');
+      } catch (err: any) {
+        // Column might already exist - that's fine, ignore silently
+      }
+      
+      try {
+        await rawSql`
+          ALTER TABLE users ADD COLUMN password VARCHAR(255)
+        `;
+        console.log('Added password column to users table');
+      } catch (err: any) {
+        // Column might already exist - that's fine, ignore silently
+      }
+      
+      try {
+        await rawSql`
+          ALTER TABLE users ADD COLUMN role VARCHAR(20) DEFAULT 'admin'
+        `;
+        console.log('Added role column to users table');
+      } catch (err: any) {
+        // Column might already exist - that's fine, ignore silently
+      }
+      
+      // Add missing columns to games table
+      try {
+        await rawSql`
+          ALTER TABLE games ADD COLUMN stream_link TEXT
+        `;
+        console.log('Added stream_link column to games table');
+      } catch (err: any) {
+        // Column might already exist - that's fine, ignore silently
+      }
+      
       // Create playoff_matches table
       await rawSql`
         CREATE TABLE IF NOT EXISTS playoff_matches (
@@ -247,6 +289,19 @@ export default async function runApp(
         )
       `;
       
+      // Create stream_requests table
+      await rawSql`
+        CREATE TABLE IF NOT EXISTS stream_requests (
+          id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          game_id VARCHAR NOT NULL,
+          user_id VARCHAR NOT NULL,
+          stream_link TEXT,
+          status VARCHAR(20) DEFAULT 'pending',
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `;
+    
     console.log('Database schema initialized successfully');
   } catch (error: any) {
     // Tables may already exist - that's fine
