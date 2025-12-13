@@ -34,7 +34,7 @@ export default function Landing() {
 
   if (maintenanceStatus?.enabled && !isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 relative">
         <Card className="max-w-md w-full p-8 border-2 border-yellow-500/30 bg-yellow-500/5">
           <div className="flex flex-col items-center text-center space-y-4">
             <Wrench className="w-16 h-16 text-yellow-600" />
@@ -42,6 +42,15 @@ export default function Landing() {
             <p className="text-yellow-800">We're currently updating the website. Please check back soon!</p>
           </div>
         </Card>
+        
+        <div className="fixed bottom-4 right-4">
+          <Button 
+            onClick={() => setLocation("/login")}
+            className="shadow-lg"
+          >
+            Admin Login
+          </Button>
+        </div>
       </div>
     );
   }
