@@ -143,10 +143,7 @@ export class DatabaseStorage implements IStorage {
       .values(cleanData as UpsertUser)
       .onConflictDoUpdate({
         target: users.id,
-        set: {
-          ...cleanData,
-          updatedAt: new Date(),
-        },
+        set: cleanData,
       })
       .returning();
     return user;
@@ -189,7 +186,7 @@ export class DatabaseStorage implements IStorage {
     }
     const [game] = await db
       .update(games)
-      .set({ ...updateData, updatedAt: new Date() })
+      .set(updateData)
       .where(eq(games.id, id))
       .returning();
     return game;
@@ -263,7 +260,7 @@ export class DatabaseStorage implements IStorage {
     if (existing) {
       const [updated] = await db
         .update(pickemRules)
-        .set({ ...cleanData, updatedAt: new Date() })
+        .set(cleanData)
         .where(eq(pickemRules.id, existing.id))
         .returning();
       return updated;
@@ -293,7 +290,7 @@ export class DatabaseStorage implements IStorage {
     if (existing.length > 0) {
       const [updated] = await db
         .update(standings)
-        .set({ ...cleanData, updatedAt: new Date() })
+        .set(cleanData)
         .where(eq(standings.id, existing[0].id))
         .returning();
       return updated;
@@ -324,7 +321,7 @@ export class DatabaseStorage implements IStorage {
     const cleanData = cleanObject(matchData);
     const [match] = await db
       .update(playoffMatches)
-      .set({ ...cleanData, updatedAt: new Date() })
+      .set(cleanData)
       .where(eq(playoffMatches.id, id))
       .returning();
     return match;
@@ -367,7 +364,7 @@ export class DatabaseStorage implements IStorage {
     if (existing) {
       const [updated] = await db
         .update(bracketImages)
-        .set({ ...cleanData, updatedAt: new Date() })
+        .set(cleanData)
         .where(eq(bracketImages.id, existing.id))
         .returning();
       return updated;
@@ -397,7 +394,7 @@ export class DatabaseStorage implements IStorage {
     const cleanData = cleanObject(requestData);
     const [request] = await db
       .update(streamRequests)
-      .set({ ...cleanData, updatedAt: new Date() })
+      .set(cleanData)
       .where(eq(streamRequests.id, id))
       .returning();
     return request;
@@ -414,7 +411,7 @@ export class DatabaseStorage implements IStorage {
   async updateUserRole(id: string, role: string): Promise<User> {
     const [user] = await db
       .update(users)
-      .set(cleanObject({ role, updatedAt: new Date() }) as any)
+      .set(cleanObject({ role }) as any)
       .where(eq(users.id, id))
       .returning();
     return user;
@@ -449,7 +446,7 @@ export class DatabaseStorage implements IStorage {
   async setSetting(key: string, value: string): Promise<void> {
     const existing = await this.getSetting(key);
     if (existing) {
-      await db.update(settings).set(cleanObject({ value, updatedAt: new Date() }) as any).where(eq(settings.key, key));
+      await db.update(settings).set(cleanObject({ value }) as any).where(eq(settings.key, key));
     } else {
       await db.insert(settings).values(cleanObject({ key, value }) as any);
     }
