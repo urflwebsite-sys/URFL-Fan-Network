@@ -2,7 +2,7 @@ export const TEAMS = {
   "Roman Gladiators": "/roman-gladiators-logo.webp",
   "Georgia Gators": "/georgia-gators-logo.webp",
   "Alaska Ice Dragons": "/alaska-ice-dragons-logo.webp",
-  "Agartha Mammoths": "https://a.espncdn.com/i/teamlogos/nfl/500/nyg.png",
+  "Agartha Mammoths": "/agartha-mammoths-logo.webp",
   "Tampa Bay Buccaneers": "https://a.espncdn.com/i/teamlogos/nfl/500/tb.png",
   "Seattle Seahawks": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png",
   "San Francisco 49ers": "https://a.espncdn.com/i/teamlogos/nfl/500/sf.png",
