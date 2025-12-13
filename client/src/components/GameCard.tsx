@@ -70,23 +70,21 @@ export function GameCard({ game, onClick, showLights = true }: GameCardProps) {
 
         {game.streamLink && (
           <div className="pt-3 border-t">
-            <a 
-              href={game.streamLink} 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="w-full gap-2"
               onClick={(e) => {
                 e.stopPropagation();
-                e.preventDefault();
-                window.open(game.streamLink, '_blank');
+                const url = game.streamLink.startsWith('http://') || game.streamLink.startsWith('https://') 
+                  ? game.streamLink 
+                  : `https://${game.streamLink}`;
+                window.open(url, '_blank');
               }}
             >
-              <Button size="sm" variant="outline" className="w-full gap-2" asChild>
-                <span>
-                  <Video className="w-4 h-4" />
-                  Watch Stream
-                </span>
-              </Button>
-            </a>
+              <Video className="w-4 h-4" />
+              Watch Stream
+            </Button>
           </div>
         )}
       </div>
