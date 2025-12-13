@@ -106,25 +106,23 @@ export interface IStorage {
   setSetting(key: string, value: string): Promise<void>;
 }
 
-// Helper function to deeply clean undefined values from objects (recursive)
+// Helper function to convert undefined to null (postgres requires explicit null, not undefined)
 function cleanObject(obj: any): any {
-  if (obj === null || obj === undefined) {
-    return undefined;
+  if (obj === undefined) {
+    return null;
+  }
+  if (obj === null) {
+    return null;
   }
   
   if (Array.isArray(obj)) {
-    return obj
-      .map(item => cleanObject(item))
-      .filter(item => item !== undefined);
+    return obj.map(item => cleanObject(item));
   }
   
   if (typeof obj === 'object' && obj.constructor === Object) {
     const cleaned: Record<string, any> = {};
     for (const [key, value] of Object.entries(obj)) {
-      const cleanedValue = cleanObject(value);
-      if (cleanedValue !== undefined) {
-        cleaned[key] = cleanedValue;
-      }
+      cleaned[key] = cleanObject(value);
     }
     return cleaned;
   }
