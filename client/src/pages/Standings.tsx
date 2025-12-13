@@ -238,8 +238,7 @@ export default function Standings() {
     setDropZone(null);
   };
 
-  const getUsedTeams = standings.map(s => s.team);
-  const availableTeams = AVAILABLE_TEAMS.filter(t => !getUsedTeams.includes(t));
+  const availableTeams = AVAILABLE_TEAMS;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
