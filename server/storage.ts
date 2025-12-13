@@ -138,6 +138,22 @@ export class DatabaseStorage implements IStorage {
 
   async upsertUser(userData: UpsertUser): Promise<User> {
     const cleanData = cleanObject(userData);
+    
+    // If id is null/undefined, remove it so PostgreSQL uses the default gen_random_uuid()
+    if (cleanData.id === null || cleanData.id === undefined) {
+      delete cleanData.id;
+    }
+    
+    // If no id, just insert (let DB generate id)
+    if (!cleanData.id) {
+      const [user] = await db
+        .insert(users)
+        .values(cleanData as UpsertUser)
+        .returning();
+      return user;
+    }
+    
+    // With id, use upsert
     const [user] = await db
       .insert(users)
       .values(cleanData as UpsertUser)
