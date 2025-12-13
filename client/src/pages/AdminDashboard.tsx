@@ -46,23 +46,23 @@ const AVAILABLE_TEAMS = [
 
 export default function AdminDashboard() {
   const { toast } = useToast();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isLoading && (!isAuthenticated || user?.role !== "admin")) {
       toast({
         title: "Unauthorized",
-        description: "You are logged out. Redirecting to login...",
+        description: "Admin access only. Redirecting...",
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/login";
+        window.location.href = "/";
       }, 500);
       return;
     }
-  }, [isAuthenticated, isLoading, toast]);
+  }, [isAuthenticated, user?.role, isLoading, toast]);
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || user?.role !== "admin") {
     return null;
   }
 
@@ -1486,6 +1486,19 @@ function UsersManager() {
     },
   });
 
+  const deleteUserMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("DELETE", `/api/users/${id}`, undefined);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({ title: "Success", description: "User deleted successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message || "Failed to delete user", variant: "destructive" });
+    },
+  });
+
   const handleCreateUser = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newUsername.trim() || !newPassword.trim()) {
@@ -1593,6 +1606,15 @@ function UsersManager() {
                     >
                       {user.role || "admin"}
                     </Badge>
+                    
+                    <Button 
+                      size="icon"
+                      variant="destructive"
+                      onClick={() => deleteUserMutation.mutate(user.id)}
+                      disabled={deleteUserMutation.isPending}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               ))}

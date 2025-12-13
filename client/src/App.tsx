@@ -57,7 +57,7 @@ function ChristmasDecorations() {
 }
 
 function MainContent() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const { collapsed } = useSidebar();
 
   if (isLoading) {
@@ -70,6 +70,8 @@ function MainContent() {
       </div>
     );
   }
+
+  const isAdmin = isAuthenticated && user?.role === "admin";
 
   return (
     <div className="min-h-screen bg-background">
@@ -93,7 +95,7 @@ function MainContent() {
           <Route path="/pickems" component={Pickems} />
           <Route path="/social" component={SocialLinks} />
           <Route path="/changelogs" component={Changelogs} />
-          {isAuthenticated && <Route path="/admin" component={AdminDashboard} />}
+          {isAdmin && <Route path="/admin" component={AdminDashboard} />}
           <Route component={NotFound} />
         </Switch>
       </main>
