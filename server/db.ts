@@ -10,7 +10,12 @@ if (!process.env.DATABASE_URL) {
 
 // Use postgres-js driver for both dev and production
 // It works with both Neon and standard PostgreSQL connections
-const sql = postgres(process.env.DATABASE_URL);
+// CRITICAL: Transform undefined to null globally - postgres-js crashes on undefined values
+const sql = postgres(process.env.DATABASE_URL, {
+  transform: {
+    undefined: null,
+  },
+});
 
 export const db = drizzle({ client: sql, schema });
 export const rawSql = sql;
