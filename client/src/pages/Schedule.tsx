@@ -7,8 +7,12 @@ import { isFuture, isPast } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { Calendar, MapPin, AlertCircle } from "lucide-react";
 import { TEAMS } from "@/lib/teams";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 
 export default function Schedule() {
+  const preferences = useUserPreferences();
+  const showLogos = preferences.showTeamLogos !== false;
+  
   const { data: allGames, isLoading, error } = useQuery<Game[]>({
     queryKey: ["/api/games/all"],
   });
@@ -87,13 +91,13 @@ export default function Schedule() {
                           </div>
                           <div className="space-y-2">
                             <div className="flex items-center gap-3">
-                              {TEAMS[game.team2 as keyof typeof TEAMS] && (
+                              {showLogos && TEAMS[game.team2 as keyof typeof TEAMS] && (
                                 <img src={TEAMS[game.team2 as keyof typeof TEAMS]} alt={game.team2} className="w-8 h-8 object-contain" />
                               )}
                               <p className="font-semibold text-lg" data-testid={`text-matchup-${game.id}`}>
                                 {game.team2} vs {game.team1}
                               </p>
-                              {TEAMS[game.team1 as keyof typeof TEAMS] && (
+                              {showLogos && TEAMS[game.team1 as keyof typeof TEAMS] && (
                                 <img src={TEAMS[game.team1 as keyof typeof TEAMS]} alt={game.team1} className="w-8 h-8 object-contain" />
                               )}
                             </div>

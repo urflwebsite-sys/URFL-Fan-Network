@@ -28,18 +28,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useNotifications } from "@/hooks/useNotifications";
 
-function ChristmasDecorations() {
-  const preferences = useUserPreferences();
-  const particlePercentage = preferences.particleEffects ?? 100;
-  const reduceAnimations = preferences.reduceAnimations ?? false;
-  
-  // Don't render snowflakes if animations are reduced
-  if (reduceAnimations) {
-    return null;
-  }
-  
+function ChristmasDecorations({ particleEffects = 100, reduceAnimations = false }: { particleEffects?: number; reduceAnimations?: boolean }) {
   const snowflakes = useMemo(() => {
-    const count = Math.round((25 * particlePercentage) / 100);
+    // If reduce animations is on, don't create any snowflakes
+    if (reduceAnimations) {
+      return [];
+    }
+    
+    const count = Math.round((25 * particleEffects) / 100);
     return Array.from({ length: count }).map((_, i) => ({
       id: i,
       left: Math.random() * 100,
@@ -48,7 +44,7 @@ function ChristmasDecorations() {
       delay: Math.random() * 15,
       opacity: Math.random() * 0.3 + 0.2,
     }));
-  }, [particlePercentage]);
+  }, [particleEffects, reduceAnimations]);
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-[1]">
@@ -112,7 +108,7 @@ function MainContent() {
 
   return (
     <div className={`min-h-screen bg-background ${preferences.reduceAnimations ? 'reduce-motion' : ''}`}>
-      <ChristmasDecorations />
+      <ChristmasDecorations particleEffects={preferences.particleEffects} reduceAnimations={preferences.reduceAnimations} />
       {showSidebar && <Sidebar />}
       
       <main className={`min-h-screen pb-20 md:pb-0 ${preferences.reduceAnimations ? '' : 'transition-all duration-300'} ${
