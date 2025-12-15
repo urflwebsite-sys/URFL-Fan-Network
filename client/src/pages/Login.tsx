@@ -11,29 +11,57 @@ import { AlertCircle } from "lucide-react";
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const [isSignup, setIsSignup] = useState(false);
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+      if (isSignup) {
+        // Sign up
+        if (password !== confirmPassword) {
+          setError("Passwords do not match");
+          setIsLoading(false);
+          return;
+        }
 
-      if (response.ok) {
-        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-        toast({ title: "Success", description: "Logged in successfully" });
-        setTimeout(() => setLocation("/admin"), 100);
+        const response = await fetch("/api/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password }),
+        });
+
+        if (response.ok) {
+          queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+          toast({ title: "Success", description: "Account created successfully!" });
+          setTimeout(() => setLocation("/"), 100);
+        } else {
+          const data = await response.json();
+          setError(data.message || "Failed to create account");
+        }
       } else {
-        setError("Invalid username or password");
+        // Login
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+
+        if (response.ok) {
+          queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+          toast({ title: "Success", description: "Logged in successfully" });
+          setTimeout(() => setLocation("/admin"), 100);
+        } else {
+          setError("Invalid username or password");
+        }
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -46,8 +74,10 @@ export default function Login() {
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <Card className="w-full max-w-md p-8">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-black mb-2">BFFL Admin</h1>
-          <p className="text-muted-foreground">Sign in to manage content</p>
+          <h1 className="text-3xl font-black mb-2">URFL Fan Hub</h1>
+          <p className="text-muted-foreground">
+            {isSignup ? "Create your account" : "Sign in to your account"}
+          </p>
         </div>
 
         {error && (
@@ -57,7 +87,7 @@ export default function Login() {
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
             <Input
@@ -68,8 +98,25 @@ export default function Login() {
               placeholder="Enter username"
               data-testid="input-username"
               disabled={isLoading}
+              required
             />
           </div>
+
+          {isSignup && (
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter email"
+                data-testid="input-email"
+                disabled={isLoading}
+                required
+              />
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
@@ -81,18 +128,55 @@ export default function Login() {
               placeholder="Enter password"
               data-testid="input-password"
               disabled={isLoading}
+              required
             />
           </div>
+
+          {isSignup && (
+            <div className="space-y-2">
+              <Label htmlFor="confirm-password">Confirm Password</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm password"
+                data-testid="input-confirm-password"
+                disabled={isLoading}
+                required
+              />
+            </div>
+          )}
 
           <Button
             type="submit"
             className="w-full"
             disabled={isLoading}
-            data-testid="button-login"
+            data-testid={isSignup ? "button-signup" : "button-login"}
           >
-            {isLoading ? "Signing in..." : "Sign in"}
+            {isLoading ? (isSignup ? "Creating account..." : "Signing in...") : (isSignup ? "Create account" : "Sign in")}
           </Button>
         </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-sm text-muted-foreground">
+            {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
+            <button
+              onClick={() => {
+                setIsSignup(!isSignup);
+                setError("");
+                setUsername("");
+                setEmail("");
+                setPassword("");
+                setConfirmPassword("");
+              }}
+              className="text-primary hover:underline font-medium"
+              disabled={isLoading}
+            >
+              {isSignup ? "Sign in" : "Sign up"}
+            </button>
+          </p>
+        </div>
       </Card>
     </div>
   );
