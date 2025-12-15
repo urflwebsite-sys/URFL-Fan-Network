@@ -214,8 +214,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/standings", isAuthenticated, async (req, res) => {
+  app.post("/api/standings", isAuthenticated, async (req: any, res) => {
     try {
+      const role = req.session?.role;
+      if (role !== "admin") {
+        return res.status(403).json({ message: "Only admins can update standings" });
+      }
+      
       const standingData = insertStandingsSchema.parse(req.body);
       const standing = await storage.upsertStandings(standingData);
       res.json(standing);
@@ -225,8 +230,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/standings/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/standings/:id", isAuthenticated, async (req: any, res) => {
     try {
+      const role = req.session?.role;
+      if (role !== "admin") {
+        return res.status(403).json({ message: "Only admins can delete standings" });
+      }
+      
       await storage.deleteStandings(req.params.id);
       res.json({ success: true });
     } catch (error) {
