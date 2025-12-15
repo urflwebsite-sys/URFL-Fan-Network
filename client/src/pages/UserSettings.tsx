@@ -131,12 +131,12 @@ export default function UserSettings() {
           </div>
           <div>
             <Label htmlFor="team-select" className="mb-2 block">Select Your Favorite Team</Label>
-            <Select value={favoriteTeam} onValueChange={setFavoriteTeam}>
+            <Select value={favoriteTeam || "none"} onValueChange={(val) => setFavoriteTeam(val === "none" ? "" : val)}>
               <SelectTrigger id="team-select">
                 <SelectValue placeholder="Select a team" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">None</SelectItem>
+                <SelectItem value="none">None</SelectItem>
                 {AVAILABLE_TEAMS.map((team) => (
                   <SelectItem key={team} value={team}>
                     <div className="flex items-center gap-2">
