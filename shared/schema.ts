@@ -292,3 +292,29 @@ export const insertPartnersSchema = createInsertSchema(partners).omit({
 
 export type InsertPartners = z.infer<typeof insertPartnersSchema>;
 export type Partner = typeof partners.$inferSelect;
+
+// User Preferences table
+export const userPreferences = pgTable("user_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().unique(),
+  particleEffects: integer("particle_effects").default(100), // 0-100
+  darkMode: boolean("dark_mode").default(false),
+  compactLayout: boolean("compact_layout").default(false),
+  showTeamLogos: boolean("show_team_logos").default(true),
+  reduceAnimations: boolean("reduce_animations").default(false),
+  favoriteTeam: varchar("favorite_team", { length: 100 }),
+  notifyGameLive: boolean("notify_game_live").default(true),
+  notifyGameFinal: boolean("notify_game_final").default(true),
+  notifyNews: boolean("notify_news").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertUserPreferencesSchema = createInsertSchema(userPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
+export type UserPreference = typeof userPreferences.$inferSelect;

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { 
   Home, Zap, Calendar, Trophy, BarChart3, Newspaper, Target, 
-  Users, BookOpen, Shield, Moon, Sun, LogOut, LogIn,
+  Users, BookOpen, Shield, Moon, Sun, LogOut, LogIn, Settings,
   Snowflake, ChevronLeft, ChevronRight, Star
 } from "lucide-react";
 import { createContext, useContext, useState, ReactNode } from "react";
@@ -50,6 +50,7 @@ export function Sidebar() {
     { path: "/pickems", label: "Pick'ems", icon: Target },
     { path: "/partners", label: "Partners", icon: Users },
     { path: "/social", label: "Social", icon: Users },
+    { path: "/settings", label: "Settings", icon: Settings },
     { path: "/changelogs", label: "Updates", icon: BookOpen },
   ];
 

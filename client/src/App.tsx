@@ -17,6 +17,7 @@ import News from "@/pages/News";
 import NewsDetail from "@/pages/NewsDetail";
 import Pickems from "@/pages/Pickems";
 import Partners from "@/pages/Partners";
+import UserSettings from "@/pages/UserSettings";
 import AdminDashboard from "@/pages/AdminDashboard";
 import SocialLinks from "@/pages/SocialLinks";
 import Changelogs from "@/pages/Changelogs";
@@ -118,6 +119,7 @@ function MainContent() {
               <Route path="/news/:id" component={NewsDetail} />
               <Route path="/pickems" component={Pickems} />
               <Route path="/partners" component={Partners} />
+              <Route path="/settings" component={UserSettings} />
               <Route path="/social" component={SocialLinks} />
               <Route path="/changelogs" component={Changelogs} />
             </>

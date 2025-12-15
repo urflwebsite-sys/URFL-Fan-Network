@@ -649,6 +649,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User Preferences endpoints
+  app.get("/api/user/preferences", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "User not identified" });
+      }
+      const prefs = await storage.getUserPreferences(userId);
+      res.json(prefs || {});
+    } catch (error) {
+      console.error("Error fetching user preferences:", error);
+      res.status(500).json({ message: "Failed to fetch preferences" });
+    }
+  });
+
+  app.post("/api/user/preferences", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "User not identified" });
+      }
+      const prefs = await storage.updateUserPreferences(userId, req.body);
+      res.json(prefs);
+    } catch (error) {
+      console.error("Error updating user preferences:", error);
+      res.status(400).json({ message: "Failed to update preferences" });
+    }
+  });
+
   // Partners endpoints
   app.get("/api/partners", async (req, res) => {
     try {

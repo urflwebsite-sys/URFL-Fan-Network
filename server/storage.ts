@@ -13,6 +13,7 @@ import {
   streamRequests,
   settings,
   partners,
+  userPreferences,
   type User,
   type UpsertUser,
   type Game,
@@ -41,6 +42,8 @@ import {
   type InsertSettings,
   type Partner,
   type InsertPartners,
+  type UserPreference,
+  type InsertUserPreferences,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -112,6 +115,9 @@ export interface IStorage {
   createPartner(partner: InsertPartners): Promise<Partner>;
   updatePartner(id: string, partner: Partial<Partner>): Promise<Partner>;
   deletePartner(id: string): Promise<void>;
+
+  getUserPreferences(userId: string): Promise<UserPreference | undefined>;
+  updateUserPreferences(userId: string, prefs: InsertUserPreferences): Promise<UserPreference>;
 }
 
 // Helper function to convert undefined to null (postgres requires explicit null, not undefined)
@@ -497,6 +503,28 @@ export class DatabaseStorage implements IStorage {
 
   async deletePartner(id: string): Promise<void> {
     await db.delete(partners).where(eq(partners.id, id));
+  }
+
+  async getUserPreferences(userId: string): Promise<UserPreference | undefined> {
+    const [prefs] = await db.select().from(userPreferences).where(eq(userPreferences.userId, userId));
+    return prefs;
+  }
+
+  async updateUserPreferences(userId: string, prefsData: InsertUserPreferences): Promise<UserPreference> {
+    const cleanData = cleanObject(prefsData);
+    const existing = await this.getUserPreferences(userId);
+    
+    if (existing) {
+      const [updated] = await db
+        .update(userPreferences)
+        .set(cleanData)
+        .where(eq(userPreferences.userId, userId))
+        .returning();
+      return updated;
+    }
+    
+    const [created] = await db.insert(userPreferences).values({ userId, ...cleanData } as InsertUserPreferences).returning();
+    return created;
   }
 }
 
