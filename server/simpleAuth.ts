@@ -1,6 +1,7 @@
 import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import connectPg from "connect-pg-simple";
+import bcrypt from "bcrypt";
 import { storage } from "./storage";
 
 interface AdminCredentials {
@@ -95,17 +96,61 @@ export async function setupAuth(app: Express) {
     }
     
     const dbUser = await storage.getUserByUsername(username);
-    if (dbUser && dbUser.password === password) {
-      (req.session as any).authenticated = true;
-      (req.session as any).userId = dbUser.id;
-      (req.session as any).username = dbUser.username;
-      (req.session as any).role = dbUser.role || "streamer";
-      
-      res.json({ success: true });
-      return;
+    if (dbUser && dbUser.password) {
+      const passwordMatch = await bcrypt.compare(password, dbUser.password);
+      if (passwordMatch) {
+        (req.session as any).authenticated = true;
+        (req.session as any).userId = dbUser.id;
+        (req.session as any).username = dbUser.username;
+        (req.session as any).role = dbUser.role || "guest";
+        
+        res.json({ success: true });
+        return;
+      }
     }
     
     res.status(401).json({ message: "Invalid credentials" });
+  });
+
+  app.post("/api/signup", async (req, res) => {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "Username, email, and password are required" });
+    }
+
+    if (username.length < 3) {
+      return res.status(400).json({ message: "Username must be at least 3 characters" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
+    }
+
+    const existingUser = await storage.getUserByUsername(username);
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already taken" });
+    }
+
+    const existingEmail = await storage.getUserByEmail(email);
+    if (existingEmail) {
+      return res.status(400).json({ message: "Email already registered" });
+    }
+
+    try {
+      const hashedPassword = await bcrypt.hash(password, 12);
+      const user = await storage.createUserWithPassword(username, email, hashedPassword, "guest");
+      
+      (req.session as any).authenticated = true;
+      (req.session as any).userId = user.id;
+      (req.session as any).username = user.username;
+      (req.session as any).role = "guest";
+
+      res.json({ success: true, user: { id: user.id, username: user.username, role: user.role } });
+    } catch (error) {
+      console.error("Signup error:", error);
+      res.status(500).json({ message: "Failed to create account" });
+    }
   });
 
   app.get("/api/logout", (req, res) => {
