@@ -215,41 +215,31 @@ export function Sidebar() {
 
 function MobileNav({ navItems, isAuthenticated }: { navItems: Array<{ path: string; label: string; icon: any }>; isAuthenticated: boolean }) {
   const [location] = useLocation();
-  const mainItems = navItems.slice(0, 5);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-secondary/95 backdrop-blur-lg border-t border-white/10 z-50 md:hidden safe-area-bottom">
-      <div className="flex justify-around items-center h-16 px-2">
-        {mainItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location === item.path;
-          return (
-            <Link key={item.path} href={item.path}>
-              <button
-                className={`flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all ${
-                  isActive 
-                    ? 'bg-primary text-primary-foreground shadow-lg' 
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="text-[10px] mt-1 font-medium">{item.label.split(' ')[0]}</span>
-              </button>
-            </Link>
-          );
-        })}
-        <Link href="/news">
-          <button
-            className={`flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all ${
-              location === '/news'
-                ? 'bg-primary text-primary-foreground shadow-lg' 
-                : 'text-white/70 hover:text-white hover:bg-white/10'
-            }`}
-          >
-            <Newspaper className="w-5 h-5" />
-            <span className="text-[10px] mt-1 font-medium">News</span>
-          </button>
-        </Link>
+      <div className="overflow-x-auto scrollbar-hide">
+        <div className="flex items-center h-16 px-2 gap-1 min-w-min">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location === item.path;
+            return (
+              <Link key={item.path} href={item.path}>
+                <button
+                  className={`flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all flex-shrink-0 ${
+                    isActive 
+                      ? 'bg-primary text-primary-foreground shadow-lg' 
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                  title={item.label}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-[10px] mt-1 font-medium">{item.label.split(' ')[0]}</span>
+                </button>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );
