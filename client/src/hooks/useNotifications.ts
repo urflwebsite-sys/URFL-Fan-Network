@@ -7,9 +7,10 @@ export function useNotifications() {
   const preferences = useUserPreferences();
   const { toast } = useToast();
   const lastCheckRef = useRef<{
-    gameIds: Set<string>;
+    liveGames: Set<string>;
+    finalGames: Set<string>;
     newsIds: Set<string>;
-  }>({ gameIds: new Set(), newsIds: new Set() });
+  }>({ liveGames: new Set(), finalGames: new Set(), newsIds: new Set() });
 
   // Fetch games for live/final notifications
   const { data: games = [] } = useQuery({
@@ -24,34 +25,38 @@ export function useNotifications() {
   });
 
   useEffect(() => {
-    if (!games.length) return;
+    if (!games.length || !preferences.notifyGameLive && !preferences.notifyGameFinal) return;
 
     games.forEach((game: any) => {
+      const isFinal = game.isFinal || game.quarter === "FINAL";
+      const isLive = game.isLive || (game.quarter && game.quarter !== "Scheduled" && game.quarter !== "FINAL");
+
       // Notify when game goes live
-      if (preferences.notifyGameLive && game.isLive && !lastCheckRef.current.gameIds.has(game.id)) {
+      if (preferences.notifyGameLive && isLive && !lastCheckRef.current.liveGames.has(game.id)) {
         toast({
           title: "Game Live!",
           description: `${game.team1} vs ${game.team2} is now live!`,
         });
-        lastCheckRef.current.gameIds.add(game.id);
+        lastCheckRef.current.liveGames.add(game.id);
       }
 
       // Notify when game goes final
-      if (preferences.notifyGameFinal && game.isFinal && !lastCheckRef.current.gameIds.has(`final-${game.id}`)) {
+      if (preferences.notifyGameFinal && isFinal && !lastCheckRef.current.finalGames.has(game.id)) {
+        const score = `${game.team1} ${game.team1Score} - ${game.team2} ${game.team2Score}`;
         toast({
           title: "Game Final",
-          description: `${game.team1} ${game.team1Score} - ${game.team2} ${game.team2Score}`,
+          description: score,
         });
-        lastCheckRef.current.gameIds.add(`final-${game.id}`);
+        lastCheckRef.current.finalGames.add(game.id);
       }
     });
   }, [games, preferences.notifyGameLive, preferences.notifyGameFinal, toast]);
 
   useEffect(() => {
-    if (!news.length) return;
+    if (!news.length || !preferences.notifyNews) return;
 
     news.forEach((item: any) => {
-      if (preferences.notifyNews && !lastCheckRef.current.newsIds.has(item.id)) {
+      if (!lastCheckRef.current.newsIds.has(item.id)) {
         toast({
           title: "Breaking News",
           description: item.title,
