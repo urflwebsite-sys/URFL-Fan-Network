@@ -81,8 +81,9 @@ export default function Standings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/standings"] });
     },
-    onError: () => {
-      toast({ title: "Error", description: "Failed to save standing", variant: "destructive" });
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || "Failed to save standing";
+      toast({ title: "Error", description: errorMessage, variant: "destructive" });
     },
   });
 
@@ -93,8 +94,9 @@ export default function Standings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/standings"] });
     },
-    onError: () => {
-      toast({ title: "Error", description: "Failed to delete standing", variant: "destructive" });
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || "Failed to delete standing";
+      toast({ title: "Error", description: errorMessage, variant: "destructive" });
     },
   });
 
