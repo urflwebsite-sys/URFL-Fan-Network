@@ -9,8 +9,9 @@ export function useNotifications() {
   const lastCheckRef = useRef<{
     liveGames: Set<string>;
     finalGames: Set<string>;
+    gameStates: Map<string, { isLive: boolean; isFinal: boolean }>;
     newsIds: Set<string>;
-  }>({ liveGames: new Set(), finalGames: new Set(), newsIds: new Set() });
+  }>({ liveGames: new Set(), finalGames: new Set(), gameStates: new Map(), newsIds: new Set() });
 
   // Fetch games for live/final notifications
   const { data: games = [] } = useQuery({
@@ -31,7 +32,7 @@ export function useNotifications() {
       const quarter = game.quarter || "";
       const quarterUpper = quarter.toUpperCase();
       
-      // Check if game is final - look for FINAL keyword
+      // Check if game is final
       const isFinal = game.isFinal || quarterUpper.includes("FINAL") || quarterUpper === "FINAL";
       
       // Check if game is live - has a quarter (1st, 2nd, 3rd, 4th) but NOT final
@@ -41,10 +42,12 @@ export function useNotifications() {
         (quarter.includes("1st") || quarter.includes("2nd") || quarter.includes("3rd") || quarter.includes("4th"))
       );
 
-      console.log(`[Notification Check] Game: ${game.team1} vs ${game.team2}, Quarter: "${quarter}", isFinal: ${isFinal}, isLive: ${isLive}, notifyFinal: ${preferences.notifyGameFinal}, notifyLive: ${preferences.notifyGameLive}`);
+      const previousState = lastCheckRef.current.gameStates.get(game.id) || { isLive: false, isFinal: false };
+      
+      console.log(`[Notification Check] Game: ${game.team1} vs ${game.team2}, Quarter: "${quarter}", isFinal: ${isFinal}, isLive: ${isLive}, Previous: isFinal=${previousState.isFinal}, isLive=${previousState.isLive}`);
 
-      // Notify when game goes final - CHECK THIS FIRST before live
-      if (preferences.notifyGameFinal && isFinal && !lastCheckRef.current.finalGames.has(game.id)) {
+      // Notify when game BECOMES final (transition from not final to final)
+      if (preferences.notifyGameFinal && isFinal && !previousState.isFinal) {
         console.log(`[FINAL NOTIFICATION] Sending for ${game.team1} vs ${game.team2}`);
         const score = `${game.team1} ${game.team1Score} - ${game.team2} ${game.team2Score}`;
         toast({
@@ -54,8 +57,8 @@ export function useNotifications() {
         lastCheckRef.current.finalGames.add(game.id);
       }
 
-      // Notify when game goes live
-      if (preferences.notifyGameLive && isLive && !lastCheckRef.current.liveGames.has(game.id)) {
+      // Notify when game BECOMES live (transition from not live to live)
+      if (preferences.notifyGameLive && isLive && !previousState.isLive) {
         console.log(`[LIVE NOTIFICATION] Sending for ${game.team1} vs ${game.team2}`);
         toast({
           title: "Game Live!",
@@ -63,6 +66,9 @@ export function useNotifications() {
         });
         lastCheckRef.current.liveGames.add(game.id);
       }
+
+      // Update the previous state for next check
+      lastCheckRef.current.gameStates.set(game.id, { isLive, isFinal });
     });
   }, [games, preferences.notifyGameLive, preferences.notifyGameFinal, toast]);
 

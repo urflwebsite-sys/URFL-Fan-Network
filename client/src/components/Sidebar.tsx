@@ -152,22 +152,6 @@ export function Sidebar() {
         </div>
 
         <div className="relative p-3 border-t border-white/10 space-y-2">
-          <Button
-            variant="ghost"
-            onClick={toggleTheme}
-            className={`w-full text-white/80 hover:text-white hover:bg-white/10 ${
-              collapsed ? 'justify-center px-2' : 'justify-start px-3'
-            }`}
-            title={collapsed ? (isDark ? 'Light Mode' : 'Dark Mode') : undefined}
-          >
-            {isDark ? (
-              <Sun className={`w-5 h-5 ${collapsed ? '' : 'mr-3'} text-accent`} />
-            ) : (
-              <Moon className={`w-5 h-5 ${collapsed ? '' : 'mr-3'}`} />
-            )}
-            {!collapsed && <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>}
-          </Button>
-
           {isAuthenticated ? (
             <a href="/api/logout">
               <Button
