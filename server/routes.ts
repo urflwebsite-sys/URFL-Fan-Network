@@ -218,7 +218,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const role = req.session?.role;
       if (role !== "admin") {
-        return res.status(403).json({ message: "Only admins can update standings" });
+        return res.status(403).json({ message: "Failed to save standings. You do not have the proper roles to edit the standings." });
       }
       
       const standingData = insertStandingsSchema.parse(req.body);
@@ -226,7 +226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(standing);
     } catch (error) {
       console.error("Error upserting standing:", error);
-      res.status(400).json({ message: "Failed to save standing" });
+      res.status(400).json({ message: "Failed to save standings. You do not have the proper roles to edit the standings." });
     }
   });
 
@@ -234,14 +234,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const role = req.session?.role;
       if (role !== "admin") {
-        return res.status(403).json({ message: "Only admins can delete standings" });
+        return res.status(403).json({ message: "Failed to save standings. You do not have the proper roles to edit the standings." });
       }
       
       await storage.deleteStandings(req.params.id);
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting standing:", error);
-      res.status(400).json({ message: "Failed to delete standing" });
+      res.status(400).json({ message: "Failed to save standings. You do not have the proper roles to edit the standings." });
     }
   });
 
