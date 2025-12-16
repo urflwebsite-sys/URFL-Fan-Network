@@ -311,6 +311,37 @@ export default async function runApp(
           updated_at TIMESTAMP DEFAULT NOW()
         )
       `;
+      
+      // Create partners table
+      await rawSql`
+        CREATE TABLE IF NOT EXISTS partners (
+          id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          name VARCHAR(200) NOT NULL,
+          quote TEXT NOT NULL,
+          image_url TEXT,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `;
+      
+      // Create user_preferences table
+      await rawSql`
+        CREATE TABLE IF NOT EXISTS user_preferences (
+          id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id VARCHAR NOT NULL UNIQUE,
+          particle_effects INTEGER DEFAULT 100,
+          dark_mode BOOLEAN DEFAULT false,
+          compact_layout BOOLEAN DEFAULT false,
+          show_team_logos BOOLEAN DEFAULT true,
+          reduce_animations BOOLEAN DEFAULT false,
+          favorite_team VARCHAR(100),
+          notify_game_live BOOLEAN DEFAULT true,
+          notify_game_final BOOLEAN DEFAULT true,
+          notify_news BOOLEAN DEFAULT true,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `;
     
     console.log('Database schema initialized successfully');
   } catch (error: any) {
