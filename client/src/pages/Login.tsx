@@ -58,7 +58,7 @@ export default function Login() {
         if (response.ok) {
           queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
           toast({ title: "Success", description: "Logged in successfully" });
-          setTimeout(() => setLocation("/admin"), 100);
+          setTimeout(() => setLocation("/"), 100);
         } else {
           setError("Invalid username or password");
         }
