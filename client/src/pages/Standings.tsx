@@ -37,8 +37,9 @@ const CONFERENCES = [
 ];
 
 export default function Standings() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
+  const isAdmin = isAuthenticated && (user as any)?.role === "admin";
   const [standings, setStandings] = useState<StandingsEntry[]>([]);
   const [newTeam, setNewTeam] = useState("");
   const [newDivision, setNewDivision] = useState<"AFC_D1" | "AFC_D2" | "NFC_D1" | "NFC_D2">("AFC_D1");
@@ -101,7 +102,7 @@ export default function Standings() {
   });
 
   const addTeam = () => {
-    if (!isAuthenticated || !newTeam.trim()) return;
+    if (!isAdmin || !newTeam.trim()) return;
     const divisionTeams = standings.filter(s => s.division === newDivision);
     const maxOrder = divisionTeams.length > 0 
       ? Math.max(...divisionTeams.map(s => s.manualOrder ?? -1)) 
@@ -122,7 +123,7 @@ export default function Standings() {
   };
 
   const updateEntry = (id: string, field: string, value: any) => {
-    if (!isAuthenticated) return;
+    if (!isAdmin) return;
     const updated = standings.map((entry) =>
       entry.id === id ? { ...entry, [field]: value } : entry
     );
@@ -134,7 +135,7 @@ export default function Standings() {
   };
 
   const deleteEntry = (id: string) => {
-    if (!isAuthenticated) return;
+    if (!isAdmin) return;
     setStandings(standings.filter((entry) => entry.id !== id));
     deleteMutation.mutate(id);
   };
@@ -250,7 +251,7 @@ export default function Standings() {
         </h1>
         <p className="text-muted-foreground text-lg">URFL Season 1 Standings</p>
       </div>
-      {isAuthenticated && (
+      {isAdmin && (
         <Card className="p-6 mb-8">
           <h2 className="text-xl font-bold mb-4">Add Team</h2>
           <div className="space-y-4">
@@ -324,7 +325,7 @@ export default function Standings() {
                           <th className="px-6 py-3 text-center text-sm font-semibold">Wins</th>
                           <th className="px-6 py-3 text-center text-sm font-semibold">Losses</th>
                           <th className="px-6 py-3 text-center text-sm font-semibold">PD</th>
-                          {isAuthenticated && <th className="px-6 py-3 text-center text-sm font-semibold">Actions</th>}
+                          {isAdmin && <th className="px-6 py-3 text-center text-sm font-semibold">Actions</th>}
                         </tr>
                       </thead>
                       <tbody className="divide-y">
@@ -351,7 +352,7 @@ export default function Standings() {
                               />
                             )}
                             <td className="px-2 py-4 text-center">
-                              {isAuthenticated && (
+                              {isAdmin && (
                                 <div 
                                   draggable
                                   onDragStart={(e) => handleDragStart(e, entry.id)}
@@ -373,7 +374,7 @@ export default function Standings() {
                               </div>
                             </td>
                             <td className="px-6 py-4 text-sm">
-                              {isAuthenticated ? (
+                              {isAdmin ? (
                                 <Input
                                   type="number"
                                   min="0"
@@ -389,7 +390,7 @@ export default function Standings() {
                               )}
                             </td>
                             <td className="px-6 py-4 text-sm">
-                              {isAuthenticated ? (
+                              {isAdmin ? (
                                 <Input
                                   type="number"
                                   min="0"
@@ -405,7 +406,7 @@ export default function Standings() {
                               )}
                             </td>
                             <td className="px-6 py-4 text-sm">
-                              {isAuthenticated ? (
+                              {isAdmin ? (
                                 <Input
                                   type="text"
                                   inputMode="numeric"
@@ -428,7 +429,7 @@ export default function Standings() {
                                 <div className="text-center">{entry.pointDifferential || 0}</div>
                               )}
                             </td>
-                            {isAuthenticated && (
+                            {isAdmin && (
                               <td className="px-6 py-4 text-sm text-center">
                                 <Button
                                   variant="ghost"
