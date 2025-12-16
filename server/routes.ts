@@ -649,6 +649,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Breaking news endpoints
+  app.get("/api/settings/breaking-news", async (req, res) => {
+    try {
+      const message = await storage.getSetting("breaking_news_message");
+      const expiresAt = await storage.getSetting("breaking_news_expires_at");
+      const active = await storage.getSetting("breaking_news_active");
+      
+      let isActive = active === "true";
+      if (expiresAt && isActive) {
+        const expiryTime = new Date(expiresAt).getTime();
+        if (Date.now() > expiryTime) {
+          isActive = false;
+          await storage.setSetting("breaking_news_active", "false");
+        }
+      }
+      
+      res.json({ 
+        message: message || "",
+        active: isActive,
+        expiresAt: expiresAt || null
+      });
+    } catch (error) {
+      console.error("Error getting breaking news:", error);
+      res.status(500).json({ message: "Failed to get breaking news" });
+    }
+  });
+
+  app.post("/api/settings/breaking-news", isAuthenticated, async (req: any, res) => {
+    try {
+      const sessionRole = req.session?.role;
+      if (sessionRole !== "admin") {
+        return res.status(403).json({ message: "Only admins can set breaking news" });
+      }
+      
+      const { message, active, durationMinutes } = req.body;
+      
+      await storage.setSetting("breaking_news_message", message || "");
+      await storage.setSetting("breaking_news_active", active ? "true" : "false");
+      
+      if (active && durationMinutes && durationMinutes > 0) {
+        const expiresAt = new Date(Date.now() + durationMinutes * 60 * 1000).toISOString();
+        await storage.setSetting("breaking_news_expires_at", expiresAt);
+      } else {
+        await storage.setSetting("breaking_news_expires_at", "");
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error setting breaking news:", error);
+      res.status(400).json({ message: "Failed to set breaking news" });
+    }
+  });
+
   // User Preferences endpoints
   app.get("/api/user/preferences", isAuthenticated, async (req: any, res) => {
     try {

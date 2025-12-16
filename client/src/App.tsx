@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import { Sidebar, SidebarProvider, useSidebar } from "@/components/Sidebar";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { BreakingNewsBanner } from "@/components/BreakingNewsBanner";
 import Landing from "@/pages/Landing";
 import LiveScores from "@/pages/LiveScores";
 import GameDetail from "@/pages/GameDetail";
@@ -108,6 +109,7 @@ function MainContent() {
 
   return (
     <div className={`min-h-screen bg-background ${preferences.reduceAnimations ? 'reduce-motion' : ''}`}>
+      <BreakingNewsBanner />
       <ChristmasDecorations particleEffects={preferences.particleEffects} reduceAnimations={preferences.reduceAnimations} />
       {showSidebar && <Sidebar />}
       

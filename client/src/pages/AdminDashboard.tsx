@@ -1720,9 +1720,16 @@ function PartnersManager() {
 function SettingsManager() {
   const { toast } = useToast();
   const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [breakingNewsMessage, setBreakingNewsMessage] = useState("");
+  const [breakingNewsActive, setBreakingNewsActive] = useState(false);
+  const [breakingNewsDuration, setBreakingNewsDuration] = useState<string>("0");
   
   const { data: maintenanceStatus } = useQuery<{ enabled: boolean }>({
     queryKey: ["/api/settings/maintenance-mode"],
+  });
+
+  const { data: breakingNewsData } = useQuery<{ message: string; active: boolean; expiresAt: string | null }>({
+    queryKey: ["/api/settings/breaking-news"],
   });
 
   const maintenanceMutation = useMutation({
@@ -1755,11 +1762,71 @@ function SettingsManager() {
     },
   });
 
+  const breakingNewsMutation = useMutation({
+    mutationFn: async (data: { message: string; active: boolean; durationMinutes: number }) => {
+      await apiRequest("POST", "/api/settings/breaking-news", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Breaking news updated",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/settings/breaking-news"] });
+    },
+    onError: (error: Error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => window.location.href = "/api/login", 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to update breaking news",
+        variant: "destructive",
+      });
+    },
+  });
+
   useEffect(() => {
     if (maintenanceStatus?.enabled !== undefined) {
       setMaintenanceMode(maintenanceStatus.enabled);
     }
   }, [maintenanceStatus]);
+
+  useEffect(() => {
+    if (breakingNewsData) {
+      setBreakingNewsMessage(breakingNewsData.message || "");
+      setBreakingNewsActive(breakingNewsData.active);
+    }
+  }, [breakingNewsData]);
+
+  const handleStartBreakingNews = () => {
+    if (!breakingNewsMessage.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a breaking news message",
+        variant: "destructive",
+      });
+      return;
+    }
+    breakingNewsMutation.mutate({
+      message: breakingNewsMessage,
+      active: true,
+      durationMinutes: parseInt(breakingNewsDuration) || 0,
+    });
+  };
+
+  const handleStopBreakingNews = () => {
+    breakingNewsMutation.mutate({
+      message: breakingNewsMessage,
+      active: false,
+      durationMinutes: 0,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -1786,6 +1853,74 @@ function SettingsManager() {
         <Card className="p-4 border-yellow-500/20 bg-yellow-500/5">
           <p className="text-sm text-yellow-800">
             ⚠️ Maintenance mode is currently <span className="font-semibold">ENABLED</span>. Users will see a maintenance message on the home page.
+          </p>
+        </Card>
+      )}
+
+      <Card className="p-6">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">📢</span>
+            <h2 className="text-2xl font-bold">Breaking News Announcement</h2>
+          </div>
+          <p className="text-muted-foreground">
+            Display a scrolling breaking news banner at the top of every page. Great for important announcements!
+          </p>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="breaking-news-message">Message</Label>
+              <Textarea
+                id="breaking-news-message"
+                placeholder="Enter your breaking news announcement..."
+                value={breakingNewsMessage}
+                onChange={(e) => setBreakingNewsMessage(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="breaking-news-duration">Auto-stop timer</Label>
+              <Select value={breakingNewsDuration} onValueChange={setBreakingNewsDuration}>
+                <SelectTrigger id="breaking-news-duration" className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">No timer (manual stop)</SelectItem>
+                  <SelectItem value="1">1 minute</SelectItem>
+                  <SelectItem value="5">5 minutes</SelectItem>
+                  <SelectItem value="10">10 minutes</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex gap-3">
+              {!breakingNewsActive ? (
+                <Button
+                  onClick={handleStartBreakingNews}
+                  disabled={breakingNewsMutation.isPending || !breakingNewsMessage.trim()}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  {breakingNewsMutation.isPending ? "Starting..." : "Start Announcement"}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleStopBreakingNews}
+                  disabled={breakingNewsMutation.isPending}
+                  variant="outline"
+                >
+                  {breakingNewsMutation.isPending ? "Stopping..." : "Stop Announcement"}
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {breakingNewsActive && (
+        <Card className="p-4 border-red-500/20 bg-red-500/5">
+          <p className="text-sm text-red-800 dark:text-red-200">
+            📢 Breaking news is currently <span className="font-semibold">LIVE</span>: "{breakingNewsMessage}"
           </p>
         </Card>
       )}
