@@ -702,6 +702,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update Plans endpoints
+  app.get("/api/update-plans", async (req, res) => {
+    try {
+      const plans = await storage.getAllUpdatePlans();
+      res.json(plans);
+    } catch (error) {
+      console.error("Error fetching update plans:", error);
+      res.status(500).json({ message: "Failed to fetch update plans" });
+    }
+  });
+
+  app.post("/api/update-plans", isAuthenticated, async (req: any, res) => {
+    try {
+      const sessionRole = req.session?.role;
+      if (sessionRole !== "admin") {
+        return res.status(403).json({ message: "Only admins can manage update plans" });
+      }
+      
+      const { year, month, hasUpdate } = req.body;
+      const plan = await storage.upsertUpdatePlan({ year, month, hasUpdate });
+      res.json(plan);
+    } catch (error) {
+      console.error("Error creating/updating update plan:", error);
+      res.status(400).json({ message: "Failed to save update plan" });
+    }
+  });
+
+  app.delete("/api/update-plans/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const sessionRole = req.session?.role;
+      if (sessionRole !== "admin") {
+        return res.status(403).json({ message: "Only admins can delete update plans" });
+      }
+      
+      await storage.deleteUpdatePlan(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting update plan:", error);
+      res.status(400).json({ message: "Failed to delete update plan" });
+    }
+  });
+
   // User Preferences endpoints
   app.get("/api/user/preferences", isAuthenticated, async (req: any, res) => {
     try {

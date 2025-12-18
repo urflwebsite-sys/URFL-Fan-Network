@@ -22,6 +22,7 @@ import UserSettings from "@/pages/UserSettings";
 import AdminDashboard from "@/pages/AdminDashboard";
 import SocialLinks from "@/pages/SocialLinks";
 import Changelogs from "@/pages/Changelogs";
+import UpdatePlanner from "@/pages/UpdatePlanner";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
 import { useMemo, useEffect, useState } from "react";
@@ -134,6 +135,7 @@ function MainContent() {
               <Route path="/settings" component={UserSettings} />
               <Route path="/social" component={SocialLinks} />
               <Route path="/changelogs" component={Changelogs} />
+              <Route path="/update-planner" component={UpdatePlanner} />
             </>
           )}
           {isAdmin && <Route path="/admin" component={AdminDashboard} />}

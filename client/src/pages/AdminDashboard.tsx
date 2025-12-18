@@ -1924,6 +1924,96 @@ function SettingsManager() {
           </p>
         </Card>
       )}
+
+      <Card className="p-6">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold">Update Planner</h2>
+          <p className="text-muted-foreground">Toggle which months have updates planned</p>
+          
+          <UpdatePlanManager />
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function UpdatePlanManager() {
+  const { toast } = useToast();
+  const { data: plans } = useQuery<any[]>({
+    queryKey: ["/api/update-plans"],
+  });
+
+  const mutation = useMutation({
+    mutationFn: async (data: { year: number; month: number; hasUpdate: boolean }) => {
+      await apiRequest("POST", "/api/update-plans", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/update-plans"] });
+      toast({ title: "Success", description: "Update plan saved" });
+    },
+    onError: (error: Error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => window.location.href = "/api/login", 500);
+        return;
+      }
+      toast({ title: "Error", description: "Failed to save update plan", variant: "destructive" });
+    },
+  });
+
+  // Generate months from December 2024 to December 2026
+  const startDate = new Date(2024, 11, 1);
+  const endDate = new Date(2026, 11, 31);
+  const months = [];
+  for (let d = new Date(startDate); d <= endDate; d.setMonth(d.getMonth() + 1)) {
+    months.push(new Date(d));
+  }
+
+  const plansMap = new Map<string, boolean>();
+  if (plans) {
+    plans.forEach((plan) => {
+      const key = `${plan.year}-${plan.month}`;
+      plansMap.set(key, plan.hasUpdate);
+    });
+  }
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+      {months.map((month) => {
+        const year = month.getFullYear();
+        const monthNum = month.getMonth() + 1;
+        const key = `${year}-${monthNum}`;
+        const hasUpdate = plansMap.get(key) || false;
+        const monthName = format(month, "MMM yyyy");
+
+        return (
+          <Button
+            key={key}
+            onClick={() =>
+              mutation.mutate({
+                year,
+                month: monthNum,
+                hasUpdate: !hasUpdate,
+              })
+            }
+            disabled={mutation.isPending}
+            variant={hasUpdate ? "default" : "outline"}
+            className={`text-sm h-auto py-3 ${
+              hasUpdate ? "bg-primary hover:bg-primary/90" : ""
+            }`}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <span className="font-semibold">{format(month, "MMM")}</span>
+              <span className="text-xs opacity-75">{year}</span>
+              {hasUpdate && <span className="text-xs">✓</span>}
+            </div>
+          </Button>
+        );
+      })}
     </div>
   );
 }

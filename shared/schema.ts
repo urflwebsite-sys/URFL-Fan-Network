@@ -318,3 +318,22 @@ export const insertUserPreferencesSchema = createInsertSchema(userPreferences).o
 
 export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
 export type UserPreference = typeof userPreferences.$inferSelect;
+
+// Update Plans table
+export const updatePlans = pgTable("update_plans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  year: integer("year").notNull(),
+  month: integer("month").notNull(), // 1-12
+  hasUpdate: boolean("has_update").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertUpdatePlanSchema = createInsertSchema(updatePlans).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertUpdatePlan = z.infer<typeof insertUpdatePlanSchema>;
+export type UpdatePlan = typeof updatePlans.$inferSelect;

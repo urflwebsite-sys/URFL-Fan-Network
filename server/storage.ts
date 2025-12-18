@@ -14,6 +14,7 @@ import {
   settings,
   partners,
   userPreferences,
+  updatePlans,
   type User,
   type UpsertUser,
   type Game,
@@ -44,6 +45,8 @@ import {
   type InsertPartners,
   type UserPreference,
   type InsertUserPreferences,
+  type UpdatePlan,
+  type InsertUpdatePlan,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -120,6 +123,11 @@ export interface IStorage {
 
   getUserPreferences(userId: string): Promise<UserPreference | undefined>;
   updateUserPreferences(userId: string, prefs: InsertUserPreferences): Promise<UserPreference>;
+
+  getAllUpdatePlans(): Promise<UpdatePlan[]>;
+  getUpdatePlans(year: number): Promise<UpdatePlan[]>;
+  upsertUpdatePlan(plan: InsertUpdatePlan): Promise<UpdatePlan>;
+  deleteUpdatePlan(id: string): Promise<void>;
 }
 
 // Helper function to convert undefined to null (postgres requires explicit null, not undefined)
@@ -535,6 +543,31 @@ export class DatabaseStorage implements IStorage {
     
     const [created] = await db.insert(userPreferences).values({ userId, ...cleanData } as InsertUserPreferences).returning();
     return created;
+  }
+
+  async getAllUpdatePlans(): Promise<UpdatePlan[]> {
+    return await db.select().from(updatePlans).orderBy(updatePlans.year, updatePlans.month);
+  }
+
+  async getUpdatePlans(year: number): Promise<UpdatePlan[]> {
+    return await db.select().from(updatePlans).where(eq(updatePlans.year, year)).orderBy(updatePlans.month);
+  }
+
+  async upsertUpdatePlan(planData: InsertUpdatePlan): Promise<UpdatePlan> {
+    const cleanData = cleanObject(planData);
+    const [plan] = await db
+      .insert(updatePlans)
+      .values(cleanData as InsertUpdatePlan)
+      .onConflictDoUpdate({
+        target: [updatePlans.year, updatePlans.month],
+        set: { hasUpdate: cleanData.hasUpdate },
+      })
+      .returning();
+    return plan;
+  }
+
+  async deleteUpdatePlan(id: string): Promise<void> {
+    await db.delete(updatePlans).where(eq(updatePlans.id, id));
   }
 }
 
