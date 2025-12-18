@@ -1939,17 +1939,19 @@ function SettingsManager() {
 
 function UpdatePlanManager() {
   const { toast } = useToast();
+  const [selectedDate, setSelectedDate] = useState<string>("");
   const { data: plans } = useQuery<any[]>({
     queryKey: ["/api/update-plans"],
   });
 
   const mutation = useMutation({
-    mutationFn: async (data: { year: number; month: number; hasUpdate: boolean }) => {
-      await apiRequest("POST", "/api/update-plans", data);
+    mutationFn: async (updateDate: string) => {
+      await apiRequest("POST", "/api/update-plans", { updateDate });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/update-plans"] });
-      toast({ title: "Success", description: "Update plan saved" });
+      toast({ title: "Success", description: "Update date added" });
+      setSelectedDate("");
     },
     onError: (error: Error) => {
       if (isUnauthorizedError(error)) {
@@ -1961,59 +1963,68 @@ function UpdatePlanManager() {
         setTimeout(() => window.location.href = "/api/login", 500);
         return;
       }
-      toast({ title: "Error", description: "Failed to save update plan", variant: "destructive" });
+      toast({ title: "Error", description: "Failed to save update date", variant: "destructive" });
     },
   });
 
-  // Generate months from December 2024 to December 2026
-  const startDate = new Date(2024, 11, 1);
-  const endDate = new Date(2026, 11, 31);
-  const months = [];
-  for (let d = new Date(startDate); d <= endDate; d.setMonth(d.getMonth() + 1)) {
-    months.push(new Date(d));
-  }
+  const deleteMutation = useMutation({
+    mutationFn: async (updateDate: string) => {
+      await apiRequest("DELETE", `/api/update-plans/${updateDate}`, undefined);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/update-plans"] });
+      toast({ title: "Success", description: "Update date removed" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: "Failed to remove update date", variant: "destructive" });
+    },
+  });
 
-  const plansMap = new Map<string, boolean>();
-  if (plans) {
-    plans.forEach((plan) => {
-      const key = `${plan.year}-${plan.month}`;
-      plansMap.set(key, plan.hasUpdate);
-    });
-  }
+  const plansSet = new Set(plans?.map(p => p.updateDate) || []);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-      {months.map((month) => {
-        const year = month.getFullYear();
-        const monthNum = month.getMonth() + 1;
-        const key = `${year}-${monthNum}`;
-        const hasUpdate = plansMap.get(key) || false;
-        const monthName = format(month, "MMM yyyy");
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <Input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          className="flex-1"
+        />
+        <Button
+          onClick={() => mutation.mutate(selectedDate)}
+          disabled={mutation.isPending || !selectedDate}
+        >
+          Add Date
+        </Button>
+      </div>
 
-        return (
-          <Button
-            key={key}
-            onClick={() =>
-              mutation.mutate({
-                year,
-                month: monthNum,
-                hasUpdate: !hasUpdate,
-              })
-            }
-            disabled={mutation.isPending}
-            variant={hasUpdate ? "default" : "outline"}
-            className={`text-sm h-auto py-3 ${
-              hasUpdate ? "bg-primary hover:bg-primary/90" : ""
-            }`}
-          >
-            <div className="flex flex-col items-center gap-1">
-              <span className="font-semibold">{format(month, "MMM")}</span>
-              <span className="text-xs opacity-75">{year}</span>
-              {hasUpdate && <span className="text-xs">✓</span>}
-            </div>
-          </Button>
-        );
-      })}
+      <div>
+        <h3 className="font-semibold mb-3">Scheduled Updates:</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+          {plans && plans.length > 0 ? (
+            plans.map((plan) => (
+              <div
+                key={plan.updateDate}
+                className="flex items-center justify-between p-3 bg-primary/10 border border-primary/30 rounded-lg"
+              >
+                <span className="text-sm font-medium">{format(new Date(plan.updateDate), "MMM d, yyyy")}</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => deleteMutation.mutate(plan.updateDate)}
+                  disabled={deleteMutation.isPending}
+                  className="h-6 w-6 p-0"
+                >
+                  ×
+                </Button>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-muted-foreground col-span-full">No updates scheduled</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

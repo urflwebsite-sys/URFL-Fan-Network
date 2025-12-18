@@ -720,8 +720,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only admins can manage update plans" });
       }
       
-      const { year, month, hasUpdate } = req.body;
-      const plan = await storage.upsertUpdatePlan({ year, month, hasUpdate });
+      const { updateDate } = req.body;
+      const plan = await storage.upsertUpdatePlan({ updateDate });
       res.json(plan);
     } catch (error) {
       console.error("Error creating/updating update plan:", error);
@@ -729,14 +729,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/update-plans/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/update-plans/:date", isAuthenticated, async (req: any, res) => {
     try {
       const sessionRole = req.session?.role;
       if (sessionRole !== "admin") {
         return res.status(403).json({ message: "Only admins can delete update plans" });
       }
       
-      await storage.deleteUpdatePlan(req.params.id);
+      await storage.deleteUpdatePlan(req.params.date);
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting update plan:", error);

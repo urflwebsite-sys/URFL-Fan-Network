@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
-import { format, startOfMonth, endOfMonth, eachMonthOfInterval } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth } from "date-fns";
 import type { UpdatePlan } from "@shared/schema";
 
 export default function UpdatePlanner() {
@@ -8,56 +8,58 @@ export default function UpdatePlanner() {
     queryKey: ["/api/update-plans"],
   });
 
-  // Generate months from December 2024 to December 2026
-  const startDate = new Date(2024, 11, 1); // December 2024
-  const endDate = new Date(2026, 11, 31); // December 2026
-  const months = eachMonthOfInterval({ start: startDate, end: endDate });
-
-  // Create a map for quick lookup
-  const plansMap = new Map<string, boolean>();
-  if (plans) {
-    plans.forEach((plan) => {
-      const key = `${plan.year}-${String(plan.month).padStart(2, "0")}`;
-      plansMap.set(key, plan.hasUpdate);
-    });
+  const now = new Date();
+  const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endDate = new Date(now.getFullYear() + 2, 11, 31);
+  
+  const months: Date[] = [];
+  for (let d = new Date(startDate); d <= endDate; d.setMonth(d.getMonth() + 1)) {
+    months.push(new Date(d));
   }
+
+  const plansSet = new Set(plans?.map(p => p.updateDate) || []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-4xl md:text-5xl font-black mb-2" data-testid="text-page-title">
-        Update Planner
-      </h1>
-      <p className="text-muted-foreground mb-8">Check what months have upcoming website updates planned</p>
+      <h1 className="text-4xl md:text-5xl font-black mb-2">Update Planner</h1>
+      <p className="text-muted-foreground mb-8">See when we have updates planned</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {months.map((month) => {
-          const year = month.getFullYear();
-          const monthNum = month.getMonth() + 1;
-          const key = `${year}-${String(monthNum).padStart(2, "0")}`;
-          const hasUpdate = plansMap.get(key) || false;
-
-          return (
-            <Card
-              key={key}
-              className={`p-6 text-center transition-all duration-200 ${
-                hasUpdate
-                  ? "bg-gradient-to-br from-primary/10 to-primary/5 border-primary/30 hover:border-primary/60"
-                  : "bg-muted/20 border-muted"
-              }`}
-            >
-              <p className="text-sm text-muted-foreground mb-1">{year}</p>
-              <h3 className="text-2xl font-bold mb-4">{format(month, "MMMM")}</h3>
-              {hasUpdate ? (
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/40">
-                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  <span className="text-sm font-semibold text-primary">Update Coming</span>
+      <div className="grid gap-6">
+        {months.map((month) => (
+          <Card key={format(month, "yyyy-MM")} className="p-6">
+            <h2 className="text-2xl font-bold mb-4">{format(month, "MMMM yyyy")}</h2>
+            <div className="grid grid-cols-7 gap-2">
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                <div key={day} className="text-center font-semibold text-xs text-muted-foreground py-2">
+                  {day}
                 </div>
-              ) : (
-                <span className="text-xs text-muted-foreground">No update planned</span>
-              )}
-            </Card>
-          );
-        })}
+              ))}
+              {eachDayOfInterval({
+                start: startOfMonth(month),
+                end: endOfMonth(month),
+              }).map((day) => {
+                const dateStr = format(day, "yyyy-MM-dd");
+                const hasUpdate = plansSet.has(dateStr);
+                const isCurrentMonth = isSameMonth(day, month);
+                
+                return (
+                  <div
+                    key={dateStr}
+                    className={`aspect-square flex items-center justify-center rounded-lg border text-sm font-medium transition-all ${
+                      !isCurrentMonth
+                        ? "opacity-30 text-muted-foreground"
+                        : hasUpdate
+                        ? "bg-primary text-primary-foreground border-primary shadow-lg"
+                        : "text-foreground border-border hover:border-primary/50"
+                    }`}
+                  >
+                    {format(day, "d")}
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        ))}
       </div>
     </div>
   );

@@ -342,6 +342,16 @@ export default async function runApp(
           updated_at TIMESTAMP DEFAULT NOW()
         )
       `;
+      
+      // Create update_plans table
+      await rawSql`
+        CREATE TABLE IF NOT EXISTS update_plans (
+          id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          update_date DATE NOT NULL UNIQUE,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `;
     
     console.log('Database schema initialized successfully');
   } catch (error: any) {

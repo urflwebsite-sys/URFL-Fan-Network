@@ -546,28 +546,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllUpdatePlans(): Promise<UpdatePlan[]> {
-    return await db.select().from(updatePlans).orderBy(updatePlans.year, updatePlans.month);
-  }
-
-  async getUpdatePlans(year: number): Promise<UpdatePlan[]> {
-    return await db.select().from(updatePlans).where(eq(updatePlans.year, year)).orderBy(updatePlans.month);
+    return await db.select().from(updatePlans).orderBy(updatePlans.updateDate);
   }
 
   async upsertUpdatePlan(planData: InsertUpdatePlan): Promise<UpdatePlan> {
     const cleanData = cleanObject(planData);
-    const [plan] = await db
-      .insert(updatePlans)
-      .values(cleanData as InsertUpdatePlan)
-      .onConflictDoUpdate({
-        target: [updatePlans.year, updatePlans.month],
-        set: { hasUpdate: cleanData.hasUpdate },
-      })
-      .returning();
+    const existing = await db.select().from(updatePlans).where(eq(updatePlans.updateDate, cleanData.updateDate as string));
+    
+    if (existing.length > 0) {
+      const [plan] = await db
+        .update(updatePlans)
+        .set({ updatedAt: new Date() })
+        .where(eq(updatePlans.updateDate, cleanData.updateDate as string))
+        .returning();
+      return plan;
+    }
+    
+    const [plan] = await db.insert(updatePlans).values(cleanData as InsertUpdatePlan).returning();
     return plan;
   }
 
-  async deleteUpdatePlan(id: string): Promise<void> {
-    await db.delete(updatePlans).where(eq(updatePlans.id, id));
+  async deleteUpdatePlan(date: string): Promise<void> {
+    await db.delete(updatePlans).where(eq(updatePlans.updateDate, date));
   }
 }
 
