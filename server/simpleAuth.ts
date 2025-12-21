@@ -84,14 +84,14 @@ export async function setupAuth(app: Express) {
         firstName: matchedEnvUser.username,
         lastName: "",
         role: matchedEnvUser.role,
-        hasCompletedTour: true,
+        hasCompletedTour: false,
       });
       
       (req.session as any).authenticated = true;
       (req.session as any).userId = userId;
       (req.session as any).username = matchedEnvUser.username;
       (req.session as any).role = matchedEnvUser.role;
-      (req.session as any).hasCompletedTour = true;
+      (req.session as any).hasCompletedTour = false;
       
       res.json({ success: true });
       return;
