@@ -115,8 +115,8 @@ function GamesManager() {
   const { toast } = useToast();
   const [week, setWeek] = useState(1);
   const [filterWeek, setFilterWeek] = useState<string>("all");
-  const [gamesList, setGamesList] = useState<Array<{ team1: string; team2: string; date: string; time: string }>>([
-    { team1: "", team2: "", date: "", time: "" },
+  const [gamesList, setGamesList] = useState<Array<{ team1: string; team2: string; date: string; time: string; isPrimetime: boolean }>>([
+    { team1: "", team2: "", date: "", time: "", isPrimetime: false },
   ]);
   const [editingGameId, setEditingGameId] = useState<string | null>(null);
   const [editDate, setEditDate] = useState("");
@@ -127,13 +127,14 @@ function GamesManager() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (games: Array<{ week: number; team1: string; team2: string; date: string; time: string }>) => {
+    mutationFn: async (games: Array<{ week: number; team1: string; team2: string; date: string; time: string; isPrimetime: boolean }>) => {
       await Promise.all(games.map((game) => {
         const payload: any = {
           week: game.week,
           team1: game.team1,
           team2: game.team2,
           gameTime: null,
+          isPrimetime: game.isPrimetime,
         };
         if (game.date && game.time) {
           const gameTime = new Date(`${game.date}T${game.time}`);
@@ -151,7 +152,7 @@ function GamesManager() {
         return typeof key[0] === 'string' && key[0]?.startsWith('/api/games');
       }});
       toast({ title: "Success", description: "Week scheduled successfully" });
-      setGamesList([{ team1: "", team2: "", date: "", time: "" }]);
+      setGamesList([{ team1: "", team2: "", date: "", time: "", isPrimetime: false }]);
       setWeek(1);
     },
     onError: (error: Error) => {
@@ -251,8 +252,14 @@ function GamesManager() {
     setGamesList(updated);
   };
 
+  const handlePrimetimeChange = (index: number, value: boolean) => {
+    const updated = [...gamesList];
+    updated[index] = { ...updated[index], isPrimetime: value };
+    setGamesList(updated);
+  };
+
   const addGameRow = () => {
-    setGamesList([...gamesList, { team1: "", team2: "", date: "", time: "" }]);
+    setGamesList([...gamesList, { team1: "", team2: "", date: "", time: "", isPrimetime: false }]);
   };
 
   const removeGameRow = (index: number) => {
@@ -298,7 +305,7 @@ function GamesManager() {
               const usedTeams = gamesList.map(g => g.team1).concat(gamesList.map(g => g.team2)).filter(t => t && (t !== game.team1 || t === game.team1) && (t !== game.team2 || t === game.team2));
               const availableTeams = AVAILABLE_TEAMS.filter(t => !usedTeams.includes(t) || t === game.team1 || t === game.team2);
               return (
-              <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 border rounded-md bg-muted/30" data-testid={`game-row-${index}`}>
+              <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-3 p-4 border rounded-md bg-muted/30" data-testid={`game-row-${index}`}>
                 <div>
                   <Label htmlFor={`team2-${index}`}>Team 2</Label>
                   <Select value={game.team2} onValueChange={(value) => handleGameChange(index, "team2", value)}>
@@ -349,13 +356,23 @@ function GamesManager() {
                     data-testid={`input-time-${index}`}
                   />
                 </div>
+                <div className="flex items-center justify-center">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={game.isPrimetime}
+                      onCheckedChange={(checked) => handlePrimetimeChange(index, checked)}
+                      data-testid={`switch-primetime-${index}`}
+                    />
+                    <Label htmlFor={`primetime-${index}`}>Primetime</Label>
+                  </div>
+                </div>
                 {gamesList.length > 1 && (
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     onClick={() => removeGameRow(index)}
-                    className="md:col-span-4 justify-self-end"
+                    className="md:col-span-5 justify-self-end"
                     data-testid={`button-remove-game-${index}`}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -632,16 +649,6 @@ function ScoresManager() {
                         data-testid={`switch-final-${game.id}`}
                       />
                       <Label>Final</Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={game.isPrimetime || false}
-                        onCheckedChange={(checked) => {
-                          updateMutation.mutate({ id: game.id, data: { isPrimetime: checked } });
-                        }}
-                        data-testid={`switch-primetime-${game.id}`}
-                      />
-                      <Label>Primetime</Label>
                     </div>
                   </div>
                 </div>
