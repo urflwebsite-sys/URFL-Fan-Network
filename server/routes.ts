@@ -832,7 +832,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.patch("/api/user/tour", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (!req.user) return res.sendStatus(401);
     const { completed } = req.body;
     try {
       const user = await storage.updateUserTourStatus((req.user as any).id, !!completed);
