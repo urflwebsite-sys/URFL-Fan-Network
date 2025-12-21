@@ -2,13 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { GameCard } from "@/components/GameCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import type { Game } from "@shared/schema";
 import { useLocation } from "wouter";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Search } from "lucide-react";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { useState } from "react";
 
 export default function LiveScores() {
   const [, setLocation] = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
   const preferences = useUserPreferences();
   
   const { data: games, isLoading, error } = useQuery<Game[]>({
@@ -16,8 +19,14 @@ export default function LiveScores() {
     refetchInterval: 30000,
   });
 
+  // Filter games by search query
+  const filteredGames = games ? games.filter(game =>
+    game.team1.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    game.team2.toLowerCase().includes(searchQuery.toLowerCase())
+  ) : [];
+
   // Sort games with favorite team first
-  const sortedGames = games ? [...games].sort((a, b) => {
+  const sortedGames = filteredGames ? [...filteredGames].sort((a, b) => {
     if (preferences.favoriteTeam) {
       const aHasFavorite = a.team1 === preferences.favoriteTeam || a.team2 === preferences.favoriteTeam;
       const bHasFavorite = b.team1 === preferences.favoriteTeam || b.team2 === preferences.favoriteTeam;
@@ -51,9 +60,19 @@ export default function LiveScores() {
             Week {currentWeek}
           </Badge>
         </div>
-        <p className="text-muted-foreground text-lg">
+        <p className="text-muted-foreground text-lg mb-4">
           Follow all the action as it happens
         </p>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search by team name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
       </div>
 
       {isLoading ? (

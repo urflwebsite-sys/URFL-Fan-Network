@@ -2,14 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 import type { Game } from "@shared/schema";
 import { isFuture, isPast } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import { Calendar, MapPin, AlertCircle } from "lucide-react";
+import { Calendar, MapPin, AlertCircle, Search } from "lucide-react";
 import { TEAMS } from "@/lib/teams";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { useState } from "react";
 
 export default function Schedule() {
+  const [searchQuery, setSearchQuery] = useState("");
   const preferences = useUserPreferences();
   const showLogos = preferences.showTeamLogos !== false;
   
@@ -28,7 +31,13 @@ export default function Schedule() {
     );
   }
 
-  const gamesByWeek = allGames?.reduce((acc, game) => {
+  // Filter games by search query
+  const filteredGames = allGames ? allGames.filter(game =>
+    game.team1.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    game.team2.toLowerCase().includes(searchQuery.toLowerCase())
+  ) : [];
+
+  const gamesByWeek = filteredGames?.reduce((acc, game) => {
     if (game.week <= 10 && !acc[game.week]) {
       acc[game.week] = [];
     }
@@ -46,9 +55,19 @@ export default function Schedule() {
         <h1 className="text-4xl md:text-5xl font-black mb-4" data-testid="text-page-title">
           Full Schedule
         </h1>
-        <p className="text-muted-foreground text-lg">
+        <p className="text-muted-foreground text-lg mb-4">
           Complete season schedule with dates, times, and locations
         </p>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search by team name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
       </div>
 
       {isLoading ? (
