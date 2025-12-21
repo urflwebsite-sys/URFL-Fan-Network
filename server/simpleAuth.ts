@@ -211,7 +211,7 @@ export async function setupAuth(app: Express) {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role || role,
-        hasCompletedTour: !!user.hasCompletedTour,
+        hasCompletedTour: Boolean(user.hasCompletedTour),
         authenticated: true 
       });
     } else {

@@ -37,8 +37,11 @@ export default function Landing() {
   const [showTour, setShowTour] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated && user && !(user as any).hasCompletedTour) {
+    // Explicitly check for false to avoid issues with undefined/null during loading
+    if (isAuthenticated && user && (user as any).hasCompletedTour === false) {
       setShowTour(true);
+    } else {
+      setShowTour(false);
     }
   }, [isAuthenticated, user]);
 
