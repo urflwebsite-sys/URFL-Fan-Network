@@ -834,8 +834,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/user/tour", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const { completed } = req.body;
-    const user = await storage.updateUserTourStatus((req.user as any).id, !!completed);
-    res.json(user);
+    try {
+      const user = await storage.updateUserTourStatus((req.user as any).id, !!completed);
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating tour status:", error);
+      res.status(500).json({ message: "Failed to update tour status" });
+    }
   });
 
   const httpServer = createServer(app);
