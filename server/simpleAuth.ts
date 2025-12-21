@@ -97,8 +97,10 @@ export async function setupAuth(app: Express) {
     
     const dbUser = await storage.getUserByUsername(username);
     if (dbUser && dbUser.password) {
+      console.log(`Attempting DB login for: ${username}`);
       const passwordMatch = await bcrypt.compare(password, dbUser.password);
       if (passwordMatch) {
+        console.log(`Login successful for: ${username}`);
         (req.session as any).authenticated = true;
         (req.session as any).userId = dbUser.id;
         (req.session as any).username = dbUser.username;
@@ -106,7 +108,11 @@ export async function setupAuth(app: Express) {
         
         res.json({ success: true });
         return;
+      } else {
+        console.log(`Password mismatch for: ${username}`);
       }
+    } else {
+      console.log(`No DB user found for: ${username}`);
     }
     
     res.status(401).json({ message: "Invalid credentials" });
