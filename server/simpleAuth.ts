@@ -204,9 +204,11 @@ export async function setupAuth(app: Express) {
       res.json({ 
         id: user.id,
         email: user.email,
+        username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role || role,
+        hasCompletedTour: user.hasCompletedTour,
         authenticated: true 
       });
     } else {
