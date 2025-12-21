@@ -18,10 +18,6 @@ interface TourStep {
 
 const TOUR_STEPS: TourStep[] = [
   {
-    title: "Welcome to URFL Fan Hub",
-    description: "Welcome to the home of the ultimate football league experience. Let's take a quick look at the main pages.",
-  },
-  {
     title: "Live Scores",
     description: "Follow every game in real-time with drive details and scoring plays on the Live Scores page.",
   },
@@ -92,7 +88,11 @@ export function SiteTour({ onComplete }: { onComplete: () => void }) {
 
   const handleComplete = () => {
     setIsOpen(false);
-    tourMutation.mutate();
+    tourMutation.mutate(undefined, {
+      onSuccess: () => {
+        onComplete();
+      }
+    });
   };
 
   return (

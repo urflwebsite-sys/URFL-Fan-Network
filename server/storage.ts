@@ -49,7 +49,7 @@ import {
   type InsertUpdatePlan,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 export interface IStorage {
@@ -566,7 +566,7 @@ export class DatabaseStorage implements IStorage {
   async upsertUpdatePlan(planData: InsertUpdatePlan): Promise<UpdatePlan> {
     const cleanData = cleanObject(planData);
     const existing = await db.select().from(updatePlans).where(eq(updatePlans.updateDate, cleanData.updateDate as string));
-    
+
     if (existing.length > 0) {
       const [plan] = await db
         .update(updatePlans)
@@ -575,7 +575,7 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return plan;
     }
-    
+
     const [plan] = await db.insert(updatePlans).values(cleanData as InsertUpdatePlan).returning();
     return plan;
   }
