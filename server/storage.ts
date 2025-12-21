@@ -486,6 +486,7 @@ export class DatabaseStorage implements IStorage {
       firstName: username,
       lastName: "",
       role,
+      hasCompletedTour: false,
     }) as any).returning();
     return user;
   }
