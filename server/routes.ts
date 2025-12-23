@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./simpleAuth";
+import { censorProfanity } from "./profanityFilter";
 import {
   insertGameSchema,
   insertNewsSchema,
@@ -857,9 +858,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const message = JSON.parse(data.toString());
         
         if (message.type === 'chat') {
+          const censoredMessage = censorProfanity(message.message);
           const chatMessage = await storage.createChatMessage({
             username: message.username,
-            message: message.message,
+            message: censoredMessage,
             gameId: message.gameId || null,
           });
 
