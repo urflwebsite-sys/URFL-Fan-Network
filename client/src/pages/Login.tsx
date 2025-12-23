@@ -13,7 +13,6 @@ export default function Login() {
   const { toast } = useToast();
   const [isSignup, setIsSignup] = useState(false);
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +35,7 @@ export default function Login() {
         const response = await fetch("/api/signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, email, password }),
+          body: JSON.stringify({ username, password }),
         });
 
         if (response.ok) {
@@ -102,22 +101,6 @@ export default function Login() {
             />
           </div>
 
-          {isSignup && (
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter email"
-                data-testid="input-email"
-                disabled={isLoading}
-                required
-              />
-            </div>
-          )}
-
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <Input
@@ -166,7 +149,6 @@ export default function Login() {
                 setIsSignup(!isSignup);
                 setError("");
                 setUsername("");
-                setEmail("");
                 setPassword("");
                 setConfirmPassword("");
               }}

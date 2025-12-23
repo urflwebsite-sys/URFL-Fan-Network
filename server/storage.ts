@@ -110,8 +110,7 @@ export interface IStorage {
   updateUserRole(id: string, role: string): Promise<User>;
   updateUserTourStatus(id: string, completed: boolean): Promise<User>;
   getUserByUsername(username: string): Promise<User | undefined>;
-  getUserByEmail(email: string): Promise<User | undefined>;
-  createUserWithPassword(username: string, email: string, password: string, role: string): Promise<User>;
+  createUserWithPassword(username: string, password: string, role: string): Promise<User>;
   deleteUser(id: string): Promise<void>;
   
   getSetting(key: string): Promise<string | null>;
@@ -472,17 +471,11 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user;
-  }
-
-  async createUserWithPassword(username: string, email: string, password: string, role: string): Promise<User> {
+  async createUserWithPassword(username: string, password: string, role: string): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 12);
     const [user] = await db.insert(users).values(cleanObject({
       username,
       password: hashedPassword,
-      email,
       firstName: username,
       lastName: "",
       role,

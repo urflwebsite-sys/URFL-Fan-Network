@@ -1362,7 +1362,7 @@ function StreamRequestsManager() {
 
   const getUserInfo = (userId: string) => {
     const user = users.find(u => u.id === userId);
-    return user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || userId : userId;
+    return user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || userId : userId;
   };
 
   return (
@@ -1592,7 +1592,7 @@ function UsersManager() {
                         ? `${user.firstName || ''} ${user.lastName || ''}`.trim() 
                         : 'Unknown User'}
                     </p>
-                    <p className="text-sm text-muted-foreground">{user.email || user.username || 'No email'}</p>
+                    <p className="text-sm text-muted-foreground">{user.username}</p>
                     <p className="text-xs text-muted-foreground">ID: {user.id}</p>
                   </div>
                   
