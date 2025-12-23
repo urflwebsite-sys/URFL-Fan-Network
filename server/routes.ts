@@ -562,13 +562,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only admins can change roles" });
       }
       
+      const user = await storage.getUser(req.params.id);
+      if (user?.username === "popfork1") {
+        return res.status(400).json({ message: "Cannot change the role of the popfork1 account" });
+      }
+      
       const { role } = req.body;
       if (!["admin", "streamer"].includes(role)) {
         return res.status(400).json({ message: "Invalid role" });
       }
       
-      const user = await storage.updateUserRole(req.params.id, role);
-      res.json(user);
+      const updatedUser = await storage.updateUserRole(req.params.id, role);
+      res.json(updatedUser);
     } catch (error) {
       console.error("Error updating user role:", error);
       res.status(400).json({ message: "Failed to update user role" });
