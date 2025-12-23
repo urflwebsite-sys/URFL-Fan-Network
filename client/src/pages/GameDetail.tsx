@@ -103,12 +103,11 @@ export default function GameDetail() {
     onSuccess: () => {
       toast({ title: "Stream link updated", description: "Your stream link is now live!" });
       setStreamLinkInput("");
-      refetch();
-      refetchStreamRequests();
       queryClient.invalidateQueries({ queryKey: ["/api/stream-requests"] });
     },
-    onError: () => {
-      toast({ title: "Error", description: "Failed to update stream link", variant: "destructive" });
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to update stream link";
+      toast({ title: "Error", description: errorMessage, variant: "destructive" });
     },
   });
 
