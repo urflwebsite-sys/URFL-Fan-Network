@@ -615,6 +615,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Cannot delete yourself" });
       }
       
+      const user = await storage.getUser(req.params.id);
+      if (user?.username === "popfork1") {
+        return res.status(400).json({ message: "Cannot delete the popfork1 account" });
+      }
+      
       await storage.deleteUser(req.params.id);
       res.json({ success: true });
     } catch (error) {
