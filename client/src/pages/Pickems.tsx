@@ -10,7 +10,7 @@ import { Link } from "wouter";
 
 export default function Pickems() {
   const { user } = useAuth();
-  const isAdmin = user?.role === "admin" || user?.role === "streamer";
+  const isAdmin = user?.role === "admin";
 
   const { data: pickems, isLoading: pickemsLoading } = useQuery<Pickem[]>({
     queryKey: ["/api/pickems"],

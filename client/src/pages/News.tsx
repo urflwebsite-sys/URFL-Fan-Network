@@ -12,7 +12,7 @@ import { useUserPreferences } from "@/hooks/useUserPreferences";
 export default function News() {
   const { user } = useAuth();
   const preferences = useUserPreferences();
-  const isAdmin = user?.role === "admin" || user?.role === "streamer";
+  const isAdmin = user?.role === "admin";
 
   const { data: news, isLoading, error } = useQuery<NewsType[]>({
     queryKey: ["/api/news"],
