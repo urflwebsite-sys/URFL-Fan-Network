@@ -49,19 +49,21 @@ export default function AdminDashboard() {
       </h1>
 
       <Tabs defaultValue="games" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-11">
-          <TabsTrigger value="games" data-testid="tab-games">Games</TabsTrigger>
-          <TabsTrigger value="scores" data-testid="tab-scores">Scores</TabsTrigger>
-          <TabsTrigger value="news" data-testid="tab-news">News</TabsTrigger>
-          <TabsTrigger value="pickems" data-testid="tab-pickems">Pick'ems</TabsTrigger>
-          <TabsTrigger value="rules" data-testid="tab-rules">Rules</TabsTrigger>
-          <TabsTrigger value="bracket" data-testid="tab-bracket">Bracket</TabsTrigger>
-          <TabsTrigger value="changelogs" data-testid="tab-changelogs">Changelogs</TabsTrigger>
-          <TabsTrigger value="streams" data-testid="tab-streams">Streams</TabsTrigger>
-          <TabsTrigger value="users" data-testid="tab-users">Users</TabsTrigger>
-          <TabsTrigger value="partners" data-testid="tab-partners">Partners</TabsTrigger>
-          <TabsTrigger value="settings" data-testid="tab-settings">Settings</TabsTrigger>
-        </TabsList>
+        <div className="w-full overflow-x-auto">
+          <TabsList className="grid grid-cols-11 w-max">
+            <TabsTrigger value="games" data-testid="tab-games">Games</TabsTrigger>
+            <TabsTrigger value="scores" data-testid="tab-scores">Scores</TabsTrigger>
+            <TabsTrigger value="news" data-testid="tab-news">News</TabsTrigger>
+            <TabsTrigger value="pickems" data-testid="tab-pickems">Pick'ems</TabsTrigger>
+            <TabsTrigger value="rules" data-testid="tab-rules">Rules</TabsTrigger>
+            <TabsTrigger value="bracket" data-testid="tab-bracket">Bracket</TabsTrigger>
+            <TabsTrigger value="changelogs" data-testid="tab-changelogs">Changelogs</TabsTrigger>
+            <TabsTrigger value="streams" data-testid="tab-streams">Streams</TabsTrigger>
+            <TabsTrigger value="users" data-testid="tab-users">Users</TabsTrigger>
+            <TabsTrigger value="partners" data-testid="tab-partners">Partners</TabsTrigger>
+            <TabsTrigger value="settings" data-testid="tab-settings">Settings</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="games">
           <GamesManager />
