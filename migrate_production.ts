@@ -171,6 +171,21 @@ async function createTables() {
     `;
     console.log('✓ Predictions table created');
 
+    // Add user_id column if it doesn't exist (for existing deployments)
+    try {
+      await sql`
+        ALTER TABLE "predictions" 
+        ADD COLUMN IF NOT EXISTS "user_id" varchar NOT NULL DEFAULT 'unknown'
+      `;
+      console.log('✓ Predictions user_id column ensured');
+    } catch (err: any) {
+      if (err?.code === '42701') { // Column already exists error
+        console.log('✓ Predictions user_id column already exists');
+      } else {
+        throw err;
+      }
+    }
+
     console.log('Creating bracket_images table...');
     await sql`
       CREATE TABLE IF NOT EXISTS "bracket_images" (
