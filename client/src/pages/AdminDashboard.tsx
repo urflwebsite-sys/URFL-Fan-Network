@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Game, News as NewsType, Pickem, PickemRules, Changelog, InsertChangelog, StreamRequest, User } from "@shared/schema";
 import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { Plus, Trash2, Edit, Save, Wrench } from "lucide-react";
 import { TEAMS } from "@/lib/teams";
 
@@ -141,8 +142,10 @@ function GamesManager() {
         if (game.date && game.time) {
           const [year, month, day] = game.date.split('-');
           const [hours, minutes] = game.time.split(':');
-          const gameTime = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes), 0));
-          payload.gameTime = gameTime.toISOString();
+          // Convert CST (UTC-6) to UTC by adding 6 hours
+          const cstDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes), 0);
+          const utcTime = new Date(cstDate.getTime() + 6 * 60 * 60 * 1000);
+          payload.gameTime = utcTime.toISOString();
         }
         return apiRequest("POST", "/api/games", payload);
       }));
@@ -200,8 +203,10 @@ function GamesManager() {
       if (date && time) {
         const [year, month, day] = date.split('-');
         const [hours, minutes] = time.split(':');
-        const gameTime = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes), 0));
-        await apiRequest("PATCH", `/api/games/${id}`, { gameTime: gameTime.toISOString() });
+        // Convert CST (UTC-6) to UTC by adding 6 hours
+        const cstDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes), 0);
+        const utcTime = new Date(cstDate.getTime() + 6 * 60 * 60 * 1000);
+        await apiRequest("PATCH", `/api/games/${id}`, { gameTime: utcTime.toISOString() });
       } else {
         await apiRequest("PATCH", `/api/games/${id}`, { gameTime: null });
       }
@@ -482,7 +487,7 @@ function GamesManager() {
                     </div>
                     <p className="font-semibold">{game.team2} vs {game.team1}</p>
                     <p className="text-sm text-muted-foreground">
-                      {game.gameTime ? format(new Date(game.gameTime), "MMM d, yyyy 'at' h:mm a") : "Time TBD"}
+                      {game.gameTime ? formatInTimeZone(new Date(game.gameTime), "America/Chicago", "MMM d, yyyy 'at' h:mm a 'CST'") : "Time TBD"}
                     </p>
                   </div>
                   <div className="flex gap-2">
