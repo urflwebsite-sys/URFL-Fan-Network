@@ -56,7 +56,7 @@ export function NewYearCountdown() {
 
   return (
     <>
-      {showPopup && <NewYearPopup onClose={handleClosePopup} />
+      {showPopup && <NewYearPopup onClose={handleClosePopup} />}
       <Card className="p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30">
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-2">
