@@ -17,11 +17,6 @@ export function ChristmasCountdown() {
       const now = new Date();
       let christmasDate = new Date(now.getFullYear(), 11, 25); // December 25
 
-      // If Christmas has already passed this year, target next year's Christmas
-      if (now > christmasDate) {
-        christmasDate = new Date(now.getFullYear() + 1, 11, 25);
-      }
-
       const difference = christmasDate.getTime() - now.getTime();
 
       if (difference > 0) {

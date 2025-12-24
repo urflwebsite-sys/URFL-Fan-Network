@@ -17,7 +17,11 @@ export function NewYearCountdown() {
       const now = new Date();
       const newYearDate = new Date(now.getFullYear() + 1, 0, 1); // January 1, next year
 
-      const difference = newYearDate.getTime() - now.getTime();
+      let difference = newYearDate.getTime() - now.getTime();
+      // If New Year has already passed, stay at 0
+      if (difference < 0) {
+        difference = 0;
+      }
 
       if (difference > 0) {
         setTimeLeft({
