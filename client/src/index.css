@@ -529,3 +529,55 @@
     animation: none !important;
   }
 }
+
+/* Christmas Celebration Animation */
+@keyframes christmas-pulse {
+  0%, 100% {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(34, 197, 94, 0.1));
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+  }
+  50% {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(34, 197, 94, 0.2));
+    box-shadow: 0 0 40px rgba(34, 197, 94, 0.3);
+  }
+}
+
+.animate-christmas-pulse {
+  animation: christmas-pulse 0.6s ease-in-out infinite;
+}
+
+/* Fireworks Animation */
+@keyframes fireworks {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+.animate-fireworks {
+  animation: fireworks 0.6s ease-in-out infinite;
+}
+
+/* Fireworks Glow Effect */
+@keyframes fireworks-glow {
+  0%, 100% {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1));
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2), 0 0 40px rgba(168, 85, 247, 0.1);
+  }
+  50% {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(168, 85, 247, 0.2));
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.3), 0 0 80px rgba(168, 85, 247, 0.2);
+  }
+}
+
+.animate-fireworks-glow {
+  animation: fireworks-glow 0.6s ease-in-out infinite;
+}

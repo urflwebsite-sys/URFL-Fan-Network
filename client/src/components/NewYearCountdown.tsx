@@ -8,6 +8,7 @@ export function NewYearCountdown() {
     minutes: 0,
     seconds: 0,
   });
+  const [isNewYear, setIsNewYear] = useState(false);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -23,6 +24,15 @@ export function NewYearCountdown() {
           minutes: Math.floor((difference / 1000 / 60) % 60),
           seconds: Math.floor((difference / 1000) % 60),
         });
+        setIsNewYear(false);
+      } else {
+        setTimeLeft({
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+        });
+        setIsNewYear(true);
       }
     };
 
@@ -33,13 +43,26 @@ export function NewYearCountdown() {
   }, []);
 
   return (
-    <Card className="p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30">
+    <Card className={`p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30 transition-all ${isNewYear ? "animate-fireworks-glow" : ""}`}>
       <div className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-3xl">🎆</span>
+        <div className={`flex items-center justify-center gap-2 ${isNewYear ? "animate-bounce" : ""}`}>
+          <span className={`text-3xl ${isNewYear ? "animate-fireworks" : ""}`}>🎆</span>
           <h3 className="text-2xl font-bold">New Year Countdown</h3>
-          <span className="text-3xl">✨</span>
+          <span className={`text-3xl ${isNewYear ? "animate-fireworks" : ""}`}>✨</span>
         </div>
+        {isNewYear && (
+          <div className="space-y-3">
+            <div className="text-4xl font-bold animate-pulse text-yellow-500">
+              🎉
+            </div>
+            <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 animate-pulse">
+              Happy New Year! 2026!
+            </div>
+            <div className="text-4xl font-bold animate-pulse text-yellow-500">
+              🎊
+            </div>
+          </div>
+        )}
         <div className="grid grid-cols-4 gap-3">
           <div className="space-y-1">
             <div className="text-3xl font-black text-blue-600">{timeLeft.days}</div>
