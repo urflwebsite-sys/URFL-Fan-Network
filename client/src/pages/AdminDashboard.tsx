@@ -142,7 +142,7 @@ function GamesManager() {
           const gameTime = new Date(`${game.date}T${game.time}`);
           // Adjust for timezone offset to preserve local time
           const offset = gameTime.getTimezoneOffset() * 60000;
-          const adjustedTime = new Date(gameTime.getTime() - offset);
+          const adjustedTime = new Date(gameTime.getTime() + offset);
           payload.gameTime = adjustedTime.toISOString();
         }
         return apiRequest("POST", "/api/games", payload);
@@ -202,7 +202,7 @@ function GamesManager() {
         const gameTime = new Date(`${date}T${time}`);
         // Adjust for timezone offset to preserve local time
         const offset = gameTime.getTimezoneOffset() * 60000;
-        const adjustedTime = new Date(gameTime.getTime() - offset);
+        const adjustedTime = new Date(gameTime.getTime() + offset);
         await apiRequest("PATCH", `/api/games/${id}`, { gameTime: adjustedTime.toISOString() });
       } else {
         await apiRequest("PATCH", `/api/games/${id}`, { gameTime: null });
