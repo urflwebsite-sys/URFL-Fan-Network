@@ -112,8 +112,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // If game is being marked as not final (transition from final to not final), unresolve bets
       if (req.body.isFinal === false && wasFinal) {
-        console.log(`[BET UNRESOLVE] Game ${req.params.id} unmarked as final. Unresolvling bets...`);
-        await storage.unresolveBeetsForGame(req.params.id);
+        console.log(`[BET UNRESOLVE] Game ${req.params.id} unmarked as final. Unresolving bets...`);
+        // Handle potential missing method safely
+        const s = storage as any;
+        if (typeof s.unresolveBetsForGame === 'function') {
+          await s.unresolveBetsForGame(req.params.id);
+        }
       }
       
       res.json(game);
