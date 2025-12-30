@@ -49,12 +49,11 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score }: F
     <div className="w-full bg-green-700 rounded-lg overflow-hidden border-4 border-white shadow-lg">
       {/* Field Container */}
       <div className="relative w-full pt-[56.25%]">
-        <div className="absolute inset-0 flex flex-col">
+        <div className="absolute inset-0 flex">
           {/* Team 1 Endzone (Left) */}
           <div className="flex-1 bg-blue-600 border-r-2 border-white flex items-center justify-center">
-            <div className="text-center text-white font-bold text-sm md:text-lg">
-              <div className="mb-2">{team1}</div>
-              <div className="text-2xl md:text-4xl font-black">{team1Score}</div>
+            <div className="text-white font-bold text-[10px] md:text-sm tracking-[0.2em] [writing-mode:vertical-rl] transform rotate-180 uppercase">
+              END ZONE
             </div>
           </div>
 
@@ -124,9 +123,8 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score }: F
 
           {/* Team 2 Endzone (Right) */}
           <div className="flex-1 bg-red-600 border-l-2 border-white flex items-center justify-center">
-            <div className="text-center text-white font-bold text-sm md:text-lg">
-              <div className="mb-2">{team2}</div>
-              <div className="text-2xl md:text-4xl font-black">{team2Score}</div>
+            <div className="text-white font-bold text-[10px] md:text-sm tracking-[0.2em] [writing-mode:vertical-rl] uppercase">
+              END ZONE
             </div>
           </div>
         </div>
