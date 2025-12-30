@@ -11,9 +11,10 @@ interface FootballFieldProps {
   team2Score: number;
   onPositionChange?: (position: number) => void;
   isAdmin?: boolean;
+  game?: Game;
 }
 
-export function FootballField({ plays, team1, team2, team1Score, team2Score, onPositionChange, isAdmin }: FootballFieldProps) {
+export function FootballField({ plays, team1, team2, team1Score, team2Score, onPositionChange, isAdmin, game }: FootballFieldProps) {
   const [ballPosition, setBallPosition] = useState(50); // 0-100 scale, 50 = midfield
   const fieldRef = useRef<HTMLDivElement>(null);
 
@@ -22,16 +23,11 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
   const x = useMotionValue(50);
   
   useEffect(() => {
-    if (plays.length === 0) {
-      setBallPosition(50);
-      x.set(50);
-      return;
-    }
-    const lastPlay = plays[plays.length - 1];
-    // Simple logic for now: keep track of position
-    // In a real app we'd probably have ballPosition in the DB
-    // For this demo we'll use the last known state or default
-  }, [plays]);
+    // Sync external ball position (from props/DB) to motion value
+    const pos = game?.ballPosition ?? 50;
+    x.set(pos);
+    setBallPosition(pos);
+  }, [game?.ballPosition, x]);
 
   const handleDragEnd = () => {
     const currentX = x.get();

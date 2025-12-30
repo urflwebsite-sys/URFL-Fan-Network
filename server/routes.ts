@@ -96,15 +96,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/games/:id", isAuthenticated, async (req, res) => {
     try {
-      // Get the current game state BEFORE updating
       const previousGame = await storage.getGame(req.params.id);
       const wasFinal = previousGame && previousGame.isFinal;
       const wasNotFinal = !wasFinal;
       
-      // Update the game
       const game = await storage.updateGame(req.params.id, req.body);
       
-      // If game is being marked as final (transition from not final to final), resolve bets
+      // Broadcast update to all connected clients
+      broadcast({
+        type: "game_update",
+        gameId: req.params.id,
+        game: game
+      });
+      
       if (req.body.isFinal === true && wasNotFinal) {
         console.log(`[BET RESOLUTION] Game ${req.params.id} marked as final. Resolving bets...`);
         await storage.resolveBetsForGame(req.params.id);

@@ -329,9 +329,13 @@ export default function GameDetail() {
                 team1Score={game.team1Score || 0}
                 team2Score={game.team2Score || 0}
                 isAdmin={(currentUser as any)?.role === 'admin'}
-                onPositionChange={(pos) => {
-                  console.log("Ball moved to:", pos);
-                  // Optional: Sync to backend if needed
+                game={game}
+                onPositionChange={async (pos) => {
+                  try {
+                    await apiRequest("PATCH", `/api/games/${gameId}`, { ballPosition: Math.round(pos) });
+                  } catch (err) {
+                    console.error("Failed to sync ball position:", err);
+                  }
                 }}
               />
             </div>
