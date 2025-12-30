@@ -316,19 +316,30 @@ export default function GameDetail() {
         </Button>
       </Link>
 
-      {/* Football Field */}
-      {(game?.isLive || game?.isFinal) && (
-        <Card className="p-6 mb-6">
-          <h2 className="text-2xl font-bold mb-4">Live Field</h2>
-          <FootballField 
-            plays={plays}
-            team1={game.team1}
-            team2={game.team2}
-            team1Score={game.team1Score || 0}
-            team2Score={game.team2Score || 0}
-          />
-        </Card>
-      )}
+      {/* Football Field and Last Play Update */}
+      <Card className="p-6 mb-6">
+        <div className="flex flex-col gap-6">
+          <div className="py-4">
+            <h2 className="text-2xl font-bold mb-4">Live Field</h2>
+            <FootballField 
+              plays={plays}
+              team1={game.team1}
+              team2={game.team2}
+              team1Score={game.team1Score || 0}
+              team2Score={game.team2Score || 0}
+            />
+          </div>
+          
+          {game.lastPlay && (
+            <div className="p-4 bg-muted/50 rounded-lg border border-border/50">
+              <div className="text-xs uppercase font-bold text-muted-foreground mb-2 tracking-wider flex items-center gap-2">
+                <Activity className="w-4 h-4" /> Last Play Update
+              </div>
+              <p className="text-lg font-medium leading-snug">{game.lastPlay}</p>
+            </div>
+          )}
+        </div>
+      </Card>
 
       {/* Plays Display */}
       {plays.length > 0 && (
