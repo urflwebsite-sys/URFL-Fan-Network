@@ -15,6 +15,8 @@ import Schedule from "@/pages/Schedule";
 import Playoffs from "@/pages/Playoffs";
 import Standings from "@/pages/Standings";
 import Stats from "@/pages/Stats";
+import Teams from "@/pages/Teams";
+import TeamDetail from "@/pages/TeamDetail";
 import News from "@/pages/News";
 import NewsDetail from "@/pages/NewsDetail";
 import Betting from "@/pages/Betting";
@@ -90,6 +92,8 @@ function MainContent() {
               <Route path="/playoffs" component={Playoffs} />
               <Route path="/standings" component={Standings} />
               <Route path="/stats" component={Stats} />
+              <Route path="/teams" component={Teams} />
+              <Route path="/teams/:name" component={TeamDetail} />
               <Route path="/news" component={News} />
               <Route path="/news/:id" component={NewsDetail} />
               <Route path="/betting" component={Betting} />

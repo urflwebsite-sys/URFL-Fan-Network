@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { 
   Home, Zap, Calendar, Trophy, BarChart3, Newspaper, Target, 
   Users, BookOpen, Shield, Moon, Sun, LogOut, LogIn, Settings,
-  Snowflake, ChevronLeft, ChevronRight, Star, Clock
+  Snowflake, ChevronLeft, ChevronRight, Star, Clock, Shirt
 } from "lucide-react";
 import { createContext, useContext, useState, ReactNode } from "react";
 import { useTheme } from "@/components/ThemeProvider";
@@ -47,6 +47,7 @@ export function Sidebar() {
     { path: "/playoffs", label: "Playoffs", icon: Trophy },
     { path: "/standings", label: "Standings", icon: BarChart3 },
     { path: "/stats", label: "Stats & Data", icon: BarChart3 },
+    { path: "/teams", label: "Teams", icon: Shirt },
     { path: "/previous-weeks", label: "Archives", icon: Calendar },
     { path: "/news", label: "News", icon: Newspaper },
     { path: "/betting", label: "Betting", icon: Target },

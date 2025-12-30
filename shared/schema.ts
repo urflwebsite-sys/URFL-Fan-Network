@@ -418,3 +418,26 @@ export const insertPlayerStatsSchema = createInsertSchema(playerStats).omit({
 
 export type InsertPlayerStats = z.infer<typeof insertPlayerStatsSchema>;
 export type PlayerStats = typeof playerStats.$inferSelect;
+
+// Teams table
+export const teams = pgTable("teams", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  logo: text("logo"),
+  colors: varchar("colors", { length: 100 }), // e.g., "red,white,blue"
+  description: text("description"),
+  foundedYear: integer("founded_year"),
+  city: varchar("city", { length: 100 }),
+  division: varchar("division", { length: 10 }), // "AFC_D1", "AFC_D2", "NFC_D1", "NFC_D2"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertTeamSchema = createInsertSchema(teams).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTeam = z.infer<typeof insertTeamSchema>;
+export type Team = typeof teams.$inferSelect;
