@@ -243,6 +243,8 @@ export default function GameDetail() {
           const data = JSON.parse(event.data);
           if (data.type === "chat" && data.gameId === gameId) {
             setChatMessages((prev) => [...prev, data.message]);
+          } else if (data.type === "game_update" && data.gameId === gameId) {
+            queryClient.setQueryData(["/api/games", gameId], data.game);
           }
         } catch (err) {
           console.error("Failed to parse WebSocket message:", err);

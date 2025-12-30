@@ -96,20 +96,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/games/:id", isAuthenticated, async (req, res) => {
     try {
-      const previousGame = await storage.getGame(req.params.id);
-      const wasFinal = previousGame && previousGame.isFinal;
-      const wasNotFinal = !wasFinal;
-      
-      const game = await storage.updateGame(req.params.id, req.body);
-      
-      // Broadcast update to all connected clients
-      broadcast({
+    const gameToUpdate = await storage.getGame(req.params.id);
+    const wasFinal = gameToUpdate && gameToUpdate.isFinal;
+    const wasNotFinal = !wasFinal;
+    
+    // Update the game
+    const updatedGame = await storage.updateGame(req.params.id, req.body);
+    
+    // Broadcast update to all connected clients
+    const wss = (app as any).wss;
+    if (wss) {
+      const updateMessage = JSON.stringify({
         type: "game_update",
         gameId: req.params.id,
-        game: game
+        game: updatedGame
       });
-      
-      if (req.body.isFinal === true && wasNotFinal) {
+      wss.clients.forEach((client: any) => {
+        if (client.readyState === 1) { // WebSocket.OPEN
+          client.send(updateMessage);
+        }
+      });
+    }
+    
+    // If game is being marked as final (transition from not final to final), resolve bets
+    if (req.body.isFinal === true && wasNotFinal) {
         console.log(`[BET RESOLUTION] Game ${req.params.id} marked as final. Resolving bets...`);
         await storage.resolveBetsForGame(req.params.id);
       }

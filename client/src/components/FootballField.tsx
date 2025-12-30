@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import type { GamePlay } from "@shared/schema";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import type { GamePlay, Game } from "@shared/schema";
+import { motion, useMotionValue } from "framer-motion";
 import fieldBg from "@/assets/field.jpg";
 
 interface FootballFieldProps {
