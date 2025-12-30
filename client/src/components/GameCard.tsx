@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import type { Game } from "@shared/schema";
 import { formatInTimeZone } from "date-fns-tz";
 import { TEAMS } from "@/lib/teams";
-import { Video } from "lucide-react";
+import { Video, Activity } from "lucide-react";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { FootballField } from "./FootballField";
 
 interface GameCardProps {
   game: Game;
@@ -91,9 +92,21 @@ export function GameCard({ game, onClick }: GameCardProps) {
           </div>
         )}
 
+        <div className="py-2" onClick={(e) => e.stopPropagation()}>
+          <FootballField 
+            plays={[]} 
+            team1={game.team1} 
+            team2={game.team2} 
+            team1Score={game.team1Score || 0} 
+            team2Score={game.team2Score || 0} 
+          />
+        </div>
+
         {game.lastPlay && (
-          <div className="mt-3 p-3 bg-muted/50 rounded-md border border-border/50">
-            <div className="text-[10px] uppercase font-bold text-muted-foreground mb-1 tracking-wider">Last Play</div>
+          <div className="mt-1 p-3 bg-muted/50 rounded-md border border-border/50">
+            <div className="text-[10px] uppercase font-bold text-muted-foreground mb-1 tracking-wider flex items-center gap-1">
+              <Activity className="w-3 h-3" /> Last Play
+            </div>
             <p className="text-sm font-medium leading-snug">{game.lastPlay}</p>
           </div>
         )}

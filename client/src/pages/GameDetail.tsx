@@ -741,6 +741,8 @@ export default function GameDetail() {
             onSendMessage={handleSendMessage}
             username={currentUser?.username}
             isAuthenticated={!!user}
+            role={(currentUser as any)?.role}
+            game={game}
           />
         </Card>
       </div>

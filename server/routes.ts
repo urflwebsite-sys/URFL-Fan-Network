@@ -117,6 +117,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const s = storage as any;
         if (typeof s.unresolveBetsForGame === 'function') {
           await s.unresolveBetsForGame(req.params.id);
+        } else if (typeof s.unresolveBeetsForGame === 'function') {
+          // Fix typo in original storage
+          await s.unresolveBeetsForGame(req.params.id);
         }
       }
       

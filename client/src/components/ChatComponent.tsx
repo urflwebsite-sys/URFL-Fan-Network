@@ -2,9 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send } from "lucide-react";
-import type { ChatMessage } from "@shared/schema";
+import { Send, Activity } from "lucide-react";
+import type { ChatMessage, Game } from "@shared/schema";
 import { format } from "date-fns";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChatComponentProps {
   gameId?: string;
@@ -12,11 +15,37 @@ interface ChatComponentProps {
   onSendMessage: (username: string, message: string) => void;
   username?: string;
   isAuthenticated?: boolean;
+  role?: string;
+  game?: Game;
 }
 
-export function ChatComponent({ messages, onSendMessage, username, isAuthenticated }: ChatComponentProps) {
+export function ChatComponent({ messages, onSendMessage, username, isAuthenticated, role, gameId, game }: ChatComponentProps) {
   const [message, setMessage] = useState("");
+  const [lastPlay, setLastPlay] = useState(game?.lastPlay || "");
+  const { toast } = useToast();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (game?.lastPlay !== undefined) {
+      setLastPlay(game.lastPlay || "");
+    }
+  }, [game?.lastPlay]);
+
+  const updateLastPlayMutation = useMutation({
+    mutationFn: async (newLastPlay: string) => {
+      if (!gameId) return;
+      await apiRequest("PATCH", `/api/games/${gameId}`, { lastPlay: newLastPlay });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/games/${gameId}`] });
+      toast({ title: "Updated", description: "Last play updated successfully" });
+    }
+  });
+
+  const handleLastPlaySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateLastPlayMutation.mutate(lastPlay);
+  };
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -95,6 +124,29 @@ export function ChatComponent({ messages, onSendMessage, username, isAuthenticat
           </Button>
         </div>
       </form>
+
+      {role === "admin" && gameId && (
+        <div className="border-t p-4 bg-muted/30">
+          <h4 className="text-xs font-bold uppercase text-muted-foreground mb-2 flex items-center gap-1">
+            <Activity className="w-3 h-3" /> Admin Play-by-Play
+          </h4>
+          <form onSubmit={handleLastPlaySubmit} className="flex gap-2">
+            <Input
+              value={lastPlay}
+              onChange={(e) => setLastPlay(e.target.value)}
+              placeholder="Update last play..."
+              className="text-sm h-8"
+            />
+            <Button 
+              type="submit" 
+              size="sm" 
+              disabled={updateLastPlayMutation.isPending}
+            >
+              Update
+            </Button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
