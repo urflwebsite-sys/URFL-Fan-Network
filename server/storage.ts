@@ -258,6 +258,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(games.id, id))
       .returning();
       
+    if (!game) return undefined as any;
     console.log(`[STORAGE] Game ${id} updated in DB. New ballPosition: ${game.ballPosition}`);
     return game;
   }

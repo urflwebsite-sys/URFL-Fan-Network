@@ -75,16 +75,6 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
           queryClient.invalidateQueries({ queryKey: ["/api/games", game.id] });
           queryClient.invalidateQueries({ queryKey: ["/api/games/all"] });
           queryClient.invalidateQueries({ queryKey: ["/api/games/current"] });
-          
-          // Broadcast the final position to all clients to ensure synchronization
-          const wss = (window as any).socket;
-          if (wss && wss.readyState === WebSocket.OPEN) {
-            wss.send(JSON.stringify({
-              type: "game_update",
-              gameId: game.id,
-              game: updated
-            }));
-          }
         })
         .catch(err => {
           console.error("[FIELD] Final save failed:", err);

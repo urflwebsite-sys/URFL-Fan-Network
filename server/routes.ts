@@ -96,66 +96,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/games/:id", isAuthenticated, async (req, res) => {
     try {
-    const gameToUpdate = await storage.getGame(req.params.id);
-    const wasFinal = gameToUpdate && gameToUpdate.isFinal;
-    const wasNotFinal = !wasFinal;
-    
-    // Update the game
-    const updatedGame = await storage.updateGame(req.params.id, req.body);
-    
-    // Broadcast update to all connected clients
-    const wss = (app as any).wss;
-    if (wss) {
-      const updateMessage = JSON.stringify({
-        type: "game_update",
-        gameId: req.params.id,
-        game: updatedGame
-      });
-      wss.clients.forEach((client: any) => {
-        if (client.readyState === 1) { // WebSocket.OPEN
-          client.send(updateMessage);
-        }
-      });
-    }
-    
-    // If game is being marked as final (transition from not final to final), resolve bets
-    if (req.body.isFinal === true && wasNotFinal) {
-        console.log(`[BET RESOLUTION] Game ${req.params.id} marked as final. Resolving bets...`);
-        await storage.resolveBetsForGame(req.params.id);
+      const { id } = req.params;
+      const gameToUpdate = await storage.getGame(id);
+      if (!gameToUpdate) {
+        return res.status(404).json({ message: "Game not found" });
+      }
+
+      const wasFinal = gameToUpdate.isFinal;
+      const wasNotFinal = !wasFinal;
+      
+      // Update the game
+      const updatedGame = await storage.updateGame(id, req.body);
+      
+      // Broadcast update to all connected clients
+      const wss = (app as any).wss;
+      if (wss) {
+        const updateMessage = JSON.stringify({
+          type: "game_update",
+          gameId: id,
+          game: updatedGame
+        });
+        wss.clients.forEach((client: any) => {
+          if (client.readyState === 1) { // WebSocket.OPEN
+            client.send(updateMessage);
+          }
+        });
+      }
+      
+      // If game is being marked as final (transition from not final to final), resolve bets
+      if (req.body.isFinal === true && wasNotFinal) {
+        console.log(`[BET RESOLUTION] Game ${id} marked as final. Resolving bets...`);
+        await storage.resolveBetsForGame(id);
       }
       
       // If game is being marked as not final (transition from final to not final), unresolve bets
       if (req.body.isFinal === false && wasFinal) {
-        console.log(`[BET UNRESOLVE] Game ${req.params.id} unmarked as final. Unresolving bets...`);
+        console.log(`[BET UNRESOLVE] Game ${id} unmarked as final. Unresolving bets...`);
         // Handle potential missing method safely
         const s = storage as any;
         if (typeof s.unresolveBetsForGame === 'function') {
-          await s.unresolveBetsForGame(req.params.id);
+          await s.unresolveBetsForGame(id);
         } else if (typeof s.unresolveBeetsForGame === 'function') {
-          // Fix typo in original storage
-          await s.unresolveBeetsForGame(req.params.id);
+          await s.unresolveBeetsForGame(id);
         }
       }
       
-      if (!updatedGame) {
-        return res.status(404).json({ message: "Game not found" });
-      }
-
       res.json(updatedGame);
-
-      // Broadcast update via WebSocket
-      const broadcastData = JSON.stringify({
-        type: "game_update",
-        gameId: req.params.id,
-        game: updatedGame,
-      });
-
-      // @ts-ignore - wss is defined in this scope
-      wss.clients.forEach((client: any) => {
-        if (client.readyState === 1) { // WebSocket.OPEN
-          client.send(broadcastData);
-        }
-      });
     } catch (error) {
       console.error("Error updating game:", error);
       res.status(400).json({ message: "Failed to update game" });
