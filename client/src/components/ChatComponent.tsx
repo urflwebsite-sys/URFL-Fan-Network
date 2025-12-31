@@ -111,14 +111,6 @@ export function ChatComponent({ messages, onSendMessage, username, isAuthenticat
 
       <form onSubmit={handleSendMessage} className="border-t p-4">
         <div className="flex gap-2">
-          <Input
-            type="text"
-            placeholder="Type your message..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            maxLength={500}
-            data-testid="input-chat-message"
-          />
           <Button type="submit" size="icon" data-testid="button-send-message">
             <Send className="w-4 h-4" />
           </Button>
