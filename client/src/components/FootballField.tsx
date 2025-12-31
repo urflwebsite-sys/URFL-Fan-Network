@@ -21,26 +21,24 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
 
   // Ball position on field is 10-110 (including endzones)
   // We'll map 0-100 yards to 8.33% - 91.66% of the container width
-  const x = useMotionValue(50);
-  
   useEffect(() => {
-    // Sync external ball position (from props/DB) to motion value
     const pos = game?.ballPosition ?? 50;
-    x.set(pos);
     setBallPosition(pos);
-    console.log("[FIELD] Initial ball position set:", pos);
-  }, [game?.ballPosition, x]);
+    console.log("[FIELD] Prop/DB position update:", pos);
+  }, [game?.ballPosition]);
 
-  const handleDrag = () => {
-    const currentX = x.get();
-    const roundedX = Math.round(currentX);
+  const handleDrag = (event: any, info: any) => {
+    if (!fieldRef.current) return;
+    const rect = fieldRef.current.getBoundingClientRect();
+    const xPos = info.point.x - rect.left;
+    const percentage = Math.max(0, Math.min(100, (xPos / rect.width) * 100));
+    const roundedX = Math.round(percentage);
     
-    // Broadcast position live while dragging if it changed
-    if (game?.id && roundedX !== ballPosition) {
+    if (roundedX !== ballPosition) {
       setBallPosition(roundedX);
       const payload = { 
         type: "ball_move",
-        gameId: game.id,
+        gameId: game?.id,
         ballPosition: roundedX 
       };
       
@@ -51,13 +49,14 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
     }
   };
 
-  const handleDragEnd = () => {
-    const currentX = x.get();
-    const roundedX = Math.round(currentX);
+  const handleDragEnd = (event: any, info: any) => {
+    if (!fieldRef.current) return;
+    const rect = fieldRef.current.getBoundingClientRect();
+    const xPos = info.point.x - rect.left;
+    const percentage = Math.max(0, Math.min(100, (xPos / rect.width) * 100));
+    const roundedX = Math.round(percentage);
     
     setBallPosition(roundedX);
-    x.set(roundedX);
-    
     console.log("[FIELD] Drag ended, persisting ball position:", roundedX);
 
     if (onPositionChange) {
@@ -66,21 +65,15 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
     
     if (game?.id) {
       const payload = { ballPosition: roundedX };
-      console.log("[FIELD] Sending PATCH request to persist ball position:", payload);
-      
       apiRequest("PATCH", `/api/games/${game.id}`, payload)
         .then((updated) => {
           console.log("[FIELD] Successfully persisted to DB:", updated);
-          // Directly update the local game state if possible, or invalidate
           queryClient.setQueryData(["/api/games", game.id], (old: any) => {
             if (!old) return old;
             return { ...old, ballPosition: roundedX };
           });
-          queryClient.invalidateQueries({ queryKey: ["/api/games", game.id] });
         })
-        .catch(err => {
-          console.error("[FIELD] Final save failed:", err);
-        });
+        .catch(err => console.error("[FIELD] Final save failed:", err));
     }
   };
 
@@ -91,7 +84,6 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
         className="relative w-full aspect-[16/9] bg-cover bg-center"
         style={{ backgroundImage: `url(${fieldBg})` }}
       >
-        {/* Draggable Ball */}
         <motion.div
           drag={isAdmin ? "x" : false}
           dragConstraints={fieldRef}
@@ -99,11 +91,12 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
           dragMomentum={false}
           onDrag={handleDrag}
           onDragEnd={handleDragEnd}
+          animate={{ left: `${ballPosition}%` }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
           style={{ 
-            x: `${x.get()}%`,
-            left: 0,
             top: "50%",
-            transform: "translate(-50%, -50%)"
+            transform: "translate(-50%, -50%)",
+            position: "absolute"
           }}
           className={`absolute w-4 h-6 bg-amber-900 rounded-full shadow-xl cursor-grab active:cursor-grabbing z-20 flex items-center justify-center border border-white/30 ${isAdmin ? 'ring-2 ring-primary ring-offset-2' : ''}`}
         >

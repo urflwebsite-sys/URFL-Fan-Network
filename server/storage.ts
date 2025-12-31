@@ -261,6 +261,7 @@ export class DatabaseStorage implements IStorage {
     // Let's ensure both fields are set to the same value to be safe.
     if (finalUpdate.ballPosition !== undefined) {
       finalUpdate.ball_position = finalUpdate.ballPosition;
+      finalUpdate.ballPosition = finalUpdate.ballPosition; // Redundant but safe
     }
 
     const [game] = await db
