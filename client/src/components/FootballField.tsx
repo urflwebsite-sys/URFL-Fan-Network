@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import type { GamePlay, Game } from "@shared/schema";
 import { motion, useMotionValue } from "framer-motion";
 import fieldBg from "@assets/Football_field_diagram_1767142475671.webp";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface FootballFieldProps {
   plays: GamePlay[];
@@ -66,14 +66,29 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
     
     if (game?.id) {
       const payload = { ballPosition: roundedX };
+      console.log("[FIELD] Sending PATCH request to persist ball position:", payload);
+      
       apiRequest("PATCH", `/api/games/${game.id}`, payload)
         .then((updated) => {
           console.log("[FIELD] Successfully persisted to DB:", updated);
+          // Invalidate queries to ensure all components see the new state
           queryClient.invalidateQueries({ queryKey: ["/api/games", game.id] });
           queryClient.invalidateQueries({ queryKey: ["/api/games/all"] });
           queryClient.invalidateQueries({ queryKey: ["/api/games/current"] });
+          
+          // Broadcast the final position to all clients to ensure synchronization
+          const wss = (window as any).socket;
+          if (wss && wss.readyState === WebSocket.OPEN) {
+            wss.send(JSON.stringify({
+              type: "game_update",
+              gameId: game.id,
+              game: updated
+            }));
+          }
         })
-        .catch(err => console.error("[FIELD] Final save failed:", err));
+        .catch(err => {
+          console.error("[FIELD] Final save failed:", err);
+        });
     }
   };
 

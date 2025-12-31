@@ -372,9 +372,9 @@ export default function GameDetail() {
                   {play.playType.charAt(0).toUpperCase() + play.playType.slice(1)}
                 </p>
                 <p className="text-sm font-medium">{play.description}</p>
-                {play.yardsGained !== 0 && (
+                {(play.yardsGained ?? 0) !== 0 && (
                   <p className="text-xs text-primary mt-1">
-                    {play.yardsGained > 0 ? '+ ' : ''}{play.yardsGained} yards
+                    {(play.yardsGained ?? 0) > 0 ? '+ ' : ''}{play.yardsGained ?? 0} yards
                   </p>
                 )}
               </div>
@@ -513,9 +513,10 @@ export default function GameDetail() {
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    const url = game.streamLink.startsWith('http://') || game.streamLink.startsWith('https://') 
-                      ? game.streamLink 
-                      : `https://${game.streamLink}`;
+                    const streamUrl = game.streamLink || "";
+                    const url = streamUrl.startsWith('http://') || streamUrl.startsWith('https://') 
+                      ? streamUrl 
+                      : `https://${streamUrl}`;
                     window.open(url, '_blank');
                   }}
                   className="gap-2"
@@ -587,7 +588,7 @@ export default function GameDetail() {
                           </div>
                           {myRequest.streamLink && (
                             <p className="text-xs text-muted-foreground">
-                              Current link: {myRequest.streamLink}
+                              Current link: {String(myRequest.streamLink)}
                             </p>
                           )}
                         </div>

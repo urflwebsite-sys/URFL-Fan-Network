@@ -142,6 +142,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.json(updatedGame);
+
+      // Broadcast update via WebSocket
+      const broadcastData = JSON.stringify({
+        type: "game_update",
+        gameId: req.params.id,
+        game: updatedGame,
+      });
+
+      // @ts-ignore - wss is defined in this scope
+      wss.clients.forEach((client: any) => {
+        if (client.readyState === 1) { // WebSocket.OPEN
+          client.send(broadcastData);
+        }
+      });
     } catch (error) {
       console.error("Error updating game:", error);
       res.status(400).json({ message: "Failed to update game" });
