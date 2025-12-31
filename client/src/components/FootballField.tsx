@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import type { GamePlay, Game } from "@shared/schema";
-import { motion, useMotionValue } from "framer-motion";
+import { motion } from "framer-motion";
 import fieldBg from "@assets/Football_field_diagram_1767142475671.webp";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
@@ -17,10 +17,23 @@ interface FootballFieldProps {
 
 export function FootballField({ plays, team1, team2, team1Score, team2Score, onPositionChange, isAdmin, game }: FootballFieldProps) {
   const [ballPosition, setBallPosition] = useState(50); // 0-100 scale, 50 = midfield
+  const [containerWidth, setContainerWidth] = useState(0);
   const fieldRef = useRef<HTMLDivElement>(null);
 
-  // Ball position on field is 10-110 (including endzones)
-  // We'll map 0-100 yards to 8.33% - 91.66% of the container width
+  // Track container width on mount and resize
+  useEffect(() => {
+    const updateWidth = () => {
+      if (fieldRef.current) {
+        setContainerWidth(fieldRef.current.getBoundingClientRect().width);
+      }
+    };
+
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
+  // Update ball position from game data
   useEffect(() => {
     const pos = game?.ballPosition ?? 50;
     setBallPosition(pos);
@@ -57,7 +70,7 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
     const roundedX = Math.round(percentage);
     
     setBallPosition(roundedX);
-    console.log("[FIELD] Drag ended, persisting ball position:", roundedX);
+    console.log("[FIELD] Drag ended, persisting ball position:", roundedX, "Container width:", rect.width);
 
     if (onPositionChange) {
       onPositionChange(roundedX);
@@ -77,6 +90,9 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
     }
   };
 
+  // Calculate pixel position from percentage
+  const pixelPosition = containerWidth > 0 ? (ballPosition / 100) * containerWidth : 0;
+
   return (
     <div className="w-full rounded-lg overflow-hidden shadow-lg border-4 border-white">
       <div 
@@ -91,7 +107,7 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
           dragMomentum={false}
           onDrag={handleDrag}
           onDragEnd={handleDragEnd}
-          animate={{ left: `${ballPosition}%` }}
+          animate={{ x: pixelPosition }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           style={{ 
             top: "50%",
