@@ -530,36 +530,6 @@ export default function Betting() {
                   );
                 })}
               </div>
-
-              {/* Bet Summary */}
-              {totalBetAmount > 0 && (
-                <Card className="p-6 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-primary/30">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-bold">Bet Summary</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Total Betting</p>
-                        <div className="flex items-center gap-2 text-2xl font-bold">
-                          <Coins className="w-6 h-6 text-yellow-500" />
-                          {totalBetAmount}
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Remaining Balance</p>
-                        <div className="flex items-center gap-2 text-2xl font-bold text-primary">
-                          <Coins className="w-6 h-6" />
-                          {remainingBalance}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="pt-2 border-t border-border/50">
-                      <p className="text-sm text-muted-foreground mb-2">
-                        You have {Object.keys(bets).length} bet(s) pending confirmation
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              )}
             </>
           )}
         </TabsContent>
@@ -815,35 +785,6 @@ export default function Betting() {
                 );
               })()}
             </>
-          )}
-
-          {/* Bet Stats Summary */}
-          {sortedUserBets.length > 0 && (
-            <Card className="p-6 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-primary/30">
-              <div className="space-y-4">
-                <h3 className="text-lg font-bold">Betting Summary</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Total Bets</p>
-                    <div className="text-2xl font-bold">{sortedUserBets.length}</div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Total Wagered</p>
-                    <div className="flex items-center gap-2 text-2xl font-bold">
-                      <Coins className="w-5 h-5 text-yellow-500" />
-                      {Math.floor(sortedUserBets.reduce((sum, b) => sum + b.amount, 0))}
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Potential Winnings</p>
-                    <div className="flex items-center gap-2 text-2xl font-bold text-accent">
-                      <Coins className="w-5 h-5" />
-                      {Math.floor(sortedUserBets.reduce((sum, b) => sum + (b.amount * (b.odds || 1.5)), 0))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
           )}
         </TabsContent>
       </Tabs>
