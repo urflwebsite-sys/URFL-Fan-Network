@@ -18,19 +18,26 @@ interface FootballFieldProps {
 export function FootballField({ plays, team1, team2, team1Score, team2Score, onPositionChange, isAdmin, game }: FootballFieldProps) {
   const [ballPosition, setBallPosition] = useState(50); // 0-100 scale, 50 = midfield
   const [containerWidth, setContainerWidth] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const fieldRef = useRef<HTMLDivElement>(null);
+  const ballRef = useRef<HTMLDivElement>(null);
 
   // Track container width on mount and resize
   useEffect(() => {
     const updateWidth = () => {
       if (fieldRef.current) {
-        setContainerWidth(fieldRef.current.getBoundingClientRect().width);
+        setContainerWidth(fieldRef.current.offsetWidth);
       }
     };
 
+    // Use a small delay to ensure layout is complete
+    const timer = setTimeout(updateWidth, 0);
     updateWidth();
     window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", updateWidth);
+    };
   }, []);
 
   // Update ball position from game data
@@ -41,10 +48,11 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
   }, [game?.ballPosition]);
 
   const handleDrag = (event: any, info: any) => {
-    if (!fieldRef.current) return;
-    const rect = fieldRef.current.getBoundingClientRect();
-    const xPos = info.point.x - rect.left;
-    const percentage = Math.max(0, Math.min(100, (xPos / rect.width) * 100));
+    if (!fieldRef.current || containerWidth === 0) return;
+    
+    // Calculate position as percentage of container width
+    const xPos = info.offset.x;
+    const percentage = Math.max(0, Math.min(100, (xPos / containerWidth) * 100));
     const roundedX = Math.round(percentage);
     
     if (roundedX !== ballPosition) {
@@ -63,14 +71,15 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
   };
 
   const handleDragEnd = (event: any, info: any) => {
-    if (!fieldRef.current) return;
-    const rect = fieldRef.current.getBoundingClientRect();
-    const xPos = info.point.x - rect.left;
-    const percentage = Math.max(0, Math.min(100, (xPos / rect.width) * 100));
+    if (containerWidth === 0) return;
+    
+    const xPos = info.offset.x;
+    const percentage = Math.max(0, Math.min(100, (xPos / containerWidth) * 100));
     const roundedX = Math.round(percentage);
     
     setBallPosition(roundedX);
-    console.log("[FIELD] Drag ended, persisting ball position:", roundedX, "Container width:", rect.width);
+    setIsDragging(false);
+    console.log("[FIELD] Drag ended, persisting ball position:", roundedX, "Container width:", containerWidth);
 
     if (onPositionChange) {
       onPositionChange(roundedX);
@@ -92,29 +101,38 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
 
   // Calculate pixel position from percentage
   const pixelPosition = containerWidth > 0 ? (ballPosition / 100) * containerWidth : 0;
+  const maxDragX = containerWidth > 0 ? containerWidth : 0;
 
   return (
     <div className="w-full rounded-lg overflow-hidden shadow-lg border-4 border-white">
       <div 
         ref={fieldRef}
         className="relative w-full aspect-[16/9] bg-cover bg-center"
-        style={{ backgroundImage: `url(${fieldBg})` }}
+        style={{ 
+          backgroundImage: `url(${fieldBg})`,
+          contain: "layout style paint",
+        } as any}
       >
         <motion.div
+          ref={ballRef}
           drag={isAdmin ? "x" : false}
-          dragConstraints={fieldRef}
           dragElastic={0}
           dragMomentum={false}
+          dragConstraints={{ left: 0, right: maxDragX }}
+          onDragStart={() => setIsDragging(true)}
           onDrag={handleDrag}
           onDragEnd={handleDragEnd}
           animate={{ x: pixelPosition }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          transition={isDragging ? { type: "linear" } : { type: "spring", stiffness: 300, damping: 30 }}
           style={{ 
             top: "50%",
-            transform: "translate(-50%, -50%)",
-            position: "absolute"
+            position: "absolute",
+            willChange: isDragging ? "transform" : "auto",
+            originX: 0.5,
+            originY: 0.5,
           }}
-          className={`absolute w-4 h-6 bg-amber-900 rounded-full shadow-xl cursor-grab active:cursor-grabbing z-20 flex items-center justify-center border border-white/30 ${isAdmin ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+          initial={{ x: pixelPosition }}
+          className={`absolute w-4 h-6 bg-amber-900 rounded-full shadow-xl cursor-grab active:cursor-grabbing z-20 flex items-center justify-center border border-white/30 pointer-events-auto ${isAdmin ? 'ring-2 ring-primary ring-offset-2' : ''}`}
         >
           <div className="w-full h-[1px] bg-white/50 absolute top-1/4" />
           <div className="w-full h-[1px] bg-white/50 absolute top-3/4" />
