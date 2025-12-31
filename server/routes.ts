@@ -137,6 +137,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      if (!updatedGame) {
+        return res.status(404).json({ message: "Game not found" });
+      }
+
       res.json(updatedGame);
     } catch (error) {
       console.error("Error updating game:", error);
