@@ -41,29 +41,6 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
     console.log("[FIELD] Prop/DB position update:", pos);
   }, [game?.ballPosition]);
 
-  const handleDrag = (event: any, info: any) => {
-    if (containerWidthRef.current === 0) return;
-    
-    // Calculate position as percentage of container width
-    const xPos = info.offset.x;
-    const percentage = Math.max(0, Math.min(100, (xPos / containerWidthRef.current) * 100));
-    const roundedX = Math.round(percentage);
-    
-    if (roundedX !== ballPosition) {
-      setBallPosition(roundedX);
-      const payload = { 
-        type: "ball_move",
-        gameId: game?.id,
-        ballPosition: roundedX 
-      };
-      
-      const wss = (window as any).socket;
-      if (wss && wss.readyState === WebSocket.OPEN) {
-        wss.send(JSON.stringify(payload));
-      }
-    }
-  };
-
   const handleDragEnd = (event: any, info: any) => {
     if (containerWidthRef.current === 0) return;
     
@@ -94,6 +71,7 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
 
   // Calculate pixel position from percentage
   const pixelPosition = containerWidthRef.current > 0 ? (ballPosition / 100) * containerWidthRef.current : 0;
+  const maxDrag = containerWidthRef.current;
 
   return (
     <div className="w-full rounded-lg overflow-hidden shadow-lg border-4 border-white">
@@ -110,7 +88,7 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
           drag={isAdmin ? "x" : false}
           dragElastic={0}
           dragMomentum={false}
-          onDrag={handleDrag}
+          dragConstraints={{ left: 0, right: maxDrag }}
           onDragEnd={handleDragEnd}
           animate={{ x: pixelPosition }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
