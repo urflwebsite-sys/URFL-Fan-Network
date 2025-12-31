@@ -644,21 +644,6 @@ function ScoresManager() {
                     </div>
                   </div>
                 </div>
-
-                <div className="pt-2">
-                  <Label htmlFor={`last-play-${game.id}`}>Last Play / Status Description</Label>
-                  <Input
-                    id={`last-play-${game.id}`}
-                    placeholder="e.g. 1st & 10 at NYG 25, Pass completion for 15 yards"
-                    defaultValue={game.lastPlay || ""}
-                    onBlur={(e) => {
-                      if (e.target.value !== (game.lastPlay || "")) {
-                        updateMutation.mutate({ id: game.id, data: { lastPlay: e.target.value } });
-                      }
-                    }}
-                    data-testid={`input-last-play-${game.id}`}
-                  />
-                </div>
               </div>
             </Card>
           ))}
