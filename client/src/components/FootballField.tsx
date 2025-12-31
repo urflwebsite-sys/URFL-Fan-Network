@@ -39,8 +39,15 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
     
     // Persist to DB if we have a game ID
     if (game?.id) {
-      apiRequest("PATCH", `/api/games/${game.id}`, { ballPosition: Math.round(currentX) })
-        .catch(err => console.error("Failed to sync ball position:", err));
+      const payload = { ballPosition: Math.round(currentX) };
+      console.log("[FIELD] Syncing ball position:", payload);
+      apiRequest("PATCH", `/api/games/${game.id}`, payload)
+        .then(() => {
+          console.log("[FIELD] Successfully synced ball position");
+          // Force a local update to match what we just sent
+          setBallPosition(currentX);
+        })
+        .catch(err => console.error("[FIELD] Failed to sync ball position:", err));
     }
   };
 
