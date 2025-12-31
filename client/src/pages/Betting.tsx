@@ -53,9 +53,15 @@ export default function Betting() {
       console.log("Placing bet:", { gameId, pickedTeam: team, amount, odds });
       return apiRequest("POST", "/api/bets", { gameId, pickedTeam: team, amount, odds });
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      // Optimistically update the balance cache immediately
+      queryClient.setQueryData(["/api/balance"], (oldData: any) => ({
+        ...oldData,
+        balance: (oldData?.balance || 1000) - variables.amount,
+      }));
+      // Then refetch the actual balance from the server
       queryClient.invalidateQueries({ queryKey: [`/api/bets`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/balance`] });
+      queryClient.refetchQueries({ queryKey: [`/api/balance`] });
       setBets({});
     },
   });
