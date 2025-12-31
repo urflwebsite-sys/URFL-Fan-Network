@@ -124,29 +124,6 @@ export function ChatComponent({ messages, onSendMessage, username, isAuthenticat
           </Button>
         </div>
       </form>
-
-      {role === "admin" && gameId && (
-        <div className="border-t p-4 bg-muted/30">
-          <h4 className="text-xs font-bold uppercase text-muted-foreground mb-2 flex items-center gap-1">
-            <Activity className="w-3 h-3" /> Admin Play-by-Play
-          </h4>
-          <form onSubmit={handleLastPlaySubmit} className="flex gap-2">
-            <Input
-              value={lastPlay}
-              onChange={(e) => setLastPlay(e.target.value)}
-              placeholder="Update last play..."
-              className="text-sm h-8"
-            />
-            <Button 
-              type="submit" 
-              size="sm" 
-              disabled={updateLastPlayMutation.isPending}
-            >
-              Update
-            </Button>
-          </form>
-        </div>
-      )}
     </div>
   );
 }
