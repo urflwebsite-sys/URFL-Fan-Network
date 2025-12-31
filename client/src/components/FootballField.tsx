@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import type { GamePlay, Game } from "@shared/schema";
 import { motion, useMotionValue } from "framer-motion";
-import fieldBg from "@/assets/field.jpg";
+import fieldBg from "@assets/Football_field_diagram_1767142475671.webp";
 
 interface FootballFieldProps {
   plays: GamePlay[];
@@ -41,7 +41,7 @@ export function FootballField({ plays, team1, team2, team1Score, team2Score, onP
     <div className="w-full rounded-lg overflow-hidden shadow-lg border-4 border-white">
       <div 
         ref={fieldRef}
-        className="relative w-full aspect-[2/1] bg-cover bg-center"
+        className="relative w-full aspect-[16/9] bg-cover bg-center"
         style={{ backgroundImage: `url(${fieldBg})` }}
       >
         {/* Draggable Ball */}
