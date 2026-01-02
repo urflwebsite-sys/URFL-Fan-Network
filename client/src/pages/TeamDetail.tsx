@@ -6,6 +6,8 @@ import { TEAMS } from "@/lib/teams";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 
+import { Team, Player } from "@shared/schema";
+
 interface PlayerStat {
   id: string;
   playerName: string;
@@ -46,6 +48,20 @@ export default function TeamDetail() {
   const teamName = decodeURIComponent(params?.name || "");
   const teamLogo = TEAMS[teamName as keyof typeof TEAMS];
 
+  const { data: teamPlayers = [] } = useQuery<Player[]>({
+    queryKey: ["/api/teams", teamName, "players"],
+    queryFn: async () => {
+      // First find the team ID from the team name
+      const allTeams: Team[] = await (await fetch("/api/teams")).json();
+      const currentTeam = allTeams.find(t => t.name === teamName);
+      if (!currentTeam) return [];
+      
+      const players: Player[] = await (await fetch(`/api/teams/${currentTeam.id}/players`)).json();
+      return players;
+    },
+    enabled: !!teamName,
+  });
+
   const { data: playerStats = [] } = useQuery<PlayerStat[]>({
     queryKey: ["/api/player-stats"],
   });
@@ -54,16 +70,22 @@ export default function TeamDetail() {
     queryKey: ["/api/games/all"],
   });
 
-  // Get team roster
-  const teamRoster = playerStats
-    .filter((p) => p.team === teamName)
+  // Get team roster from the new players table
+  const teamRoster = (teamPlayers as Player[])
     .sort((a, b) => {
       const positionOrder = { QB: 0, RB: 1, WR: 2, DEF: 3 };
       const aOrder = positionOrder[a.position as keyof typeof positionOrder] || 999;
       const bOrder = positionOrder[b.position as keyof typeof positionOrder] || 999;
       if (aOrder !== bOrder) return aOrder - bOrder;
-      return a.playerName.localeCompare(b.playerName);
+      return a.name.localeCompare(b.name);
     });
+
+  // Helper for roster display mapping
+  const getPlayersByPosition = (pos: string) => teamRoster.filter(p => p.position === pos);
+  const qbPlayers = getPlayersByPosition("QB");
+  const rbPlayers = getPlayersByPosition("RB");
+  const wrPlayers = getPlayersByPosition("WR");
+  const defPlayers = getPlayersByPosition("DEF");
 
   // Get team stats from games
   const calculateTeamStats = (): TeamStats => {
@@ -75,14 +97,14 @@ export default function TeamDetail() {
     games.forEach((game) => {
       if (game.isFinal) {
         if (game.team1 === teamName) {
-          pointsFor += game.team1Score;
-          pointsAgainst += game.team2Score;
-          if (game.team1Score > game.team2Score) wins++;
+          pointsFor += game.team1Score ?? 0;
+          pointsAgainst += game.team2Score ?? 0;
+          if ((game.team1Score ?? 0) > (game.team2Score ?? 0)) wins++;
           else losses++;
         } else if (game.team2 === teamName) {
-          pointsFor += game.team2Score;
-          pointsAgainst += game.team1Score;
-          if (game.team2Score > game.team1Score) wins++;
+          pointsFor += game.team2Score ?? 0;
+          pointsAgainst += game.team1Score ?? 0;
+          if ((game.team2Score ?? 0) > (game.team1Score ?? 0)) wins++;
           else losses++;
         }
       }
@@ -166,16 +188,16 @@ export default function TeamDetail() {
         <TabsContent value="roster" className="mt-6 space-y-6">
           {teamRoster.length > 0 ? (
             <>
-              {qbStats.length > 0 && (
+              {qbPlayers.length > 0 && (
                 <Card className="p-6">
                   <h3 className="text-2xl font-bold mb-4">Quarterbacks</h3>
                   <div className="space-y-2">
-                    {qbStats.map((player) => (
+                    {qbPlayers.map((player) => (
                       <div
                         key={player.id}
                         className="flex justify-between items-center p-3 border-b last:border-b-0"
                       >
-                        <p className="font-semibold">{player.playerName}</p>
+                        <p className="font-semibold">{player.name} {player.number && <span className="text-muted-foreground ml-2">#{player.number}</span>}</p>
                         <p className="text-sm text-muted-foreground">QB</p>
                       </div>
                     ))}
@@ -183,16 +205,16 @@ export default function TeamDetail() {
                 </Card>
               )}
 
-              {rbStats.length > 0 && (
+              {rbPlayers.length > 0 && (
                 <Card className="p-6">
                   <h3 className="text-2xl font-bold mb-4">Running Backs</h3>
                   <div className="space-y-2">
-                    {rbStats.map((player) => (
+                    {rbPlayers.map((player) => (
                       <div
                         key={player.id}
                         className="flex justify-between items-center p-3 border-b last:border-b-0"
                       >
-                        <p className="font-semibold">{player.playerName}</p>
+                        <p className="font-semibold">{player.name} {player.number && <span className="text-muted-foreground ml-2">#{player.number}</span>}</p>
                         <p className="text-sm text-muted-foreground">RB</p>
                       </div>
                     ))}
@@ -200,16 +222,16 @@ export default function TeamDetail() {
                 </Card>
               )}
 
-              {wrStats.length > 0 && (
+              {wrPlayers.length > 0 && (
                 <Card className="p-6">
                   <h3 className="text-2xl font-bold mb-4">Wide Receivers</h3>
                   <div className="space-y-2">
-                    {wrStats.map((player) => (
+                    {wrPlayers.map((player) => (
                       <div
                         key={player.id}
                         className="flex justify-between items-center p-3 border-b last:border-b-0"
                       >
-                        <p className="font-semibold">{player.playerName}</p>
+                        <p className="font-semibold">{player.name} {player.number && <span className="text-muted-foreground ml-2">#{player.number}</span>}</p>
                         <p className="text-sm text-muted-foreground">WR</p>
                       </div>
                     ))}
@@ -217,16 +239,16 @@ export default function TeamDetail() {
                 </Card>
               )}
 
-              {defStats.length > 0 && (
+              {defPlayers.length > 0 && (
                 <Card className="p-6">
                   <h3 className="text-2xl font-bold mb-4">Defense</h3>
                   <div className="space-y-2">
-                    {defStats.map((player) => (
+                    {defPlayers.map((player) => (
                       <div
                         key={player.id}
                         className="flex justify-between items-center p-3 border-b last:border-b-0"
                       >
-                        <p className="font-semibold">{player.playerName}</p>
+                        <p className="font-semibold">{player.name} {player.number && <span className="text-muted-foreground ml-2">#{player.number}</span>}</p>
                         <p className="text-sm text-muted-foreground">DEF</p>
                       </div>
                     ))}
@@ -360,7 +382,7 @@ export default function TeamDetail() {
                   const opponent = isHome ? game.team1 : game.team2;
                   const teamScore = isHome ? game.team2Score : game.team1Score;
                   const oppScore = isHome ? game.team1Score : game.team2Score;
-                  const won = teamScore > oppScore;
+                  const won = (teamScore ?? 0) > (oppScore ?? 0);
 
                   return (
                     <div

@@ -143,6 +143,16 @@ export interface IStorage {
   placeBet(bet: InsertBet): Promise<Bet>;
   getUserBalance(userId: string): Promise<number>;
   updateUserBalance(userId: string, amount: number): Promise<User>;
+  
+  // Roster management
+  getAllTeams(): Promise<Team[]>;
+  getTeamPlayers(teamId: string): Promise<Player[]>;
+  createPlayer(player: InsertPlayer): Promise<Player>;
+  deletePlayer(id: string): Promise<void>;
+
+  // Bet resolution
+  resolveBetsForGame(gameId: string): Promise<void>;
+  unresolveBetsForGame(gameId: string): Promise<void>;
 }
 
 // Helper function to convert undefined to null (postgres requires explicit null, not undefined)
@@ -629,6 +639,23 @@ export class DatabaseStorage implements IStorage {
     await db.delete(updatePlans).where(eq(updatePlans.updateDate, date));
   }
 
+  async getAllTeams(): Promise<Team[]> {
+    return await db.select().from(teams);
+  }
+
+  async getTeamPlayers(teamId: string): Promise<Player[]> {
+    return await db.select().from(players).where(eq(players.teamId, teamId));
+  }
+
+  async createPlayer(playerData: InsertPlayer): Promise<Player> {
+    const [player] = await db.insert(players).values(cleanObject(playerData) as InsertPlayer).returning();
+    return player;
+  }
+
+  async deletePlayer(id: string): Promise<void> {
+    await db.delete(players).where(eq(players.id, id));
+  }
+
   async getUserBets(userId: string): Promise<Bet[]> {
     return await db.select().from(bets).where(eq(bets.userId, userId)).orderBy(desc(bets.createdAt));
   }
@@ -737,7 +764,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async unresolveBeetsForGame(gameId: string): Promise<void> {
+  async unresolveBetsForGame(gameId: string): Promise<void> {
     try {
       const game = await this.getGame(gameId);
       if (!game) {
@@ -778,7 +805,7 @@ export class DatabaseStorage implements IStorage {
           .where(eq(bets.id, bet.id));
       }
     } catch (error) {
-      console.error("[BET UNRESOLVE] Error unresolvling bets:", error);
+      console.error("[BET UNRESOLVE] Error unresolving bets:", error);
     }
   }
 }

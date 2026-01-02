@@ -134,13 +134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If game is being marked as not final (transition from final to not final), unresolve bets
       if (req.body.isFinal === false && wasFinal) {
         console.log(`[BET UNRESOLVE] Game ${id} unmarked as final. Unresolving bets...`);
-        // Handle potential missing method safely
-        const s = storage as any;
-        if (typeof s.unresolveBetsForGame === 'function') {
-          await s.unresolveBetsForGame(id);
-        } else if (typeof s.unresolveBeetsForGame === 'function') {
-          await s.unresolveBeetsForGame(id);
-        }
+        await storage.unresolveBetsForGame(id);
       }
       
       res.json(updatedGame);
@@ -310,7 +304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/teams", async (req, res) => {
     try {
-      const allTeams = await db.select().from(teams);
+      const allTeams = await storage.getAllTeams();
       res.json(allTeams);
     } catch (error) {
       console.error("Error fetching teams:", error);
@@ -320,7 +314,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/teams/:teamId/players", async (req, res) => {
     try {
-      const teamPlayers = await db.select().from(players).where(eq(players.teamId, req.params.teamId));
+      const teamPlayers = await storage.getTeamPlayers(req.params.teamId);
       res.json(teamPlayers);
     } catch (error) {
       console.error("Error fetching team players:", error);
@@ -334,7 +328,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Admin access required" });
       }
       const playerData = insertPlayerSchema.parse(req.body);
-      const [player] = await db.insert(players).values(playerData).returning();
+      const player = await storage.createPlayer(playerData);
       res.json(player);
     } catch (error) {
       console.error("Error creating player:", error);
@@ -347,7 +341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.session?.role !== "admin") {
         return res.status(403).json({ message: "Admin access required" });
       }
-      await db.delete(players).where(eq(players.id, req.params.id));
+      await storage.deletePlayer(req.params.id);
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting player:", error);
