@@ -22,7 +22,7 @@ import {
   insertGamePlaySchema,
   insertPlayerSchema,
 } from "@shared/schema";
-import { playerStats, gamePlays, players } from "@shared/schema";
+import { playerStats, gamePlays, players, teams } from "@shared/schema";
 import { db } from "./db";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -310,7 +310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/teams", async (req, res) => {
     try {
-      const allTeams = await db.select().from(require("@shared/schema").teams);
+      const allTeams = await db.select().from(teams);
       res.json(allTeams);
     } catch (error) {
       console.error("Error fetching teams:", error);
