@@ -103,7 +103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Game not found" });
       }
 
-      const wasFinal = gameToUpdate.isFinal;
+      const wasFinal = gameToUpdate.isFinal ?? false;
       const wasNotFinal = !wasFinal;
       
       // Update the game
