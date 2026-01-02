@@ -13,10 +13,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Game, News as NewsType, Pickem, PickemRules, Changelog, InsertChangelog, StreamRequest, User } from "@shared/schema";
+import type { Game, News as NewsType, Pickem, PickemRules, Changelog, InsertChangelog, StreamRequest, User, Team, Player } from "@shared/schema";
 import { format } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import { Plus, Trash2, Edit, Save, Wrench } from "lucide-react";
+import { Plus, Trash2, Edit, Save, Wrench, Users } from "lucide-react";
 import { TEAMS } from "@/lib/teams";
 
 const AVAILABLE_TEAMS = Object.keys(TEAMS);
@@ -59,6 +59,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="bracket" data-testid="tab-bracket">Bracket</TabsTrigger>
             <TabsTrigger value="changelogs" data-testid="tab-changelogs">Changelogs</TabsTrigger>
             <TabsTrigger value="streams" data-testid="tab-streams">Streams</TabsTrigger>
+            <TabsTrigger value="rosters" data-testid="tab-rosters">Rosters</TabsTrigger>
             <TabsTrigger value="users" data-testid="tab-users">Users</TabsTrigger>
             <TabsTrigger value="partners" data-testid="tab-partners">Partners</TabsTrigger>
             <TabsTrigger value="settings" data-testid="tab-settings">Settings</TabsTrigger>
@@ -91,6 +92,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="streams">
           <StreamRequestsManager />
+        </TabsContent>
+
+        <TabsContent value="rosters">
+          <RosterManager />
         </TabsContent>
 
         <TabsContent value="users">
@@ -2025,6 +2030,166 @@ function UpdatePlanManager() {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function RosterManager() {
+  const { toast } = useToast();
+  const [selectedTeamId, setSelectedTeamId] = useState<string>("");
+  const [playerName, setPlayerName] = useState("");
+  const [playerNumber, setPlayerNumber] = useState("");
+  const [playerPosition, setPlayerPosition] = useState("");
+
+  const { data: teams } = useQuery<Team[]>({
+    queryKey: ["/api/teams"],
+  });
+
+  const { data: players, refetch: refetchPlayers } = useQuery<Player[]>({
+    queryKey: ["/api/teams", selectedTeamId, "players"],
+    enabled: !!selectedTeamId,
+  });
+
+  const createPlayerMutation = useMutation({
+    mutationFn: async (data: { name: string; number: number; position: string; teamId: string }) => {
+      await apiRequest("POST", "/api/players", data);
+    },
+    onSuccess: () => {
+      refetchPlayers();
+      setPlayerName("");
+      setPlayerNumber("");
+      setPlayerPosition("");
+      toast({ title: "Success", description: "Player added to roster" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to add player", variant: "destructive" });
+    },
+  });
+
+  const deletePlayerMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("DELETE", `/api/players/${id}`);
+    },
+    onSuccess: () => {
+      refetchPlayers();
+      toast({ title: "Success", description: "Player removed from roster" });
+    },
+  });
+
+  return (
+    <div className="space-y-6">
+      <Card className="p-6">
+        <h2 className="text-2xl font-bold mb-4">Manage Rosters</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div>
+              <Label>Select Team</Label>
+              <Select value={selectedTeamId} onValueChange={setSelectedTeamId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a team" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teams?.map((team) => (
+                    <SelectItem key={team.id} value={team.id}>
+                      {team.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {selectedTeamId && (
+              <div className="p-4 border rounded-md space-y-4">
+                <h3 className="font-bold">Add Player</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="col-span-2">
+                    <Label>Name</Label>
+                    <Input value={playerName} onChange={(e) => setPlayerName(e.target.value)} placeholder="Full Name" />
+                  </div>
+                  <div>
+                    <Label>Number</Label>
+                    <Input type="number" value={playerNumber} onChange={(e) => setPlayerNumber(e.target.value)} placeholder="00" />
+                  </div>
+                  <div>
+                    <Label>Position</Label>
+                    <Select value={playerPosition} onValueChange={setPlayerPosition}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pos" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="QB">QB</SelectItem>
+                        <SelectItem value="WR">WR</SelectItem>
+                        <SelectItem value="RB">RB</SelectItem>
+                        <SelectItem value="TE">TE</SelectItem>
+                        <SelectItem value="OL">OL</SelectItem>
+                        <SelectItem value="DL">DL</SelectItem>
+                        <SelectItem value="LB">LB</SelectItem>
+                        <SelectItem value="DB">DB</SelectItem>
+                        <SelectItem value="K">K</SelectItem>
+                        <SelectItem value="P">P</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Button 
+                  className="w-full" 
+                  onClick={() => createPlayerMutation.mutate({
+                    name: playerName,
+                    number: parseInt(playerNumber),
+                    position: playerPosition,
+                    teamId: selectedTeamId
+                  })}
+                  disabled={!playerName || !playerNumber || !playerPosition || createPlayerMutation.isPending}
+                >
+                  <Plus className="w-4 h-4 mr-2" /> Add to Roster
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="font-bold">Current Roster</h3>
+            <div className="border rounded-md overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="p-2 text-left">#</th>
+                    <th className="p-2 text-left">Name</th>
+                    <th className="p-2 text-left">Pos</th>
+                    <th className="p-2 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {players?.map((player) => (
+                    <tr key={player.id}>
+                      <td className="p-2">{player.number}</td>
+                      <td className="p-2 font-medium">{player.name}</td>
+                      <td className="p-2">{player.position}</td>
+                      <td className="p-2 text-right">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => deletePlayerMutation.mutate(player.id)}
+                          disabled={deletePlayerMutation.isPending}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                  {(!players || players.length === 0) && (
+                    <tr>
+                      <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                        No players found for this team.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

@@ -20,8 +20,9 @@ import {
   insertBetSchema,
   insertPlayerStatsSchema,
   insertGamePlaySchema,
+  insertPlayerSchema,
 } from "@shared/schema";
-import { playerStats, gamePlays } from "@shared/schema";
+import { playerStats, gamePlays, players } from "@shared/schema";
 import { db } from "./db";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -304,6 +305,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting standing:", error);
       res.status(400).json({ message: "Failed to save standings. You do not have the proper roles to edit the standings." });
+    }
+  });
+
+  app.get("/api/teams", async (req, res) => {
+    try {
+      const allTeams = await db.select().from(require("@shared/schema").teams);
+      res.json(allTeams);
+    } catch (error) {
+      console.error("Error fetching teams:", error);
+      res.status(500).json({ message: "Failed to fetch teams" });
+    }
+  });
+
+  app.get("/api/teams/:teamId/players", async (req, res) => {
+    try {
+      const teamPlayers = await db.select().from(players).where(eq(players.teamId, req.params.teamId));
+      res.json(teamPlayers);
+    } catch (error) {
+      console.error("Error fetching team players:", error);
+      res.status(500).json({ message: "Failed to fetch players" });
+    }
+  });
+
+  app.post("/api/players", isAuthenticated, async (req: any, res) => {
+    try {
+      if (req.session?.role !== "admin") {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const playerData = insertPlayerSchema.parse(req.body);
+      const [player] = await db.insert(players).values(playerData).returning();
+      res.json(player);
+    } catch (error) {
+      console.error("Error creating player:", error);
+      res.status(400).json({ message: "Failed to create player" });
+    }
+  });
+
+  app.delete("/api/players/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      if (req.session?.role !== "admin") {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      await db.delete(players).where(eq(players.id, req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting player:", error);
+      res.status(400).json({ message: "Failed to delete player" });
     }
   });
 

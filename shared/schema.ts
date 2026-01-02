@@ -444,6 +444,26 @@ export const insertTeamSchema = createInsertSchema(teams).omit({
 export type InsertTeam = z.infer<typeof insertTeamSchema>;
 export type Team = typeof teams.$inferSelect;
 
+// Players table (for rosters)
+export const players = pgTable("players", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 100 }).notNull(),
+  number: integer("number"),
+  position: varchar("position", { length: 10 }),
+  teamId: varchar("team_id").notNull().references(() => teams.id, { onDelete: 'cascade' }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPlayerSchema = createInsertSchema(players).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPlayer = z.infer<typeof insertPlayerSchema>;
+export type Player = typeof players.$inferSelect;
+
 // Game Plays table (play-by-play tracking)
 export const gamePlays = pgTable("game_plays", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
