@@ -2,6 +2,7 @@ import { Team, Player } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { TEAMS } from "@/lib/teams";
 
 interface PlayerStat {
@@ -166,108 +167,158 @@ export default function Stats() {
             {/* QB Leaders */}
             <Card className="p-6">
               <h3 className="text-xl font-bold mb-4">Quarterback Leaders</h3>
-              <div className="space-y-3">
-                {getLeaderboard("QB").length > 0 ? (
-                  getLeaderboard("QB").map((player, idx) => {
-                    const compPct = player.attempts > 0 ? ((player.completions / player.attempts) * 100).toFixed(1) : "0.0";
-                    const rating = player.attempts > 0 ? (
-                      ((8.4 * player.passingYards) + (330 * player.passingTouchdowns) + (100 * player.completions) - (200 * player.interceptions)) / player.attempts
-                    ).toFixed(1) : "0.0";
-                    
-                    return (
-                      <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
-                          <div>
-                            <p className="font-semibold">{player.playerName}</p>
-                            <p className="text-sm text-muted-foreground">{player.team}</p>
+              <ScrollArea className="h-[400px] pr-4">
+                <div className="space-y-3">
+                  {getLeaderboard("QB").length > 0 ? (
+                    getLeaderboard("QB").map((player, idx) => {
+                      const compPct = player.attempts > 0 ? ((player.completions / player.attempts) * 100).toFixed(1) : "0.0";
+                      const rating = player.attempts > 0 ? (
+                        ((8.4 * player.passingYards) + (330 * player.passingTouchdowns) + (100 * player.completions) - (200 * player.interceptions)) / player.attempts
+                      ).toFixed(1) : "0.0";
+                      
+                      return (
+                        <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
+                            <div>
+                              <p className="font-semibold">{player.playerName}</p>
+                              <p className="text-sm text-muted-foreground">{player.team}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="flex flex-col items-end">
+                              <span className="font-bold whitespace-nowrap">{player.passingYards} Yds</span>
+                              <span className="text-sm font-semibold text-primary">{player.passingTouchdowns} TD</span>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground mt-1 leading-tight">
+                              RTG: {rating} • {compPct}% • {player.completions}/{player.attempts} • {player.interceptions} INT • {player.sacks} SCK
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-bold">{player.passingYards} Yds, {player.passingTouchdowns} TD</p>
-                          <p className="text-xs text-muted-foreground">
-                            Rating: {rating}, {compPct}%, {player.completions}/{player.attempts}, {player.interceptions} INT, {player.sacks} Sck
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">No QB stats yet</p>
-                )}
-              </div>
+                      );
+                    })
+                  ) : (
+                    <p className="text-muted-foreground text-center py-8">No QB stats yet</p>
+                  )}
+                </div>
+              </ScrollArea>
             </Card>
 
             {/* WR Leaders */}
             <Card className="p-6">
               <h3 className="text-xl font-bold mb-4">Wide Receiver Leaders</h3>
-              <div className="space-y-3">
-                {getLeaderboard("WR").length > 0 ? (
-                  getLeaderboard("WR").map((player, idx) => {
-                    const catchPct = player.targets > 0 ? ((player.receptions / player.targets) * 100).toFixed(1) : "0.0";
-                    return (
-                      <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
-                          <div>
-                            <p className="font-semibold">{player.playerName}</p>
-                            <p className="text-sm text-muted-foreground">{player.team}</p>
+              <ScrollArea className="h-[400px] pr-4">
+                <div className="space-y-3">
+                  {getLeaderboard("WR").length > 0 ? (
+                    getLeaderboard("WR").map((player, idx) => {
+                      const catchPct = player.targets > 0 ? ((player.receptions / player.targets) * 100).toFixed(1) : "0.0";
+                      return (
+                        <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
+                            <div>
+                              <p className="font-semibold">{player.playerName}</p>
+                              <p className="text-sm text-muted-foreground">{player.team}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="flex flex-col items-end">
+                              <span className="font-bold whitespace-nowrap">{player.receivingYards} Yds</span>
+                              <span className="text-sm font-semibold text-primary">{player.receivingTouchdowns} TD</span>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground mt-1 leading-tight">
+                              {player.receptions}/{player.targets} Rec ({catchPct}%) • {player.yardsAfterCatch} YAC
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-bold">{player.receivingYards} Yds, {player.receivingTouchdowns} TD</p>
-                          <p className="text-xs text-muted-foreground">
-                            {player.receptions}/{player.targets} Rec ({catchPct}%), {player.yardsAfterCatch} YAC
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">No WR stats yet</p>
-                )}
-              </div>
+                      );
+                    })
+                  ) : (
+                    <p className="text-muted-foreground text-center py-8">No WR stats yet</p>
+                  )}
+                </div>
+              </ScrollArea>
             </Card>
 
             {/* RB Leaders */}
             <Card className="p-6">
               <h3 className="text-xl font-bold mb-4">Running Back Leaders</h3>
-              <div className="space-y-3">
-                {getLeaderboard("RB").length > 0 ? (
-                  getLeaderboard("RB").map((player, idx) => {
-                    const ypa = player.rushingAttempts > 0 ? (player.rushingYards / player.rushingAttempts).toFixed(1) : "0.0";
-                    return (
-                      <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
-                          <div>
-                            <p className="font-semibold">{player.playerName}</p>
-                            <p className="text-sm text-muted-foreground">{player.team}</p>
+              <ScrollArea className="h-[400px] pr-4">
+                <div className="space-y-3">
+                  {getLeaderboard("RB").length > 0 ? (
+                    getLeaderboard("RB").map((player, idx) => {
+                      const ypa = player.rushingAttempts > 0 ? (player.rushingYards / player.rushingAttempts).toFixed(1) : "0.0";
+                      return (
+                        <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
+                            <div>
+                              <p className="font-semibold">{player.playerName}</p>
+                              <p className="text-sm text-muted-foreground">{player.team}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="flex flex-col items-end">
+                              <span className="font-bold whitespace-nowrap">{player.rushingYards} Yds</span>
+                              <span className="text-sm font-semibold text-primary">{player.rushingTouchdowns} TD</span>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground mt-1 leading-tight">
+                              {player.rushingAttempts} Att • {ypa} YPA • {player.missedTacklesForced} Misses
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-bold">{player.rushingYards} Yds, {player.rushingTouchdowns} TD</p>
-                          <p className="text-xs text-muted-foreground">
-                            {player.rushingAttempts} Att, {ypa} YPA, {player.missedTacklesForced} Misses
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">No RB stats yet</p>
-                )}
-              </div>
+                      );
+                    })
+                  ) : (
+                    <p className="text-muted-foreground text-center py-8">No RB stats yet</p>
+                  )}
+                </div>
+              </ScrollArea>
             </Card>
 
             {/* DB Leaders */}
             <Card className="p-6">
               <h3 className="text-xl font-bold mb-4">Defensive Back Leaders</h3>
-              <div className="space-y-3">
-                {getLeaderboard("DB").length > 0 ? (
-                  getLeaderboard("DB").map((player, idx) => {
-                    const denyPct = player.targetsAllowed > 0 ? (((player.targetsAllowed - player.completionsAllowed) / player.targetsAllowed) * 100).toFixed(1) : "0.0";
-                    return (
+              <ScrollArea className="h-[400px] pr-4">
+                <div className="space-y-3">
+                  {getLeaderboard("DB").length > 0 ? (
+                    getLeaderboard("DB").map((player, idx) => {
+                      const denyPct = player.targetsAllowed > 0 ? (((player.targetsAllowed - player.completionsAllowed) / player.targetsAllowed) * 100).toFixed(1) : "0.0";
+                      return (
+                        <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
+                            <div>
+                              <p className="font-semibold">{player.playerName}</p>
+                              <p className="text-sm text-muted-foreground">{player.team}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="flex flex-col items-end">
+                              <span className="font-bold whitespace-nowrap">{player.defensiveInterceptions} INT</span>
+                              <span className="text-sm font-semibold text-primary">{player.swats} Swat</span>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground mt-1 leading-tight">
+                              {denyPct}% Deny • {player.completionsAllowed}/{player.targetsAllowed} Comp • {player.defensiveTouchdowns} TD
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p className="text-muted-foreground text-center py-8">No DB stats yet</p>
+                  )}
+                </div>
+              </ScrollArea>
+            </Card>
+
+            {/* DEF Leaders */}
+            <Card className="p-6">
+              <h3 className="text-xl font-bold mb-4">Team Defense Leaders</h3>
+              <ScrollArea className="h-[400px] pr-4">
+                <div className="space-y-3">
+                  {getLeaderboard("DEF").length > 0 ? (
+                    getLeaderboard("DEF").map((player, idx) => (
                       <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
                         <div className="flex items-center gap-3">
                           <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
@@ -277,46 +328,21 @@ export default function Stats() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold">{player.defensiveInterceptions} INT, {player.swats} Swat</p>
-                          <p className="text-xs text-muted-foreground">
-                            {denyPct}% Deny, {player.completionsAllowed}/{player.targetsAllowed} Comp, {player.defensiveTouchdowns} TD
+                          <div className="flex flex-col items-end">
+                            <span className="font-bold whitespace-nowrap">{player.defensiveSacks} Sck</span>
+                            <span className="text-sm font-semibold text-primary">{player.tackles} Tkl</span>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground mt-1 leading-tight">
+                            {player.defensiveMisses} Miss • {player.safeties} Sfty
                           </p>
                         </div>
                       </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">No DB stats yet</p>
-                )}
-              </div>
-            </Card>
-
-            {/* DEF Leaders */}
-            <Card className="p-6">
-              <h3 className="text-xl font-bold mb-4">Team Defense Leaders</h3>
-              <div className="space-y-3">
-                {getLeaderboard("DEF").length > 0 ? (
-                  getLeaderboard("DEF").map((player, idx) => (
-                    <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
-                        <div>
-                          <p className="font-semibold">{player.playerName}</p>
-                          <p className="text-sm text-muted-foreground">{player.team}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold">{player.defensiveSacks} Sck, {player.tackles} Tkl</p>
-                        <p className="text-xs text-muted-foreground">
-                          {player.defensiveMisses} Miss, {player.safeties} Sfty
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">No DEF stats yet</p>
-                )}
-              </div>
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground text-center py-8">No DEF stats yet</p>
+                  )}
+                </div>
+              </ScrollArea>
             </Card>
           </div>
         </TabsContent>
