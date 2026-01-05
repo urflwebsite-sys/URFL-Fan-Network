@@ -9,14 +9,37 @@ interface PlayerStat {
   playerName: string;
   team: string;
   position: string;
+  // QB
   passingYards: number;
   passingTouchdowns: number;
   interceptions: number;
+  completions: number;
+  attempts: number;
+  sacks: number;
+  // RB
   rushingYards: number;
   rushingTouchdowns: number;
+  rushingAttempts: number;
+  missedTacklesForced: number;
+  // WR
   receivingYards: number;
   receivingTouchdowns: number;
   receptions: number;
+  targets: number;
+  yardsAfterCatch: number;
+  // DB
+  defensiveInterceptions: number;
+  passesDefended: number;
+  completionsAllowed: number;
+  targetsAllowed: number;
+  swats: number;
+  defensiveTouchdowns: number;
+  // DEF
+  defensiveSacks: number;
+  tackles: number;
+  defensiveMisses: number;
+  safeties: number;
+  
   defensivePoints: number;
   week: number;
 }
@@ -93,8 +116,10 @@ export default function Stats() {
           return b.rushingYards - a.rushingYards;
         } else if (position === "WR") {
           return b.receivingYards - a.receivingYards;
+        } else if (position === "DB") {
+          return b.defensiveInterceptions - a.defensiveInterceptions;
         } else if (position === "DEF") {
-          return b.defensivePoints - a.defensivePoints;
+          return b.defensiveSacks - a.defensiveSacks;
         }
         return 0;
       })
@@ -143,21 +168,30 @@ export default function Stats() {
               <h3 className="text-xl font-bold mb-4">Quarterback Leaders</h3>
               <div className="space-y-3">
                 {getLeaderboard("QB").length > 0 ? (
-                  getLeaderboard("QB").map((player, idx) => (
-                    <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
-                        <div>
-                          <p className="font-semibold">{player.playerName}</p>
-                          <p className="text-sm text-muted-foreground">{player.team}</p>
+                  getLeaderboard("QB").map((player, idx) => {
+                    const compPct = player.attempts > 0 ? ((player.completions / player.attempts) * 100).toFixed(1) : "0.0";
+                    const rating = player.attempts > 0 ? (
+                      ((8.4 * player.passingYards) + (330 * player.passingTouchdowns) + (100 * player.completions) - (200 * player.interceptions)) / player.attempts
+                    ).toFixed(1) : "0.0";
+                    
+                    return (
+                      <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
+                          <div>
+                            <p className="font-semibold">{player.playerName}</p>
+                            <p className="text-sm text-muted-foreground">{player.team}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold">{player.passingYards} Yds, {player.passingTouchdowns} TD</p>
+                          <p className="text-xs text-muted-foreground">
+                            Rating: {rating}, {compPct}%, {player.completions}/{player.attempts}, {player.interceptions} INT, {player.sacks} Sck
+                          </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold">{player.passingYards} yds</p>
-                        <p className="text-sm text-muted-foreground">{player.passingTouchdowns} TD</p>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <p className="text-muted-foreground text-center py-8">No QB stats yet</p>
                 )}
@@ -169,21 +203,26 @@ export default function Stats() {
               <h3 className="text-xl font-bold mb-4">Wide Receiver Leaders</h3>
               <div className="space-y-3">
                 {getLeaderboard("WR").length > 0 ? (
-                  getLeaderboard("WR").map((player, idx) => (
-                    <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
-                        <div>
-                          <p className="font-semibold">{player.playerName}</p>
-                          <p className="text-sm text-muted-foreground">{player.team}</p>
+                  getLeaderboard("WR").map((player, idx) => {
+                    const catchPct = player.targets > 0 ? ((player.receptions / player.targets) * 100).toFixed(1) : "0.0";
+                    return (
+                      <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
+                          <div>
+                            <p className="font-semibold">{player.playerName}</p>
+                            <p className="text-sm text-muted-foreground">{player.team}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold">{player.receivingYards} Yds, {player.receivingTouchdowns} TD</p>
+                          <p className="text-xs text-muted-foreground">
+                            {player.receptions}/{player.targets} Rec ({catchPct}%), {player.yardsAfterCatch} YAC
+                          </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold">{player.receivingYards} yds</p>
-                        <p className="text-sm text-muted-foreground">{player.receptions} rec</p>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <p className="text-muted-foreground text-center py-8">No WR stats yet</p>
                 )}
@@ -195,30 +234,66 @@ export default function Stats() {
               <h3 className="text-xl font-bold mb-4">Running Back Leaders</h3>
               <div className="space-y-3">
                 {getLeaderboard("RB").length > 0 ? (
-                  getLeaderboard("RB").map((player, idx) => (
-                    <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
-                        <div>
-                          <p className="font-semibold">{player.playerName}</p>
-                          <p className="text-sm text-muted-foreground">{player.team}</p>
+                  getLeaderboard("RB").map((player, idx) => {
+                    const ypa = player.rushingAttempts > 0 ? (player.rushingYards / player.rushingAttempts).toFixed(1) : "0.0";
+                    return (
+                      <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
+                          <div>
+                            <p className="font-semibold">{player.playerName}</p>
+                            <p className="text-sm text-muted-foreground">{player.team}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold">{player.rushingYards} Yds, {player.rushingTouchdowns} TD</p>
+                          <p className="text-xs text-muted-foreground">
+                            {player.rushingAttempts} Att, {ypa} YPA, {player.missedTacklesForced} Misses
+                          </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold">{player.rushingYards} yds</p>
-                        <p className="text-sm text-muted-foreground">{player.rushingTouchdowns} TD</p>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <p className="text-muted-foreground text-center py-8">No RB stats yet</p>
                 )}
               </div>
             </Card>
 
+            {/* DB Leaders */}
+            <Card className="p-6">
+              <h3 className="text-xl font-bold mb-4">Defensive Back Leaders</h3>
+              <div className="space-y-3">
+                {getLeaderboard("DB").length > 0 ? (
+                  getLeaderboard("DB").map((player, idx) => {
+                    const denyPct = player.targetsAllowed > 0 ? (((player.targetsAllowed - player.completionsAllowed) / player.targetsAllowed) * 100).toFixed(1) : "0.0";
+                    return (
+                      <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
+                          <div>
+                            <p className="font-semibold">{player.playerName}</p>
+                            <p className="text-sm text-muted-foreground">{player.team}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold">{player.defensiveInterceptions} INT, {player.swats} Swat</p>
+                          <p className="text-xs text-muted-foreground">
+                            {denyPct}% Deny, {player.completionsAllowed}/{player.targetsAllowed} Comp, {player.defensiveTouchdowns} TD
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-muted-foreground text-center py-8">No DB stats yet</p>
+                )}
+              </div>
+            </Card>
+
             {/* DEF Leaders */}
             <Card className="p-6">
-              <h3 className="text-xl font-bold mb-4">Defense Leaders</h3>
+              <h3 className="text-xl font-bold mb-4">Team Defense Leaders</h3>
               <div className="space-y-3">
                 {getLeaderboard("DEF").length > 0 ? (
                   getLeaderboard("DEF").map((player, idx) => (
@@ -231,7 +306,10 @@ export default function Stats() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold">{player.defensivePoints} pts</p>
+                        <p className="font-bold">{player.defensiveSacks} Sck, {player.tackles} Tkl</p>
+                        <p className="text-xs text-muted-foreground">
+                          {player.defensiveMisses} Miss, {player.safeties} Sfty
+                        </p>
                       </div>
                     </div>
                   ))
