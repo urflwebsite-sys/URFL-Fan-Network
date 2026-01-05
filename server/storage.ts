@@ -156,6 +156,7 @@ export interface IStorage {
   // Roster management
   getAllTeams(): Promise<Team[]>;
   getTeamPlayers(teamId: string): Promise<Player[]>;
+  createTeam(team: InsertTeam): Promise<Team>;
   createPlayer(player: InsertPlayer): Promise<Player>;
   deletePlayer(id: string): Promise<void>;
 
@@ -654,6 +655,11 @@ export class DatabaseStorage implements IStorage {
 
   async getTeamPlayers(teamId: string): Promise<Player[]> {
     return await db.select().from(players).where(eq(players.teamId, teamId));
+  }
+
+  async createTeam(teamData: InsertTeam): Promise<Team> {
+    const [team] = await db.insert(teams).values(cleanObject(teamData) as InsertTeam).returning();
+    return team;
   }
 
   async createPlayer(playerData: InsertPlayer): Promise<Player> {
