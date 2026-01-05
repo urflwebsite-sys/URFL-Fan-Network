@@ -397,15 +397,43 @@ export const playerStats = pgTable("player_stats", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   playerName: varchar("player_name", { length: 100 }).notNull(),
   team: varchar("team", { length: 100 }).notNull(),
-  position: varchar("position", { length: 10 }).notNull(), // "QB", "WR", "RB", "DEF"
+  position: varchar("position", { length: 10 }).notNull(), // "QB", "WR", "RB", "DB", "DEF"
+  
+  // QB Stats
   passingYards: integer("passing_yards").default(0),
   passingTouchdowns: integer("passing_touchdowns").default(0),
   interceptions: integer("interceptions").default(0),
+  completions: integer("completions").default(0),
+  attempts: integer("attempts").default(0),
+  sacks: integer("sacks").default(0),
+  
+  // RB Stats
   rushingYards: integer("rushing_yards").default(0),
   rushingTouchdowns: integer("rushing_touchdowns").default(0),
+  rushingAttempts: integer("rushing_attempts").default(0),
+  missedTacklesForced: integer("missed_tackles_forced").default(0),
+  
+  // WR Stats
   receivingYards: integer("receiving_yards").default(0),
   receivingTouchdowns: integer("receiving_touchdowns").default(0),
   receptions: integer("receptions").default(0),
+  targets: integer("targets").default(0),
+  yardsAfterCatch: integer("yards_after_catch").default(0),
+  
+  // DB Stats
+  defensiveInterceptions: integer("defensive_interceptions").default(0),
+  passesDefended: integer("passes_defended").default(0),
+  completionsAllowed: integer("completions_allowed").default(0),
+  targetsAllowed: integer("targets_allowed").default(0),
+  swats: integer("swats").default(0),
+  defensiveTouchdowns: integer("defensive_touchdowns").default(0),
+  
+  // DEF Stats
+  defensiveSacks: integer("defensive_sacks").default(0),
+  tackles: integer("tackles").default(0),
+  defensiveMisses: integer("defensive_misses").default(0),
+  safeties: integer("safeties").default(0),
+  
   defensivePoints: integer("defensive_points").default(0),
   week: integer("week").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
