@@ -2089,6 +2089,24 @@ function RosterManager() {
     },
   });
 
+  const handleCreatePlayer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTeamId || !playerName.trim() || !playerNumber || !playerPosition) {
+      toast({
+        title: "Error",
+        description: "All fields are required",
+        variant: "destructive",
+      });
+      return;
+    }
+    createPlayerMutation.mutate({
+      name: playerName.trim(),
+      number: parseInt(playerNumber),
+      position: playerPosition,
+      teamId: selectedTeamId,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <Card className="p-6">
@@ -2114,48 +2132,46 @@ function RosterManager() {
             {selectedTeamId && (
               <div className="p-4 border rounded-md space-y-4">
                 <h3 className="font-bold">Add Player</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="col-span-2">
-                    <Label>Name</Label>
-                    <Input value={playerName} onChange={(e) => setPlayerName(e.target.value)} placeholder="Full Name" />
+                <form onSubmit={handleCreatePlayer} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="col-span-2">
+                      <Label>Name</Label>
+                      <Input value={playerName} onChange={(e) => setPlayerName(e.target.value)} placeholder="Full Name" />
+                    </div>
+                    <div>
+                      <Label>Number</Label>
+                      <Input type="number" value={playerNumber} onChange={(e) => setPlayerNumber(e.target.value)} placeholder="00" />
+                    </div>
+                    <div>
+                      <Label>Position</Label>
+                      <Select value={playerPosition} onValueChange={setPlayerPosition}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pos" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="QB">QB</SelectItem>
+                          <SelectItem value="WR">WR</SelectItem>
+                          <SelectItem value="RB">RB</SelectItem>
+                          <SelectItem value="TE">TE</SelectItem>
+                          <SelectItem value="OL">OL</SelectItem>
+                          <SelectItem value="DL">DL</SelectItem>
+                          <SelectItem value="LB">LB</SelectItem>
+                          <SelectItem value="DB">DB</SelectItem>
+                          <SelectItem value="K">K</SelectItem>
+                          <SelectItem value="P">P</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div>
-                    <Label>Number</Label>
-                    <Input type="number" value={playerNumber} onChange={(e) => setPlayerNumber(e.target.value)} placeholder="00" />
-                  </div>
-                  <div>
-                    <Label>Position</Label>
-                    <Select value={playerPosition} onValueChange={setPlayerPosition}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pos" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="QB">QB</SelectItem>
-                        <SelectItem value="WR">WR</SelectItem>
-                        <SelectItem value="RB">RB</SelectItem>
-                        <SelectItem value="TE">TE</SelectItem>
-                        <SelectItem value="OL">OL</SelectItem>
-                        <SelectItem value="DL">DL</SelectItem>
-                        <SelectItem value="LB">LB</SelectItem>
-                        <SelectItem value="DB">DB</SelectItem>
-                        <SelectItem value="K">K</SelectItem>
-                        <SelectItem value="P">P</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <Button 
-                  className="w-full" 
-                  onClick={() => createPlayerMutation.mutate({
-                    name: playerName,
-                    number: parseInt(playerNumber),
-                    position: playerPosition,
-                    teamId: selectedTeamId
-                  })}
-                  disabled={!playerName || !playerNumber || !playerPosition || createPlayerMutation.isPending}
-                >
-                  <Plus className="w-4 h-4 mr-2" /> Add to Roster
-                </Button>
+                  <Button 
+                    type="submit"
+                    className="w-full" 
+                    disabled={!playerName || !playerNumber || !playerPosition || createPlayerMutation.isPending}
+                  >
+                    <Plus className="w-4 h-4 mr-2" /> 
+                    {createPlayerMutation.isPending ? "Adding..." : "Add to Roster"}
+                  </Button>
+                </form>
               </div>
             )}
           </div>
