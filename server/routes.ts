@@ -322,6 +322,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/teams", async (req, res) => {
     try {
       const allTeams = await storage.getAllTeams();
+      if (allTeams.length === 0) {
+        // Seed teams if none exist
+        const defaultTeams = [
+          { name: "Agartha Mammoths", city: "Agartha", division: "AFC_D1" },
+          { name: "Alaska Ice Dragons", city: "Alaska", division: "AFC_D2" },
+          { name: "Georgia Gators", city: "Georgia", division: "NFC_D1" },
+          { name: "Jacksonville Ironbacks", city: "Jacksonville", division: "NFC_D2" },
+          { name: "New York Cobras", city: "New York", division: "AFC_D1" },
+          { name: "Roman Gladiators", city: "Rome", division: "NFC_D1" },
+          { name: "San Antonio Brahamas", city: "San Antonio", division: "NFC_D2" },
+        ];
+        
+        for (const team of defaultTeams) {
+          await storage.createTeam(team);
+        }
+        const seededTeams = await storage.getAllTeams();
+        return res.json(seededTeams);
+      }
       res.json(allTeams);
     } catch (error) {
       console.error("Error fetching teams:", error);
