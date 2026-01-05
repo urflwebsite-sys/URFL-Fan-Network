@@ -64,6 +64,9 @@ export default function TeamDetail() {
         fetch("/api/player-stats")
       ]);
       
+      if (!playersRes.ok) throw new Error("Failed to fetch players");
+      if (!statsRes.ok) throw new Error("Failed to fetch stats");
+      
       const players: Player[] = await playersRes.json();
       const stats: PlayerStat[] = await statsRes.json();
       

@@ -2061,6 +2061,7 @@ function RosterManager() {
     },
     onSuccess: () => {
       refetchPlayers();
+      queryClient.invalidateQueries({ queryKey: ["/api/teams", selectedTeamId, "players"] });
       setPlayerName("");
       setPlayerNumber("");
       setPlayerPosition("");
@@ -2077,6 +2078,7 @@ function RosterManager() {
     },
     onSuccess: () => {
       refetchPlayers();
+      queryClient.invalidateQueries({ queryKey: ["/api/teams", selectedTeamId, "players"] });
       toast({ title: "Success", description: "Player removed from roster" });
     },
   });
