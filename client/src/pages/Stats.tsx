@@ -185,14 +185,20 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground">{player.team}</p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="flex flex-col items-end">
-                              <span className="font-bold whitespace-nowrap">{player.passingYards} Yds</span>
-                              <span className="text-sm font-semibold text-primary">{player.passingTouchdowns} TD</span>
+                          <div className="text-right flex flex-col items-end min-w-[140px]">
+                            <div className="flex gap-2 items-baseline justify-end">
+                              <span className="font-bold text-lg">{player.passingYards}</span>
+                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Yds</span>
+                              <span className="font-bold text-lg text-primary ml-2">{player.passingTouchdowns}</span>
+                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">TD</span>
                             </div>
-                            <p className="text-[10px] text-muted-foreground mt-1 leading-tight">
-                              RTG: {rating} • {compPct}% • {player.completions}/{player.attempts} • {player.interceptions} INT • {player.sacks} SCK
-                            </p>
+                            <div className="grid grid-cols-3 gap-x-2 gap-y-0 text-[10px] text-muted-foreground mt-1 text-right">
+                              <span>RTG: {rating}</span>
+                              <span>{compPct}%</span>
+                              <span>{player.completions}/{player.attempts}</span>
+                              <span>INT: {player.interceptions}</span>
+                              <span>SCK: {player.sacks}</span>
+                            </div>
                           </div>
                         </div>
                       );
@@ -221,14 +227,18 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground">{player.team}</p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="flex flex-col items-end">
-                              <span className="font-bold whitespace-nowrap">{player.receivingYards} Yds</span>
-                              <span className="text-sm font-semibold text-primary">{player.receivingTouchdowns} TD</span>
+                          <div className="text-right flex flex-col items-end min-w-[140px]">
+                            <div className="flex gap-2 items-baseline justify-end">
+                              <span className="font-bold text-lg">{player.receivingYards}</span>
+                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Yds</span>
+                              <span className="font-bold text-lg text-primary ml-2">{player.receivingTouchdowns}</span>
+                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">TD</span>
                             </div>
-                            <p className="text-[10px] text-muted-foreground mt-1 leading-tight">
-                              {player.receptions}/{player.targets} Rec ({catchPct}%) • {player.yardsAfterCatch} YAC
-                            </p>
+                            <div className="grid grid-cols-2 gap-x-2 gap-y-0 text-[10px] text-muted-foreground mt-1 text-right">
+                              <span>REC: {player.receptions}/{player.targets}</span>
+                              <span>({catchPct}%)</span>
+                              <span className="col-span-2">YAC: {player.yardsAfterCatch}</span>
+                            </div>
                           </div>
                         </div>
                       );
@@ -257,14 +267,18 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground">{player.team}</p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="flex flex-col items-end">
-                              <span className="font-bold whitespace-nowrap">{player.rushingYards} Yds</span>
-                              <span className="text-sm font-semibold text-primary">{player.rushingTouchdowns} TD</span>
+                          <div className="text-right flex flex-col items-end min-w-[140px]">
+                            <div className="flex gap-2 items-baseline justify-end">
+                              <span className="font-bold text-lg">{player.rushingYards}</span>
+                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Yds</span>
+                              <span className="font-bold text-lg text-primary ml-2">{player.rushingTouchdowns}</span>
+                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">TD</span>
                             </div>
-                            <p className="text-[10px] text-muted-foreground mt-1 leading-tight">
-                              {player.rushingAttempts} Att • {ypa} YPA • {player.missedTacklesForced} Misses
-                            </p>
+                            <div className="grid grid-cols-2 gap-x-2 gap-y-0 text-[10px] text-muted-foreground mt-1 text-right">
+                              <span>ATT: {player.rushingAttempts}</span>
+                              <span>YPA: {ypa}</span>
+                              <span className="col-span-2">MISSES: {player.missedTacklesForced}</span>
+                            </div>
                           </div>
                         </div>
                       );
@@ -293,14 +307,18 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground">{player.team}</p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="flex flex-col items-end">
-                              <span className="font-bold whitespace-nowrap">{player.defensiveInterceptions} INT</span>
-                              <span className="text-sm font-semibold text-primary">{player.swats} Swat</span>
+                          <div className="text-right flex flex-col items-end min-w-[140px]">
+                            <div className="flex gap-2 items-baseline justify-end">
+                              <span className="font-bold text-lg">{player.defensiveInterceptions}</span>
+                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Int</span>
+                              <span className="font-bold text-lg text-primary ml-2">{player.swats}</span>
+                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Swat</span>
                             </div>
-                            <p className="text-[10px] text-muted-foreground mt-1 leading-tight">
-                              {denyPct}% Deny • {player.completionsAllowed}/{player.targetsAllowed} Comp • {player.defensiveTouchdowns} TD
-                            </p>
+                            <div className="grid grid-cols-2 gap-x-2 gap-y-0 text-[10px] text-muted-foreground mt-1 text-right">
+                              <span>DENY: {denyPct}%</span>
+                              <span>CMP: {player.completionsAllowed}/{player.targetsAllowed}</span>
+                              <span className="col-span-2">TD: {player.defensiveTouchdowns}</span>
+                            </div>
                           </div>
                         </div>
                       );
@@ -327,14 +345,17 @@ export default function Stats() {
                             <p className="text-sm text-muted-foreground">{player.team}</p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="flex flex-col items-end">
-                            <span className="font-bold whitespace-nowrap">{player.defensiveSacks} Sck</span>
-                            <span className="text-sm font-semibold text-primary">{player.tackles} Tkl</span>
+                        <div className="text-right flex flex-col items-end min-w-[140px]">
+                          <div className="flex gap-2 items-baseline justify-end">
+                            <span className="font-bold text-lg">{player.defensiveSacks}</span>
+                            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Sck</span>
+                            <span className="font-bold text-lg text-primary ml-2">{player.tackles}</span>
+                            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Tkl</span>
                           </div>
-                          <p className="text-[10px] text-muted-foreground mt-1 leading-tight">
-                            {player.defensiveMisses} Miss • {player.safeties} Sfty
-                          </p>
+                          <div className="grid grid-cols-2 gap-x-2 gap-y-0 text-[10px] text-muted-foreground mt-1 text-right">
+                            <span>MISS: {player.defensiveMisses}</span>
+                            <span>SFTY: {player.safeties}</span>
+                          </div>
                         </div>
                       </div>
                     ))
