@@ -186,23 +186,19 @@ export default function Stats() {
                             </div>
                           </div>
                           <div className="flex-1 max-w-[300px] ml-4">
-                            <table className="w-full border-collapse border border-muted rounded-sm overflow-hidden">
-                              <thead className="bg-muted/50">
-                                <tr className="divide-x divide-muted border-b border-muted">
-                                  <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Pass Yds</th>
-                                  <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Pass TD</th>
-                                  <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">INT</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr className="divide-x divide-muted font-mono text-sm">
-                                  <td className="py-1 px-1 text-center font-bold">{player.passingYards}</td>
-                                  <td className="py-1 px-1 text-center font-bold text-primary">{player.passingTouchdowns}</td>
-                                  <td className="py-1 px-1 text-center font-bold">{player.interceptions}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                            <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-medium uppercase tracking-tighter">
+                            <div className="border border-muted rounded-sm overflow-hidden">
+                              <div className="flex bg-muted/50 border-b border-muted">
+                                <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none border-r border-muted h-6 flex items-center justify-center">Pass Yds</div>
+                                <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none border-r border-muted h-6 flex items-center justify-center">Pass TD</div>
+                                <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none h-6 flex items-center justify-center">INT</div>
+                              </div>
+                              <div className="flex font-mono text-sm bg-card">
+                                <div className="flex-1 py-1.5 px-1 text-center font-black border-r border-muted leading-none">{player.passingYards}</div>
+                                <div className="flex-1 py-1.5 px-1 text-center font-black border-r border-muted leading-none text-primary">{player.passingTouchdowns}</div>
+                                <div className="flex-1 py-1.5 px-1 text-center font-black leading-none">{player.interceptions}</div>
+                              </div>
+                            </div>
+                            <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-black uppercase tracking-tighter">
                               <span>RTG: {rating}</span>
                               <span>{compPct}%</span>
                               <span>{player.completions}/{player.attempts}</span>
@@ -237,23 +233,19 @@ export default function Stats() {
                             </div>
                           </div>
                           <div className="flex-1 max-w-[300px] ml-4">
-                            <table className="w-full border-collapse border border-muted rounded-sm overflow-hidden">
-                              <thead className="bg-muted/50">
-                                <tr className="divide-x divide-muted border-b border-muted">
-                                  <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Rec Yds</th>
-                                  <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Rec TD</th>
-                                  <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Rec</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr className="divide-x divide-muted font-mono text-sm">
-                                  <td className="py-1 px-1 text-center font-bold">{player.receivingYards}</td>
-                                  <td className="py-1 px-1 text-center font-bold text-primary">{player.receivingTouchdowns}</td>
-                                  <td className="py-1 px-1 text-center font-bold">{player.receptions}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                            <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-medium uppercase tracking-tighter">
+                            <div className="border border-muted rounded-sm overflow-hidden">
+                              <div className="flex bg-muted/50 border-b border-muted">
+                                <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none border-r border-muted h-6 flex items-center justify-center">Rec Yds</div>
+                                <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none border-r border-muted h-6 flex items-center justify-center">Rec TD</div>
+                                <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none h-6 flex items-center justify-center">Rec</div>
+                              </div>
+                              <div className="flex font-mono text-sm bg-card">
+                                <div className="flex-1 py-1.5 px-1 text-center font-black border-r border-muted leading-none">{player.receivingYards}</div>
+                                <div className="flex-1 py-1.5 px-1 text-center font-black border-r border-muted leading-none text-primary">{player.receivingTouchdowns}</div>
+                                <div className="flex-1 py-1.5 px-1 text-center font-black leading-none">{player.receptions}</div>
+                              </div>
+                            </div>
+                            <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-black uppercase tracking-tighter">
                               <span>{player.receptions}/{player.targets} TGT ({catchPct}%)</span>
                               <span>YAC: {player.yardsAfterCatch}</span>
                             </div>
@@ -286,23 +278,19 @@ export default function Stats() {
                             </div>
                           </div>
                           <div className="flex-1 max-w-[300px] ml-4">
-                            <table className="w-full border-collapse border border-muted rounded-sm overflow-hidden">
-                              <thead className="bg-muted/50">
-                                <tr className="divide-x divide-muted border-b border-muted">
-                                  <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Rush Yds</th>
-                                  <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Rush TD</th>
-                                  <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Att</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr className="divide-x divide-muted font-mono text-sm">
-                                  <td className="py-1 px-1 text-center font-bold">{player.rushingYards}</td>
-                                  <td className="py-1 px-1 text-center font-bold text-primary">{player.rushingTouchdowns}</td>
-                                  <td className="py-1 px-1 text-center font-bold">{player.rushingAttempts}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                            <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-medium uppercase tracking-tighter">
+                            <div className="border border-muted rounded-sm overflow-hidden">
+                              <div className="flex bg-muted/50 border-b border-muted">
+                                <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none border-r border-muted h-6 flex items-center justify-center">Rush Yds</div>
+                                <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none border-r border-muted h-6 flex items-center justify-center">Rush TD</div>
+                                <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none h-6 flex items-center justify-center">Att</div>
+                              </div>
+                              <div className="flex font-mono text-sm bg-card">
+                                <div className="flex-1 py-1.5 px-1 text-center font-black border-r border-muted leading-none">{player.rushingYards}</div>
+                                <div className="flex-1 py-1.5 px-1 text-center font-black border-r border-muted leading-none text-primary">{player.rushingTouchdowns}</div>
+                                <div className="flex-1 py-1.5 px-1 text-center font-black leading-none">{player.rushingAttempts}</div>
+                              </div>
+                            </div>
+                            <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-black uppercase tracking-tighter">
                               <span>YPA: {ypa}</span>
                               <span>MISSES: {player.missedTacklesForced}</span>
                             </div>
@@ -335,23 +323,19 @@ export default function Stats() {
                             </div>
                           </div>
                           <div className="flex-1 max-w-[300px] ml-4">
-                            <table className="w-full border-collapse border border-muted rounded-sm overflow-hidden">
-                              <thead className="bg-muted/50">
-                                <tr className="divide-x divide-muted border-b border-muted">
-                                  <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Int</th>
-                                  <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Swat</th>
-                                  <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">TD</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr className="divide-x divide-muted font-mono text-sm">
-                                  <td className="py-1 px-1 text-center font-bold">{player.defensiveInterceptions}</td>
-                                  <td className="py-1 px-1 text-center font-bold text-primary">{player.swats}</td>
-                                  <td className="py-1 px-1 text-center font-bold">{player.defensiveTouchdowns}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                            <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-medium uppercase tracking-tighter">
+                            <div className="border border-muted rounded-sm overflow-hidden">
+                              <div className="flex bg-muted/50 border-b border-muted">
+                                <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none border-r border-muted h-6 flex items-center justify-center">Int</div>
+                                <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none border-r border-muted h-6 flex items-center justify-center">Swat</div>
+                                <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none h-6 flex items-center justify-center">TD</div>
+                              </div>
+                              <div className="flex font-mono text-sm bg-card">
+                                <div className="flex-1 py-1.5 px-1 text-center font-black border-r border-muted leading-none">{player.defensiveInterceptions}</div>
+                                <div className="flex-1 py-1.5 px-1 text-center font-black border-r border-muted leading-none text-primary">{player.swats}</div>
+                                <div className="flex-1 py-1.5 px-1 text-center font-black leading-none">{player.defensiveTouchdowns}</div>
+                              </div>
+                            </div>
+                            <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-black uppercase tracking-tighter">
                               <span>DENY: {denyPct}%</span>
                               <span>CMP: {player.completionsAllowed}/{player.targetsAllowed}</span>
                             </div>
@@ -382,23 +366,19 @@ export default function Stats() {
                           </div>
                         </div>
                         <div className="flex-1 max-w-[300px] ml-4">
-                          <table className="w-full border-collapse border border-muted rounded-sm overflow-hidden">
-                            <thead className="bg-muted/50">
-                              <tr className="divide-x divide-muted border-b border-muted">
-                                <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Sck</th>
-                                <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Tkl</th>
-                                <th className="w-1/3 py-1 px-1 text-[10px] font-bold uppercase tracking-tighter text-center">Sfty</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr className="divide-x divide-muted font-mono text-sm">
-                                <td className="py-1 px-1 text-center font-bold">{player.defensiveSacks}</td>
-                                <td className="py-1 px-1 text-center font-bold text-primary">{player.tackles}</td>
-                                <td className="py-1 px-1 text-center font-bold">{player.safeties}</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                          <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-medium uppercase tracking-tighter">
+                          <div className="border border-muted rounded-sm overflow-hidden">
+                            <div className="flex bg-muted/50 border-b border-muted">
+                              <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none border-r border-muted h-6 flex items-center justify-center">Sck</div>
+                              <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none border-r border-muted h-6 flex items-center justify-center">Tkl</div>
+                              <div className="flex-1 py-1 px-0.5 text-[10px] font-black uppercase tracking-tighter text-center leading-none h-6 flex items-center justify-center">Sfty</div>
+                            </div>
+                            <div className="flex font-mono text-sm bg-card">
+                              <div className="flex-1 py-1.5 px-1 text-center font-black border-r border-muted leading-none">{player.defensiveSacks}</div>
+                              <div className="flex-1 py-1.5 px-1 text-center font-black border-r border-muted leading-none text-primary">{player.tackles}</div>
+                              <div className="flex-1 py-1.5 px-1 text-center font-black leading-none">{player.safeties}</div>
+                            </div>
+                          </div>
+                          <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-black uppercase tracking-tighter">
                             <span>MISS: {player.defensiveMisses}</span>
                           </div>
                         </div>
