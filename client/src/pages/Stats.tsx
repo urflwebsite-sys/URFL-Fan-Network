@@ -5,44 +5,48 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TEAMS } from "@/lib/teams";
 
-interface PlayerStat {
-  id: string;
-  playerName: string;
-  team: string;
-  position: string;
-  // QB
-  passingYards: number;
-  passingTouchdowns: number;
-  interceptions: number;
-  completions: number;
-  attempts: number;
-  sacks: number;
-  // RB
-  rushingYards: number;
-  rushingTouchdowns: number;
-  rushingAttempts: number;
-  missedTacklesForced: number;
-  // WR
-  receivingYards: number;
-  receivingTouchdowns: number;
-  receptions: number;
-  targets: number;
-  yardsAfterCatch: number;
-  // DB
-  defensiveInterceptions: number;
-  passesDefended: number;
-  completionsAllowed: number;
-  targetsAllowed: number;
-  swats: number;
-  defensiveTouchdowns: number;
-  // DEF
-  defensiveSacks: number;
-  tackles: number;
-  defensiveMisses: number;
-  safeties: number;
-  
-  defensivePoints: number;
-  week: number;
+    id: string;
+    playerName: string;
+    team: string;
+    position: string;
+    // QB
+    passingYards: number;
+    passingTouchdowns: number;
+    interceptions: number;
+    completions: number;
+    attempts: number;
+    sacks: number;
+    // RB
+    rushingYards: number;
+    rushingTouchdowns: number;
+    rushingAttempts: number;
+    missedTacklesForced: number;
+    // WR
+    receivingYards: number;
+    receivingTouchdowns: number;
+    receptions: number;
+    targets: number;
+    yardsAfterCatch: number;
+    // K
+    fieldGoalsMade: number;
+    fieldGoalsAttempted: number;
+    extraPointsMade: number;
+    extraPointsAttempted: number;
+    // DB
+    defensiveInterceptions: number;
+    passesDefended: number;
+    completionsAllowed: number;
+    targetsAllowed: number;
+    swats: number;
+    defensiveTouchdowns: number;
+    // DEF
+    defensiveSacks: number;
+    tackles: number;
+    defensiveMisses: number;
+    safeties: number;
+    
+    defensivePoints: number;
+    week: number;
 }
 
 interface TeamStats {
@@ -127,6 +131,8 @@ export default function Stats() {
           return (b.defensiveInterceptions || 0) - (a.defensiveInterceptions || 0);
         } else if (position === "DEF") {
           return (b.defensiveSacks || 0) - (a.defensiveSacks || 0);
+        } else if (position === "K") {
+          return ((b.fieldGoalsMade || 0) * 3 + (b.extraPointsMade || 0)) - ((a.fieldGoalsMade || 0) * 3 + (a.extraPointsMade || 0));
         }
         return 0;
       })
@@ -160,8 +166,9 @@ export default function Stats() {
       </div>
 
       <Tabs defaultValue="leaderboard" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="leaderboard">Player Leaders</TabsTrigger>
+          <TabsTrigger value="kicking">Kicking</TabsTrigger>
           <TabsTrigger value="offense">Offense</TabsTrigger>
           <TabsTrigger value="defense">Defense</TabsTrigger>
           <TabsTrigger value="records">Record Book</TabsTrigger>
@@ -182,6 +189,13 @@ export default function Stats() {
                         ((8.4 * (player.passingYards || 0)) + (330 * (player.passingTouchdowns || 0)) + (100 * (player.completions || 0)) - (200 * (player.interceptions || 0))) / player.attempts
                       ).toFixed(1) : "0.0";
                       
+                      const showQB = player.position === "QB";
+                      const showRB = player.position === "RB";
+                      const showWR = player.position === "WR";
+                      const showK = player.position === "K";
+                      const showDB = player.position === "DB";
+                      const showDEF = player.position === "DEF";
+
                       return (
                         <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
                           <div className="flex items-center gap-3">
@@ -193,22 +207,79 @@ export default function Stats() {
                           </div>
                           <div className="flex-1 max-w-full ml-4 overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
                             <div className="min-w-[400px] border border-muted rounded-md overflow-hidden shadow-sm">
-                              <div className="flex bg-muted/50 border-b border-muted">
-                                <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Pass Yds</div>
-                                <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Pass TD</div>
-                                <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none h-7 flex items-center justify-center">INT</div>
-                              </div>
-                              <div className="flex font-mono text-base bg-card">
-                                <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none">{player.passingYards || 0}</div>
-                                <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none text-primary">{player.passingTouchdowns || 0}</div>
-                                <div className="flex-1 py-2 px-1 text-center font-black leading-none">{player.interceptions || 0}</div>
-                              </div>
+                              {showQB && (
+                                <>
+                                  <div className="flex bg-muted/50 border-b border-muted">
+                                    <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Pass Yds</div>
+                                    <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Pass TD</div>
+                                    <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none h-7 flex items-center justify-center">INT</div>
+                                  </div>
+                                  <div className="flex font-mono text-base bg-card">
+                                    <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none">{player.passingYards || 0}</div>
+                                    <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none text-primary">{player.passingTouchdowns || 0}</div>
+                                    <div className="flex-1 py-2 px-1 text-center font-black leading-none">{player.interceptions || 0}</div>
+                                  </div>
+                                </>
+                              )}
+                              {showK && (
+                                <>
+                                  <div className="flex bg-muted/50 border-b border-muted">
+                                    <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">FG Made</div>
+                                    <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">FG Att</div>
+                                    <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none h-7 flex items-center justify-center">XP Made</div>
+                                  </div>
+                                  <div className="flex font-mono text-base bg-card">
+                                    <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none">{player.fieldGoalsMade || 0}</div>
+                                    <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none">{player.fieldGoalsAttempted || 0}</div>
+                                    <div className="flex-1 py-2 px-1 text-center font-black leading-none text-primary">{player.extraPointsMade || 0}</div>
+                                  </div>
+                                </>
+                              )}
+                              {showRB && (
+                                <>
+                                  <div className="flex bg-muted/50 border-b border-muted">
+                                    <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Rush Yds</div>
+                                    <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Rush TD</div>
+                                    <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none h-7 flex items-center justify-center">Att</div>
+                                  </div>
+                                  <div className="flex font-mono text-base bg-card">
+                                    <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none">{player.rushingYards || 0}</div>
+                                    <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none text-primary">{player.rushingTouchdowns || 0}</div>
+                                    <div className="flex-1 py-2 px-1 text-center font-black leading-none">{player.rushingAttempts || 0}</div>
+                                  </div>
+                                </>
+                              )}
+                              {showWR && (
+                                <>
+                                  <div className="flex bg-muted/50 border-b border-muted">
+                                    <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Rec Yds</div>
+                                    <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Rec TD</div>
+                                    <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none h-7 flex items-center justify-center">Rec</div>
+                                  </div>
+                                  <div className="flex font-mono text-base bg-card">
+                                    <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none">{player.receivingYards || 0}</div>
+                                    <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none text-primary">{player.receivingTouchdowns || 0}</div>
+                                    <div className="flex-1 py-2 px-1 text-center font-black leading-none">{player.receptions || 0}</div>
+                                  </div>
+                                </>
+                              )}
                             </div>
                             <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight min-w-[400px]">
-                              <span>RTG: {rating}</span>
-                              <span>{compPct}%</span>
-                              <span>{player.completions || 0}/{player.attempts || 0}</span>
-                              <span>SCK: {player.sacks || 0}</span>
+                              {showQB && (
+                                <>
+                                  <span>RTG: {rating}</span>
+                                  <span>{compPct}%</span>
+                                  <span>{player.completions || 0}/{player.attempts || 0}</span>
+                                  <span>SCK: {player.sacks || 0}</span>
+                                </>
+                              )}
+                              {showK && (
+                                <>
+                                  <span>FG: {player.fieldGoalsAttempted > 0 ? ((player.fieldGoalsMade / player.fieldGoalsAttempted) * 100).toFixed(1) : "0.0"}%</span>
+                                  <span>XP: {player.extraPointsAttempted > 0 ? ((player.extraPointsMade / player.extraPointsAttempted) * 100).toFixed(1) : "0.0"}%</span>
+                                  <span>TOTAL PTS: {(player.fieldGoalsMade * 3) + player.extraPointsMade}</span>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -404,6 +475,57 @@ export default function Stats() {
               </ScrollArea>
             </Card>
           </div>
+        </TabsContent>
+
+        {/* Kicking Leaders */}
+        <TabsContent value="kicking" className="mt-6">
+          <Card className="p-6">
+            <h3 className="text-xl font-bold mb-4">Kicking Leaders</h3>
+            <ScrollArea className="h-[600px] pr-4">
+              <div className="space-y-3">
+                {getLeaderboard("K").length > 0 ? (
+                  getLeaderboard("K").map((player, idx) => {
+                    const fgPct = player.fieldGoalsAttempted > 0 ? ((player.fieldGoalsMade / player.fieldGoalsAttempted) * 100).toFixed(1) : "0.0";
+                    const xpPct = player.extraPointsAttempted > 0 ? ((player.extraPointsMade / player.extraPointsAttempted) * 100).toFixed(1) : "0.0";
+                    return (
+                      <div key={player.id} className="flex justify-between items-center pb-3 border-b last:border-b-0">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-bold text-muted-foreground w-6">{idx + 1}</span>
+                          <div>
+                            <p className="font-semibold">{player.playerName}</p>
+                            <p className="text-sm text-muted-foreground">{player.team}</p>
+                          </div>
+                        </div>
+                        <div className="flex-1 max-w-full ml-4 overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                          <div className="min-w-[400px] border border-muted rounded-md overflow-hidden shadow-sm">
+                            <div className="flex bg-muted/50 border-b border-muted">
+                              <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">FG Made</div>
+                              <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">FG Att</div>
+                              <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">XP Made</div>
+                              <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none h-7 flex items-center justify-center">XP Att</div>
+                            </div>
+                            <div className="flex font-mono text-base bg-card">
+                              <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none">{player.fieldGoalsMade || 0}</div>
+                              <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none">{player.fieldGoalsAttempted || 0}</div>
+                              <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none text-primary">{player.extraPointsMade || 0}</div>
+                              <div className="flex-1 py-2 px-1 text-center font-black leading-none">{player.extraPointsAttempted || 0}</div>
+                            </div>
+                          </div>
+                          <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight min-w-[400px]">
+                            <span>FG: {fgPct}%</span>
+                            <span>XP: {xpPct}%</span>
+                            <span>TOTAL PTS: {(player.fieldGoalsMade * 3) + player.extraPointsMade}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-muted-foreground text-center py-8">No Kicking stats yet</p>
+                )}
+              </div>
+            </ScrollArea>
+          </Card>
         </TabsContent>
 
         {/* Team Offense Rankings */}

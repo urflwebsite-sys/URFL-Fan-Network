@@ -1455,6 +1455,12 @@ function PlayerStatsManager() {
   const [receivingYards, setReceivingYards] = useState("0");
   const [receivingTouchdowns, setReceivingTouchdowns] = useState("0");
 
+  // K Stats
+  const [fieldGoalsMade, setFieldGoalsMade] = useState("0");
+  const [fieldGoalsAttempted, setFieldGoalsAttempted] = useState("0");
+  const [extraPointsMade, setExtraPointsMade] = useState("0");
+  const [extraPointsAttempted, setExtraPointsAttempted] = useState("0");
+
   const { data: teams = [] } = useQuery<Team[]>({ queryKey: ["/api/teams"] });
   const { data: teamPlayers = [] } = useQuery<Player[]>({ 
     queryKey: ["/api/teams", selectedTeam, "players"],
@@ -1502,7 +1508,32 @@ function PlayerStatsManager() {
       rushingTouchdowns: parseInt(rushingTouchdowns) || 0,
       receivingYards: parseInt(receivingYards) || 0,
       receivingTouchdowns: parseInt(receivingTouchdowns) || 0,
+      // Kicker stats
+      fieldGoalsMade: parseInt(fieldGoalsMade) || 0,
+      fieldGoalsAttempted: parseInt(fieldGoalsAttempted) || 0,
+      extraPointsMade: parseInt(extraPointsMade) || 0,
+      extraPointsAttempted: parseInt(extraPointsAttempted) || 0,
       // Default all other required schema fields
+      attempts: 0,
+      completions: 0,
+      sacks: 0,
+      rushingAttempts: 0,
+      missedTacklesForced: 0,
+      receptions: 0,
+      targets: 0,
+      yardsAfterCatch: 0,
+      defensiveInterceptions: 0,
+      passesDefended: 0,
+      completionsAllowed: 0,
+      targetsAllowed: 0,
+      swats: 0,
+      defensiveTouchdowns: 0,
+      defensiveSacks: 0,
+      tackles: 0,
+      defensiveMisses: 0,
+      safeties: 0,
+      defensivePoints: 0
+    };
       attempts: 0,
       completions: 0,
       sacks: 0,
@@ -1560,20 +1591,71 @@ function PlayerStatsManager() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label>Pass Yds</Label>
-              <Input type="number" value={passingYards} onChange={e => setPassingYards(e.target.value)} />
+          {selectedPlayer && teamPlayers.find(p => p.id === selectedPlayer)?.position === "K" && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <Label>FG Made</Label>
+                <Input type="number" value={fieldGoalsMade} onChange={e => setFieldGoalsMade(e.target.value)} />
+              </div>
+              <div>
+                <Label>FG Att</Label>
+                <Input type="number" value={fieldGoalsAttempted} onChange={e => setFieldGoalsAttempted(e.target.value)} />
+              </div>
+              <div>
+                <Label>XP Made</Label>
+                <Input type="number" value={extraPointsMade} onChange={e => setExtraPointsMade(e.target.value)} />
+              </div>
+              <div>
+                <Label>XP Att</Label>
+                <Input type="number" value={extraPointsAttempted} onChange={e => setExtraPointsAttempted(e.target.value)} />
+              </div>
             </div>
-            <div>
-              <Label>Pass TD</Label>
-              <Input type="number" value={passingTouchdowns} onChange={e => setPassingTouchdowns(e.target.value)} />
+          )}
+
+          {selectedPlayer && teamPlayers.find(p => p.id === selectedPlayer)?.position === "QB" && (
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label>Pass Yds</Label>
+                <Input type="number" value={passingYards} onChange={e => setPassingYards(e.target.value)} />
+              </div>
+              <div>
+                <Label>Pass TD</Label>
+                <Input type="number" value={passingTouchdowns} onChange={e => setPassingTouchdowns(e.target.value)} />
+              </div>
+              <div>
+                <Label>INT</Label>
+                <Input type="number" value={interceptions} onChange={e => setInterceptions(e.target.value)} />
+              </div>
             </div>
-            <div>
-              <Label>INT</Label>
-              <Input type="number" value={interceptions} onChange={e => setInterceptions(e.target.value)} />
+          )}
+
+          {selectedPlayer && ["RB", "WR"].includes(teamPlayers.find(p => p.id === selectedPlayer)?.position || "") && (
+            <div className="grid grid-cols-2 gap-4">
+              {teamPlayers.find(p => p.id === selectedPlayer)?.position === "RB" ? (
+                <>
+                  <div>
+                    <Label>Rush Yds</Label>
+                    <Input type="number" value={rushingYards} onChange={e => setRushingYards(e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Rush TD</Label>
+                    <Input type="number" value={rushingTouchdowns} onChange={e => setRushingTouchdowns(e.target.value)} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <Label>Rec Yds</Label>
+                    <Input type="number" value={receivingYards} onChange={e => setReceivingYards(e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Rec TD</Label>
+                    <Input type="number" value={receivingTouchdowns} onChange={e => setReceivingTouchdowns(e.target.value)} />
+                  </div>
+                </>
+              )}
             </div>
-          </div>
+          )}
 
           <Button type="submit" disabled={createMutation.isPending}>Save Stats</Button>
         </form>
