@@ -1534,26 +1534,6 @@ function PlayerStatsManager() {
       safeties: 0,
       defensivePoints: 0
     };
-      attempts: 0,
-      completions: 0,
-      sacks: 0,
-      rushingAttempts: 0,
-      missedTacklesForced: 0,
-      receptions: 0,
-      targets: 0,
-      yardsAfterCatch: 0,
-      defensiveInterceptions: 0,
-      passesDefended: 0,
-      completionsAllowed: 0,
-      targetsAllowed: 0,
-      swats: 0,
-      defensiveTouchdowns: 0,
-      defensiveSacks: 0,
-      tackles: 0,
-      defensiveMisses: 0,
-      safeties: 0,
-      defensivePoints: 0
-    };
 
     console.log("Submitting stats:", payload);
     createMutation.mutate(payload);
