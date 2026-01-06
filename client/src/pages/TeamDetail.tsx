@@ -329,8 +329,8 @@ export default function TeamDetail() {
                         <div className="flex items-center gap-3">
                           <p className="font-semibold">{player.name}</p>
                         </div>
-                        <div className="flex-1 max-w-full ml-4 overflow-hidden">
-                          <div className="border border-muted rounded-md overflow-hidden shadow-sm">
+                        <div className="flex-1 max-w-full ml-4 overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                          <div className="min-w-[400px] border border-muted rounded-md overflow-hidden shadow-sm">
                             <div className="flex bg-muted/50 border-b border-muted">
                               <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Pass Yds</div>
                               <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Pass TD</div>
@@ -342,7 +342,7 @@ export default function TeamDetail() {
                               <div className="flex-1 py-2 px-1 text-center font-black leading-none">{ints}</div>
                             </div>
                           </div>
-                          <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight">
+                          <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight min-w-[400px]">
                             <span>RTG: {rating}</span>
                             <span>{compPct}%</span>
                             <span>{completions}/{attempts}</span>
@@ -373,8 +373,8 @@ export default function TeamDetail() {
                         <div className="flex items-center gap-3">
                           <p className="font-semibold">{player.name}</p>
                         </div>
-                        <div className="flex-1 max-w-full ml-4 overflow-hidden">
-                          <div className="border border-muted rounded-md overflow-hidden shadow-sm">
+                        <div className="flex-1 max-w-full ml-4 overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                          <div className="min-w-[400px] border border-muted rounded-md overflow-hidden shadow-sm">
                             <div className="flex bg-muted/50 border-b border-muted">
                               <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Rush Yds</div>
                               <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Rush TD</div>
@@ -386,7 +386,7 @@ export default function TeamDetail() {
                               <div className="flex-1 py-2 px-1 text-center font-black leading-none">{att}</div>
                             </div>
                           </div>
-                          <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight">
+                          <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight min-w-[400px]">
                             <span>YPA: {ypa}</span>
                             <span>MISSES: {misses}</span>
                           </div>
@@ -416,8 +416,8 @@ export default function TeamDetail() {
                         <div className="flex items-center gap-3">
                           <p className="font-semibold">{player.name}</p>
                         </div>
-                        <div className="flex-1 max-w-full ml-4 overflow-hidden">
-                          <div className="border border-muted rounded-md overflow-hidden shadow-sm">
+                        <div className="flex-1 max-w-full ml-4 overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                          <div className="min-w-[400px] border border-muted rounded-md overflow-hidden shadow-sm">
                             <div className="flex bg-muted/50 border-b border-muted">
                               <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Rec Yds</div>
                               <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Rec TD</div>
@@ -429,7 +429,7 @@ export default function TeamDetail() {
                               <div className="flex-1 py-2 px-1 text-center font-black leading-none">{rec}</div>
                             </div>
                           </div>
-                          <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight">
+                          <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight min-w-[400px]">
                             <span>{rec}/{targets} TGT ({catchPct}%)</span>
                             <span>YAC: {yac}</span>
                           </div>
@@ -462,8 +462,8 @@ export default function TeamDetail() {
                       <div key={player.id} className="pb-6 border-b last:border-b-0 space-y-4">
                         <div className="flex justify-between items-center">
                           <p className="font-semibold">{player.name}</p>
-                          <div className="flex-1 max-w-full ml-4 overflow-hidden">
-                            <div className="border border-muted rounded-md overflow-hidden shadow-sm">
+                          <div className="flex-1 max-w-full ml-4 overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                            <div className="min-w-[400px] border border-muted rounded-md overflow-hidden shadow-sm">
                               <div className="flex bg-muted/50 border-b border-muted">
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Sck</div>
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Tkl</div>
@@ -480,8 +480,8 @@ export default function TeamDetail() {
 
                         <div className="flex justify-between items-center">
                           <div className="w-1/4"></div>
-                          <div className="flex-1 max-w-full ml-4 overflow-hidden">
-                            <div className="border border-muted rounded-md overflow-hidden shadow-sm">
+                          <div className="flex-1 max-w-full ml-4 overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                            <div className="min-w-[400px] border border-muted rounded-md overflow-hidden shadow-sm">
                               <div className="flex bg-muted/50 border-b border-muted">
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Int</div>
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Swat</div>
@@ -493,7 +493,7 @@ export default function TeamDetail() {
                                 <div className="flex-1 py-2 px-1 text-center font-black leading-none">{tds}</div>
                               </div>
                             </div>
-                            <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight">
+                            <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight min-w-[400px]">
                               <span>MISS: {misses}</span>
                               <span>DENY: {denyPct}%</span>
                               <span>CMP: {comps}/{targets}</span>

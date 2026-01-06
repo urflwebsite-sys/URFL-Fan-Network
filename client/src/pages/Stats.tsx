@@ -185,8 +185,8 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground">{player.team}</p>
                             </div>
                           </div>
-                          <div className="flex-1 max-w-full ml-4 overflow-hidden">
-                            <div className="border border-muted rounded-md overflow-hidden shadow-sm">
+                          <div className="flex-1 max-w-full ml-4 overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                            <div className="min-w-[400px] border border-muted rounded-md overflow-hidden shadow-sm">
                               <div className="flex bg-muted/50 border-b border-muted">
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Pass Yds</div>
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Pass TD</div>
@@ -198,7 +198,7 @@ export default function Stats() {
                                 <div className="flex-1 py-2 px-1 text-center font-black leading-none">{player.interceptions}</div>
                               </div>
                             </div>
-                            <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight">
+                            <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight min-w-[400px]">
                               <span>RTG: {rating}</span>
                               <span>{compPct}%</span>
                               <span>{player.completions}/{player.attempts}</span>
@@ -232,8 +232,8 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground">{player.team}</p>
                             </div>
                           </div>
-                          <div className="flex-1 max-w-full ml-4 overflow-hidden">
-                            <div className="border border-muted rounded-md overflow-hidden shadow-sm">
+                          <div className="flex-1 max-w-full ml-4 overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                            <div className="min-w-[400px] border border-muted rounded-md overflow-hidden shadow-sm">
                               <div className="flex bg-muted/50 border-b border-muted">
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Rec Yds</div>
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Rec TD</div>
@@ -245,7 +245,7 @@ export default function Stats() {
                                 <div className="flex-1 py-2 px-1 text-center font-black leading-none">{player.receptions}</div>
                               </div>
                             </div>
-                            <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight">
+                            <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight min-w-[400px]">
                               <span>{player.receptions}/{player.targets} TGT ({catchPct}%)</span>
                               <span>YAC: {player.yardsAfterCatch}</span>
                             </div>
@@ -277,8 +277,8 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground">{player.team}</p>
                             </div>
                           </div>
-                          <div className="flex-1 max-w-full ml-4 overflow-hidden">
-                            <div className="border border-muted rounded-md overflow-hidden shadow-sm">
+                          <div className="flex-1 max-w-full ml-4 overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                            <div className="min-w-[400px] border border-muted rounded-md overflow-hidden shadow-sm">
                               <div className="flex bg-muted/50 border-b border-muted">
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Rush Yds</div>
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Rush TD</div>
@@ -290,7 +290,7 @@ export default function Stats() {
                                 <div className="flex-1 py-2 px-1 text-center font-black leading-none">{player.rushingAttempts}</div>
                               </div>
                             </div>
-                            <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight">
+                            <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight min-w-[400px]">
                               <span>YPA: {ypa}</span>
                               <span>MISSES: {player.missedTacklesForced}</span>
                             </div>
@@ -322,8 +322,8 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground">{player.team}</p>
                             </div>
                           </div>
-                          <div className="flex-1 max-w-full ml-4 overflow-hidden">
-                            <div className="border border-muted rounded-md overflow-hidden shadow-sm">
+                          <div className="flex-1 max-w-full ml-4 overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                            <div className="min-w-[400px] border border-muted rounded-md overflow-hidden shadow-sm">
                               <div className="flex bg-muted/50 border-b border-muted">
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Int</div>
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Swat</div>
@@ -335,7 +335,7 @@ export default function Stats() {
                                 <div className="flex-1 py-2 px-1 text-center font-black leading-none">{player.defensiveTouchdowns}</div>
                               </div>
                             </div>
-                            <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight">
+                            <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight min-w-[400px]">
                               <span>DENY: {denyPct}%</span>
                               <span>CMP: {player.completionsAllowed}/{player.targetsAllowed}</span>
                             </div>
@@ -365,8 +365,8 @@ export default function Stats() {
                             <p className="text-sm text-muted-foreground">{player.team}</p>
                           </div>
                         </div>
-                        <div className="flex-1 max-w-full ml-4 overflow-hidden">
-                          <div className="border border-muted rounded-md overflow-hidden shadow-sm">
+                        <div className="flex-1 max-w-full ml-4 overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                          <div className="min-w-[400px] border border-muted rounded-md overflow-hidden shadow-sm">
                             <div className="flex bg-muted/50 border-b border-muted">
                               <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Sck</div>
                               <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none border-r border-muted h-7 flex items-center justify-center">Tkl</div>
@@ -378,7 +378,7 @@ export default function Stats() {
                               <div className="flex-1 py-2 px-1 text-center font-black leading-none">{player.safeties}</div>
                             </div>
                           </div>
-                          <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight">
+                          <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight min-w-[400px]">
                             <span>MISS: {player.defensiveMisses}</span>
                           </div>
                         </div>
