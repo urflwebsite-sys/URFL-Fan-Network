@@ -106,20 +106,18 @@ export default function Stats() {
     });
     return filtered
       .sort((a, b) => {
-        if (position === "QB") {
-          return (b.passingYards || 0) - (a.passingYards || 0);
-        } else if (position === "RB") {
-          return (b.rushingYards || 0) - (a.rushingYards || 0);
-        } else if (position === "WR") {
-          return (b.receivingYards || 0) - (a.receivingYards || 0);
-        } else if (position === "DB") {
-          return (b.defensiveInterceptions || 0) - (a.defensiveInterceptions || 0);
-        } else if (position === "DEF") {
-          return (b.defensiveSacks || 0) - (a.defensiveSacks || 0);
-        } else if (position === "K") {
+        const p1Score = (a.passingYards || 0) + (a.rushingYards || 0) + (a.receivingYards || 0);
+        const p2Score = (b.passingYards || 0) + (b.rushingYards || 0) + (b.receivingYards || 0);
+        
+        if (position === "K") {
           return ((b.fieldGoalsMade || 0) * 3 + (b.extraPointsMade || 0)) - ((a.fieldGoalsMade || 0) * 3 + (a.extraPointsMade || 0));
         }
-        return 0;
+        
+        if (["DB", "S", "DE", "LB"].includes(position)) {
+           return (b.defensiveInterceptions || 0) * 5 + (b.defensiveSacks || 0) * 3 + (b.tackles || 0) - ((a.defensiveInterceptions || 0) * 5 + (a.defensiveSacks || 0) * 3 + (a.tackles || 0));
+        }
+
+        return p2Score - p1Score;
       })
       .slice(0, 10);
   };

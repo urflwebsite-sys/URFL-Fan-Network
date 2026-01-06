@@ -2377,16 +2377,9 @@ function RosterManager() {
                           <SelectValue placeholder="Pos" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="QB">QB</SelectItem>
-                          <SelectItem value="WR">WR</SelectItem>
-                          <SelectItem value="RB">RB</SelectItem>
-                          <SelectItem value="TE">TE</SelectItem>
-                          <SelectItem value="OL">OL</SelectItem>
-                          <SelectItem value="DL">DL</SelectItem>
-                          <SelectItem value="LB">LB</SelectItem>
-                          <SelectItem value="DB">DB</SelectItem>
-                          <SelectItem value="K">K</SelectItem>
-                          <SelectItem value="P">P</SelectItem>
+                          {POSITIONS.map((pos) => (
+                            <SelectItem key={pos} value={pos}>{pos}</SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
