@@ -108,19 +108,25 @@ export default function Stats() {
 
   // Get player leaderboards by position
   const getLeaderboard = (position: string) => {
-    return playerStats
-      .filter((p) => p.position === position)
+    console.log("Filtering stats for position:", position, "Total stats:", playerStats.length);
+    const filtered = playerStats.filter((p) => {
+      const pPos = p.position?.toUpperCase();
+      const targetPos = position?.toUpperCase();
+      return pPos === targetPos;
+    });
+    console.log("Filtered stats:", filtered);
+    return filtered
       .sort((a, b) => {
         if (position === "QB") {
-          return b.passingYards - a.passingYards;
+          return (b.passingYards || 0) - (a.passingYards || 0);
         } else if (position === "RB") {
-          return b.rushingYards - a.rushingYards;
+          return (b.rushingYards || 0) - (a.rushingYards || 0);
         } else if (position === "WR") {
-          return b.receivingYards - a.receivingYards;
+          return (b.receivingYards || 0) - (a.receivingYards || 0);
         } else if (position === "DB") {
-          return b.defensiveInterceptions - a.defensiveInterceptions;
+          return (b.defensiveInterceptions || 0) - (a.defensiveInterceptions || 0);
         } else if (position === "DEF") {
-          return b.defensiveSacks - a.defensiveSacks;
+          return (b.defensiveSacks || 0) - (a.defensiveSacks || 0);
         }
         return 0;
       })

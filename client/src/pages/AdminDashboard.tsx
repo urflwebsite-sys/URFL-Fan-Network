@@ -1485,9 +1485,12 @@ function PlayerStatsManager() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const player = teamPlayers.find(p => p.id === selectedPlayer);
-    if (!player) return;
+    if (!player) {
+      toast({ title: "Error", description: "Please select a player", variant: "destructive" });
+      return;
+    }
 
-    createMutation.mutate({
+    const payload = {
       playerName: player.name,
       team: teams.find(t => t.id === selectedTeam)?.name || "",
       position: player.position,
@@ -1499,7 +1502,7 @@ function PlayerStatsManager() {
       rushingTouchdowns: parseInt(rushingTouchdowns) || 0,
       receivingYards: parseInt(receivingYards) || 0,
       receivingTouchdowns: parseInt(receivingTouchdowns) || 0,
-      // Add missing required fields for the schema
+      // Default all other required schema fields
       attempts: 0,
       completions: 0,
       sacks: 0,
@@ -1519,7 +1522,10 @@ function PlayerStatsManager() {
       defensiveMisses: 0,
       safeties: 0,
       defensivePoints: 0
-    });
+    };
+
+    console.log("Submitting stats:", payload);
+    createMutation.mutate(payload);
   };
 
   return (
