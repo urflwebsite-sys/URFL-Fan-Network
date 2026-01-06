@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TEAMS } from "@/lib/teams";
 
+interface PlayerStat {
     id: string;
     playerName: string;
     team: string;
