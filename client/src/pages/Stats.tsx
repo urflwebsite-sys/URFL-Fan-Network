@@ -185,18 +185,19 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground">{player.team}</p>
                             </div>
                           </div>
-                          <div className="text-right flex flex-col items-end min-w-[140px]">
-                            <div className="flex gap-2 items-baseline justify-end">
-                              <span className="font-bold text-lg">{player.passingYards}</span>
-                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Yds</span>
-                              <span className="font-bold text-lg text-primary ml-2">{player.passingTouchdowns}</span>
-                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">TD</span>
+                          <div className="flex-1 max-w-[300px] ml-4">
+                            <div className="grid grid-cols-3 gap-0 border border-muted rounded-sm overflow-hidden text-center">
+                              <div className="bg-muted/50 py-1 px-2 border-r border-b text-[10px] font-bold uppercase tracking-tighter">Pass Yds</div>
+                              <div className="bg-muted/50 py-1 px-2 border-r border-b text-[10px] font-bold uppercase tracking-tighter">Pass TD</div>
+                              <div className="bg-muted/50 py-1 px-2 border-b text-[10px] font-bold uppercase tracking-tighter">INT</div>
+                              <div className="py-1 px-2 border-r font-bold text-sm">{player.passingYards}</div>
+                              <div className="py-1 px-2 border-r font-bold text-sm text-primary">{player.passingTouchdowns}</div>
+                              <div className="py-1 px-2 font-bold text-sm">{player.interceptions}</div>
                             </div>
-                            <div className="grid grid-cols-3 gap-x-2 gap-y-0 text-[10px] text-muted-foreground mt-1 text-right">
+                            <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-medium">
                               <span>RTG: {rating}</span>
                               <span>{compPct}%</span>
                               <span>{player.completions}/{player.attempts}</span>
-                              <span>INT: {player.interceptions}</span>
                               <span>SCK: {player.sacks}</span>
                             </div>
                           </div>
@@ -227,17 +228,18 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground">{player.team}</p>
                             </div>
                           </div>
-                          <div className="text-right flex flex-col items-end min-w-[140px]">
-                            <div className="flex gap-2 items-baseline justify-end">
-                              <span className="font-bold text-lg">{player.receivingYards}</span>
-                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Yds</span>
-                              <span className="font-bold text-lg text-primary ml-2">{player.receivingTouchdowns}</span>
-                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">TD</span>
+                          <div className="flex-1 max-w-[300px] ml-4">
+                            <div className="grid grid-cols-3 gap-0 border border-muted rounded-sm overflow-hidden text-center">
+                              <div className="bg-muted/50 py-1 px-2 border-r border-b text-[10px] font-bold uppercase tracking-tighter">Rec Yds</div>
+                              <div className="bg-muted/50 py-1 px-2 border-r border-b text-[10px] font-bold uppercase tracking-tighter">Rec TD</div>
+                              <div className="bg-muted/50 py-1 px-2 border-b text-[10px] font-bold uppercase tracking-tighter">Rec</div>
+                              <div className="py-1 px-2 border-r font-bold text-sm">{player.receivingYards}</div>
+                              <div className="py-1 px-2 border-r font-bold text-sm text-primary">{player.receivingTouchdowns}</div>
+                              <div className="py-1 px-2 font-bold text-sm">{player.receptions}</div>
                             </div>
-                            <div className="grid grid-cols-2 gap-x-2 gap-y-0 text-[10px] text-muted-foreground mt-1 text-right">
-                              <span>REC: {player.receptions}/{player.targets}</span>
-                              <span>({catchPct}%)</span>
-                              <span className="col-span-2">YAC: {player.yardsAfterCatch}</span>
+                            <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-medium">
+                              <span>{player.receptions}/{player.targets} TGT ({catchPct}%)</span>
+                              <span>YAC: {player.yardsAfterCatch}</span>
                             </div>
                           </div>
                         </div>
@@ -267,17 +269,18 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground">{player.team}</p>
                             </div>
                           </div>
-                          <div className="text-right flex flex-col items-end min-w-[140px]">
-                            <div className="flex gap-2 items-baseline justify-end">
-                              <span className="font-bold text-lg">{player.rushingYards}</span>
-                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Yds</span>
-                              <span className="font-bold text-lg text-primary ml-2">{player.rushingTouchdowns}</span>
-                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">TD</span>
+                          <div className="flex-1 max-w-[300px] ml-4">
+                            <div className="grid grid-cols-3 gap-0 border border-muted rounded-sm overflow-hidden text-center">
+                              <div className="bg-muted/50 py-1 px-2 border-r border-b text-[10px] font-bold uppercase tracking-tighter">Rush Yds</div>
+                              <div className="bg-muted/50 py-1 px-2 border-r border-b text-[10px] font-bold uppercase tracking-tighter">Rush TD</div>
+                              <div className="bg-muted/50 py-1 px-2 border-b text-[10px] font-bold uppercase tracking-tighter">Att</div>
+                              <div className="py-1 px-2 border-r font-bold text-sm">{player.rushingYards}</div>
+                              <div className="py-1 px-2 border-r font-bold text-sm text-primary">{player.rushingTouchdowns}</div>
+                              <div className="py-1 px-2 font-bold text-sm">{player.rushingAttempts}</div>
                             </div>
-                            <div className="grid grid-cols-2 gap-x-2 gap-y-0 text-[10px] text-muted-foreground mt-1 text-right">
-                              <span>ATT: {player.rushingAttempts}</span>
+                            <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-medium">
                               <span>YPA: {ypa}</span>
-                              <span className="col-span-2">MISSES: {player.missedTacklesForced}</span>
+                              <span>MISSES: {player.missedTacklesForced}</span>
                             </div>
                           </div>
                         </div>
@@ -307,17 +310,18 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground">{player.team}</p>
                             </div>
                           </div>
-                          <div className="text-right flex flex-col items-end min-w-[140px]">
-                            <div className="flex gap-2 items-baseline justify-end">
-                              <span className="font-bold text-lg">{player.defensiveInterceptions}</span>
-                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Int</span>
-                              <span className="font-bold text-lg text-primary ml-2">{player.swats}</span>
-                              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Swat</span>
+                          <div className="flex-1 max-w-[300px] ml-4">
+                            <div className="grid grid-cols-3 gap-0 border border-muted rounded-sm overflow-hidden text-center">
+                              <div className="bg-muted/50 py-1 px-2 border-r border-b text-[10px] font-bold uppercase tracking-tighter">Int</div>
+                              <div className="bg-muted/50 py-1 px-2 border-r border-b text-[10px] font-bold uppercase tracking-tighter">Swat</div>
+                              <div className="bg-muted/50 py-1 px-2 border-b text-[10px] font-bold uppercase tracking-tighter">TD</div>
+                              <div className="py-1 px-2 border-r font-bold text-sm">{player.defensiveInterceptions}</div>
+                              <div className="py-1 px-2 border-r font-bold text-sm text-primary">{player.swats}</div>
+                              <div className="py-1 px-2 font-bold text-sm">{player.defensiveTouchdowns}</div>
                             </div>
-                            <div className="grid grid-cols-2 gap-x-2 gap-y-0 text-[10px] text-muted-foreground mt-1 text-right">
+                            <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-medium">
                               <span>DENY: {denyPct}%</span>
                               <span>CMP: {player.completionsAllowed}/{player.targetsAllowed}</span>
-                              <span className="col-span-2">TD: {player.defensiveTouchdowns}</span>
                             </div>
                           </div>
                         </div>
@@ -345,16 +349,17 @@ export default function Stats() {
                             <p className="text-sm text-muted-foreground">{player.team}</p>
                           </div>
                         </div>
-                        <div className="text-right flex flex-col items-end min-w-[140px]">
-                          <div className="flex gap-2 items-baseline justify-end">
-                            <span className="font-bold text-lg">{player.defensiveSacks}</span>
-                            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Sck</span>
-                            <span className="font-bold text-lg text-primary ml-2">{player.tackles}</span>
-                            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Tkl</span>
+                        <div className="flex-1 max-w-[300px] ml-4">
+                          <div className="grid grid-cols-3 gap-0 border border-muted rounded-sm overflow-hidden text-center">
+                            <div className="bg-muted/50 py-1 px-2 border-r border-b text-[10px] font-bold uppercase tracking-tighter">Sck</div>
+                            <div className="bg-muted/50 py-1 px-2 border-r border-b text-[10px] font-bold uppercase tracking-tighter">Tkl</div>
+                            <div className="bg-muted/50 py-1 px-2 border-b text-[10px] font-bold uppercase tracking-tighter">Sfty</div>
+                            <div className="py-1 px-2 border-r font-bold text-sm">{player.defensiveSacks}</div>
+                            <div className="py-1 px-2 border-r font-bold text-sm text-primary">{player.tackles}</div>
+                            <div className="py-1 px-2 font-bold text-sm">{player.safeties}</div>
                           </div>
-                          <div className="grid grid-cols-2 gap-x-2 gap-y-0 text-[10px] text-muted-foreground mt-1 text-right">
+                          <div className="flex justify-between mt-1 px-1 text-[9px] text-muted-foreground font-medium">
                             <span>MISS: {player.defensiveMisses}</span>
-                            <span>SFTY: {player.safeties}</span>
                           </div>
                         </div>
                       </div>
