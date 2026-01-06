@@ -173,7 +173,7 @@ export default function Stats() {
                     getLeaderboard("QB").map((player, idx) => {
                       const compPct = player.attempts > 0 ? ((player.completions / player.attempts) * 100).toFixed(1) : "0.0";
                       const rating = player.attempts > 0 ? (
-                        ((8.4 * player.passingYards) + (330 * player.passingTouchdowns) + (100 * player.completions) - (200 * player.interceptions)) / player.attempts
+                        ((8.4 * (player.passingYards || 0)) + (330 * (player.passingTouchdowns || 0)) + (100 * (player.completions || 0)) - (200 * (player.interceptions || 0))) / player.attempts
                       ).toFixed(1) : "0.0";
                       
                       return (
@@ -193,23 +193,30 @@ export default function Stats() {
                                 <div className="flex-1 py-1 px-1 text-[11px] font-black uppercase tracking-tight text-center leading-none h-7 flex items-center justify-center">INT</div>
                               </div>
                               <div className="flex font-mono text-base bg-card">
-                                <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none">{player.passingYards}</div>
-                                <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none text-primary">{player.passingTouchdowns}</div>
-                                <div className="flex-1 py-2 px-1 text-center font-black leading-none">{player.interceptions}</div>
+                                <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none">{player.passingYards || 0}</div>
+                                <div className="flex-1 py-2 px-1 text-center font-black border-r border-muted leading-none text-primary">{player.passingTouchdowns || 0}</div>
+                                <div className="flex-1 py-2 px-1 text-center font-black leading-none">{player.interceptions || 0}</div>
                               </div>
                             </div>
                             <div className="flex justify-between mt-1.5 px-1 text-[10px] text-muted-foreground font-black uppercase tracking-tight min-w-[400px]">
                               <span>RTG: {rating}</span>
                               <span>{compPct}%</span>
-                              <span>{player.completions}/{player.attempts}</span>
-                              <span>SCK: {player.sacks}</span>
+                              <span>{player.completions || 0}/{player.attempts || 0}</span>
+                              <span>SCK: {player.sacks || 0}</span>
                             </div>
                           </div>
                         </div>
                       );
                     })
                   ) : (
-                    <p className="text-muted-foreground text-center py-8">No QB stats yet</p>
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground mb-4">No QB stats yet</p>
+                      {playerStats.length > 0 && (
+                        <p className="text-xs text-muted-foreground">
+                          Total Stats found: {playerStats.length}. Positions found: {Array.from(new Set(playerStats.map(p => p.position))).join(', ')}
+                        </p>
+                      )}
+                    </div>
                   )}
                 </div>
               </ScrollArea>
