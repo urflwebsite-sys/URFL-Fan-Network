@@ -29,6 +29,11 @@ interface PlayerStat {
     receptions: number;
     targets: number;
     yardsAfterCatch: number;
+    // K
+    fieldGoalsMade: number;
+    extraPointsMade: number;
+    fieldGoalsAttempted: number;
+    extraPointsAttempted: number;
     // DB
     defensiveInterceptions: number;
     passesDefended: number;
