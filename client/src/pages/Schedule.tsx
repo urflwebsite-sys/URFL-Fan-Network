@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Game } from "@shared/schema";
 import { isFuture, isPast } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
@@ -14,7 +16,7 @@ import { useState } from "react";
 
 export default function Schedule() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSeason, setSelectedSeason] = useState("1");
+  const [selectedSeason, setSelectedSeason] = useState("2");
   const [primetimeFilter, setPrimetimeFilter] = useState<"all" | "primetime" | "regular">("all");
   const preferences = useUserPreferences();
   const showLogos = preferences.showTeamLogos !== false;
@@ -93,28 +95,27 @@ export default function Schedule() {
           />
         </div>
         <div className="flex gap-2">
-            <Button
-              variant={primetimeFilter === "all" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setPrimetimeFilter("all")}
-            >
-              All Games
-            </Button>
-            <Button
-              variant={primetimeFilter === "primetime" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setPrimetimeFilter("primetime")}
-            >
-              Primetime
-            </Button>
-            <Button
-              variant={primetimeFilter === "regular" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setPrimetimeFilter("regular")}
-            >
-              Regular
-            </Button>
-          </div>
+          <Button
+            variant={primetimeFilter === "all" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPrimetimeFilter("all")}
+          >
+            All Games
+          </Button>
+          <Button
+            variant={primetimeFilter === "primetime" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPrimetimeFilter("primetime")}
+          >
+            Primetime
+          </Button>
+          <Button
+            variant={primetimeFilter === "regular" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPrimetimeFilter("regular")}
+          >
+            Regular
+          </Button>
         </div>
       </div>
 

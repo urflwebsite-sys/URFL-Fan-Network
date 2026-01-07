@@ -41,7 +41,7 @@ export default function Standings() {
   const { toast } = useToast();
   const isAdmin = isAuthenticated && (user as any)?.role === "admin";
   const [standings, setStandings] = useState<StandingsEntry[]>([]);
-  const [selectedSeason, setSelectedSeason] = useState("1");
+  const [selectedSeason, setSelectedSeason] = useState("2");
   const [newTeam, setNewTeam] = useState("");
   const [newDivision, setNewDivision] = useState<"AFC_D1" | "AFC_D2" | "NFC_D1" | "NFC_D2">("AFC_D1");
   const [editingPD, setEditingPD] = useState<Record<string, string>>({});
