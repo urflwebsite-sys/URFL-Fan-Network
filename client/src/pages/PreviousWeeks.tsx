@@ -11,15 +11,16 @@ import { AlertCircle } from "lucide-react";
 import { Link } from "wouter";
 
 export default function PreviousWeeks() {
+  const [selectedSeason, setSelectedSeason] = useState("2");
   const [selectedWeek, setSelectedWeek] = useState(1);
   const [, setLocation] = useLocation();
 
   const { data: games, isLoading, error } = useQuery<Game[]>({
-    queryKey: ["/api/games/week", selectedWeek],
+    queryKey: ["/api/games/week", selectedWeek, { season: selectedSeason }],
   });
 
   const { data: allGames, isLoading: allGamesLoading } = useQuery<Game[]>({
-    queryKey: ["/api/games/all"],
+    queryKey: ["/api/games/all", { season: selectedSeason }],
   });
 
   const weeks = Array.from({ length: 14 }, (_, i) => i + 1);
@@ -83,14 +84,29 @@ export default function PreviousWeeks() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-black mb-4" data-testid="text-page-title">
-          Previous Weeks
-        </h1>
-        <p className="text-muted-foreground text-lg mb-6">
-          Browse final scores from all weeks of the season
-        </p>
+      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-4xl md:text-5xl font-black mb-4" data-testid="text-page-title">
+            Previous Weeks
+          </h1>
+          <p className="text-muted-foreground text-lg mb-6">
+            Browse final scores from Season {selectedSeason}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 mb-6">
+          <span className="text-sm font-medium text-muted-foreground">Season:</span>
+          <select 
+            value={selectedSeason} 
+            onChange={(e) => setSelectedSeason(e.target.value)}
+            className="bg-background border-2 border-primary/20 rounded-md px-2 py-1 text-sm font-bold focus:outline-none focus:border-primary transition-colors"
+          >
+            <option value="1">Season 1</option>
+            <option value="2">Season 2</option>
+          </select>
+        </div>
+      </div>
 
+      <div className="mb-8">
         <div className="flex flex-wrap gap-2">
           {weeks.map((week) => {
             const roundName = week === 11 ? "Wildcard" : week === 12 ? "Divisional" : week === 13 ? "Conference" : week === 14 ? "Super Bowl" : `Week ${week}`;
@@ -127,7 +143,7 @@ export default function PreviousWeeks() {
       ) : (
         <div className="text-center py-16">
           <p className="text-muted-foreground text-lg">
-            No games found for Week {selectedWeek}
+            No games found for Week {selectedWeek} in Season {selectedSeason}
           </p>
         </div>
       )}

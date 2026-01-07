@@ -15,9 +15,10 @@ import { SiteTour } from "@/components/SiteTour";
 export default function Landing() {
   const [, setLocation] = useLocation();
   const { user, isAuthenticated } = useAuth();
+  const [selectedSeason, setSelectedSeason] = useState("2");
 
   const { data: games, isLoading: gamesLoading } = useQuery<Game[]>({
-    queryKey: ["/api/games/current"],
+    queryKey: ["/api/games/current", { season: selectedSeason }],
   });
 
   const { data: news, isLoading: newsLoading } = useQuery<NewsType[]>({
@@ -80,8 +81,8 @@ export default function Landing() {
           </div>
         </div>
       )}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="text-3xl">⚡</span>
           </div>
@@ -89,6 +90,17 @@ export default function Landing() {
             <h1 className="text-2xl md:text-3xl font-black">Welcome to URFL Fan Hub</h1>
             <p className="text-muted-foreground text-sm">Your destination for all things URFL</p>
           </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-muted-foreground">Season:</span>
+          <select 
+            value={selectedSeason} 
+            onChange={(e) => setSelectedSeason(e.target.value)}
+            className="bg-background border-2 border-primary/20 rounded-md px-2 py-1 text-sm font-bold focus:outline-none focus:border-primary transition-colors"
+          >
+            <option value="1">Season 1</option>
+            <option value="2">Season 2</option>
+          </select>
         </div>
       </div>
       
@@ -99,7 +111,7 @@ export default function Landing() {
             <div className="relative z-10">
               <Badge className="mb-4">
                 <Sparkles className="w-3 h-3 mr-1" />
-                Season 1 Highlights
+                Season {selectedSeason} Highlights
               </Badge>
               
               <h2 className="text-3xl md:text-4xl font-black mb-4 leading-tight">

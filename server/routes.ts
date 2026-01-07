@@ -52,23 +52,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/games/current", async (req, res) => {
+  app.get("/api/games/week/:week", async (req, res) => {
     try {
-      const games = await storage.getCurrentWeekGames();
-      res.json(games);
+      const week = parseInt(req.params.week);
+      const season = req.query.season ? parseInt(req.query.season as string) : 1;
+      const games = await storage.getGamesByWeek(week);
+      res.json(games.filter(g => (g.season || 1) === season));
     } catch (error) {
-      console.error("Error fetching current week games:", error);
+      console.error("Error fetching games by week:", error);
       res.status(500).json({ message: "Failed to fetch games" });
     }
   });
 
-  app.get("/api/games/week/:week", async (req, res) => {
+  app.get("/api/games/current", async (req, res) => {
     try {
-      const week = parseInt(req.params.week);
-      const games = await storage.getGamesByWeek(week);
-      res.json(games);
+      const season = req.query.season ? parseInt(req.query.season as string) : null;
+      const games = await storage.getCurrentWeekGames();
+      if (season !== null) {
+        res.json(games.filter(g => (g.season || 1) === season));
+      } else {
+        res.json(games);
+      }
     } catch (error) {
-      console.error("Error fetching games by week:", error);
+      console.error("Error fetching current week games:", error);
       res.status(500).json({ message: "Failed to fetch games" });
     }
   });

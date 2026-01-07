@@ -228,20 +228,35 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(games).orderBy(games.gameTime);
   }
 
+  async getCurrentWeekGames(): Promise<Game[]> {
+    const allGames = await db.select().from(games).orderBy(desc(games.week));
+    if (allGames.length === 0) return [];
+    
+    // Find games for the current week of the latest season
+    const latestSeason = Math.max(...allGames.map(g => g.season || 1));
+    const seasonGames = allGames.filter(g => (g.season || 1) === latestSeason);
+    
+    const liveGames = seasonGames.filter(g => g.isLive);
+    if (liveGames.length > 0) return liveGames;
+
+    const upcomingGames = seasonGames.filter(g => !g.isFinal);
+    if (upcomingGames.length > 0) {
+      const minWeek = Math.min(...upcomingGames.map(g => g.week));
+      return upcomingGames.filter(g => g.week === minWeek);
+    }
+
+    const maxWeek = Math.max(...seasonGames.map(g => g.week));
+    return seasonGames.filter(g => g.week === maxWeek);
+  }
+
   async getGamesByWeek(week: number): Promise<Game[]> {
+    // Note: This needs to consider the selected season which is usually passed via query param
+    // But since this is a storage method, it returns all for that week across seasons unless filtered later
     return await db
       .select()
       .from(games)
       .where(eq(games.week, week))
       .orderBy(games.gameTime);
-  }
-
-  async getCurrentWeekGames(): Promise<Game[]> {
-    const allGames = await db.select().from(games).orderBy(desc(games.week));
-    if (allGames.length === 0) return [];
-    
-    const currentWeek = allGames[0].week;
-    return allGames.filter(g => g.week === currentWeek);
   }
 
   async getGame(id: string): Promise<Game | undefined> {
