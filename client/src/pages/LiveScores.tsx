@@ -4,11 +4,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
 import type { Game } from "@shared/schema";
 import { useLocation } from "wouter";
-import { AlertCircle, Search } from "lucide-react";
+import { AlertCircle, Search, Zap, Trophy, Target } from "lucide-react";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useState } from "react";
 
@@ -28,7 +27,6 @@ export default function LiveScores() {
     refetchInterval: 30000,
   });
 
-  // Filter games by search query and primetime status
   const filteredGames = games ? games.filter(game => {
     const matchesSearch = game.team1.toLowerCase().includes(searchQuery.toLowerCase()) ||
       game.team2.toLowerCase().includes(searchQuery.toLowerCase());
@@ -39,7 +37,6 @@ export default function LiveScores() {
     return matchesSearch && matchesPrimetime;
   }) : [];
 
-  // Sort games with favorite team first
   const sortedGames = filteredGames ? [...filteredGames].sort((a, b) => {
     if (preferences.favoriteTeam) {
       const aHasFavorite = a.team1 === preferences.favoriteTeam || a.team2 === preferences.favoriteTeam;
@@ -52,10 +49,11 @@ export default function LiveScores() {
 
   if (error) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="flex items-center justify-center gap-3 text-destructive">
-          <AlertCircle className="w-5 h-5" />
-          <p>Failed to load games</p>
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="text-center space-y-4">
+          <AlertCircle className="w-12 h-12 text-destructive mx-auto" />
+          <p className="text-xl font-black uppercase tracking-tighter italic">Signal Lost</p>
+          <Button onClick={() => window.location.reload()} variant="outline" className="rounded-full">Retry Connection</Button>
         </div>
       </div>
     );
@@ -64,83 +62,83 @@ export default function LiveScores() {
   const currentWeek = games && games.length > 0 ? games[0].week : 1;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-black mb-2" data-testid="text-page-title">
-              Live Scores
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              Follow all the action as it happens in Season 2
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-4">
-            <Badge variant="outline" className="text-lg px-4 py-2 bg-primary/5 text-primary border-primary/20" data-testid="badge-current-week">
-              Week {currentWeek}
-            </Badge>
-          </div>
+    <div className="min-h-screen bg-background p-6 md:p-10 max-w-7xl mx-auto space-y-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="space-y-4">
+          <Badge className="bg-primary/10 text-primary border-none font-black uppercase tracking-[0.2em] text-[10px] px-4 py-1.5 rounded-full">
+            <span className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Live Broadcast Network
+            </span>
+          </Badge>
+          <h1 className="text-5xl md:text-6xl font-black italic uppercase tracking-tighter leading-none">
+            Gameday <span className="text-muted-foreground/20">W{currentWeek}</span>
+          </h1>
         </div>
-        <div className="space-y-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+          <div className="relative group flex-1 md:w-72">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <Input
-              type="text"
-              placeholder="Search by team name..."
+              placeholder="Filter teams..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="h-12 pl-12 bg-white/5 border-white/10 rounded-2xl focus:ring-primary/20 transition-all font-bold text-sm"
             />
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant={primetimeFilter === "all" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setPrimetimeFilter("all")}
-            >
-              All Games
-            </Button>
-            <Button
-              variant={primetimeFilter === "primetime" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setPrimetimeFilter("primetime")}
-            >
-              Primetime
-            </Button>
-            <Button
-              variant={primetimeFilter === "regular" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setPrimetimeFilter("regular")}
-            >
-              Regular
-            </Button>
+          <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
+            {["all", "primetime", "regular"].map((f) => (
+              <Button
+                key={f}
+                variant="ghost"
+                size="sm"
+                onClick={() => setPrimetimeFilter(f as any)}
+                className={`flex-1 sm:px-6 rounded-xl font-black uppercase tracking-widest text-[9px] h-10 transition-all ${
+                  primetimeFilter === f ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-muted-foreground"
+                }`}
+              >
+                {f}
+              </Button>
+            ))}
           </div>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="h-64" />
+            <Skeleton key={i} className="h-64 rounded-[32px] bg-card/50" />
           ))}
         </div>
-      ) : sortedGames && sortedGames.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      ) : sortedGames.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {sortedGames.map((game) => (
-            <GameCard
-              key={game.id}
-              game={game}
-              onClick={() => setLocation(`/game/${game.id}`)}
-            />
+            <GameCard key={game.id} game={game} onClick={() => setLocation(`/game/${game.id}`)} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-16">
-          <p className="text-muted-foreground text-lg">
-            No games scheduled for this week yet
-          </p>
-        </div>
+        <Card className="p-24 text-center border-dashed border-2 border-white/5 bg-transparent rounded-[40px]">
+          <Zap className="w-16 h-16 text-muted-foreground/10 mx-auto mb-6" />
+          <h3 className="text-2xl font-black italic uppercase tracking-tighter text-muted-foreground/40">No Matchups Found</h3>
+          <p className="text-muted-foreground/30 text-[10px] font-black uppercase tracking-widest mt-2">Check the filters or search query</p>
+        </Card>
       )}
+
+      <section className="grid md:grid-cols-3 gap-6 pt-12 border-t border-white/5">
+        {[
+          { icon: Trophy, label: "Playoff Bracket", desc: "View the road to the bowl", path: "/playoffs" },
+          { icon: Target, label: "Active Bets", desc: "Check your prediction history", path: "/betting" },
+          { icon: Zap, label: "Team Intel", desc: "Deep dive into team statistics", path: "/teams" },
+        ].map((item, i) => (
+          <Button key={i} variant="ghost" onClick={() => setLocation(item.path)} className="h-32 flex flex-col items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-[32px] group">
+            <item.icon className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+            <div className="text-center">
+              <p className="text-[10px] font-black uppercase tracking-widest leading-none">{item.label}</p>
+              <p className="text-[9px] text-muted-foreground mt-1 opacity-50">{item.desc}</p>
+            </div>
+          </Button>
+        ))}
+      </section>
     </div>
   );
 }

@@ -4,93 +4,107 @@ import { Button } from "@/components/ui/button";
 import type { Game } from "@shared/schema";
 import { formatInTimeZone } from "date-fns-tz";
 import { TEAMS } from "@/lib/teams";
-import { Video, Activity } from "lucide-react";
+import { Video } from "lucide-react";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
-import { FootballField } from "./FootballField";
 
 interface GameCardProps {
   game: Game;
   onClick?: () => void;
 }
 
+const TeamLogo = ({ teamName, className }: { teamName: string; className?: string }) => {
+  const logo = TEAMS[teamName as keyof typeof TEAMS];
+  if (!logo) return <div className={`${className} bg-muted rounded-full flex items-center justify-center text-[10px] font-bold`}>{teamName.substring(0, 2)}</div>;
+  return <img src={logo} alt={teamName} className={`${className} object-contain`} />;
+};
+
 export function GameCard({ game, onClick }: GameCardProps) {
   const preferences = useUserPreferences();
-  const showLogos = preferences.showTeamLogos !== false;
-  const team2Logo = showLogos ? TEAMS[game.team2 as keyof typeof TEAMS] : null;
-  const team1Logo = showLogos ? TEAMS[game.team1 as keyof typeof TEAMS] : null;
 
   return (
-    <Card
-      className={`p-6 cursor-pointer hover:shadow-lg hover:border-primary/30 transition-all ${game.isLive ? 'border-primary' : ''}`}
+    <Card 
+      className={`group relative overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(var(--primary),0.15)] border-border/40 bg-card/40 backdrop-blur-xl cursor-pointer ${
+        game.isLive ? 'ring-1 ring-primary/50 bg-primary/5' : ''
+      }`}
       onClick={onClick}
-      data-testid={`card-game-${game.id}`}
     >
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <Badge
-            variant={game.isLive ? "default" : game.isFinal ? "secondary" : "outline"}
-            className={game.isLive ? "animate-pulse" : ""}
-            data-testid={`badge-status-${game.id}`}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      <div className="p-5 space-y-6 relative z-10">
+        <div className="flex justify-between items-center">
+          <Badge 
+            variant={game.isLive ? "default" : "secondary"}
+            className={`text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full ${
+              game.isLive ? 'animate-pulse bg-primary shadow-lg shadow-primary/20' : 'bg-muted/50 border-none'
+            }`}
           >
-            {game.isLive ? `LIVE${game.quarter && game.quarter !== "Scheduled" ? ` - ${game.quarter}` : ""}` : game.isFinal ? "FINAL" : game.quarter || "Scheduled"}
+            {game.isLive ? (
+              <span className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                Live • {game.quarter}
+              </span>
+            ) : game.isFinal ? 'Final' : 'Scheduled'}
           </Badge>
-          <span className="text-xs text-muted-foreground" data-testid={`text-gametime-${game.id}`}>
-            {game.gameTime ? formatInTimeZone(new Date(game.gameTime), "America/New_York", "EEE, MMM d 'at' h:mm a 'EST'") : "Time TBD"}
-          </span>
+          <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] italic">Week {game.week}</span>
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              {team2Logo && <img src={team2Logo} alt={game.team2} className="w-8 h-8 object-contain flex-shrink-0" />}
-              <span className={`text-lg font-bold truncate ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary' : ''}`} data-testid={`text-team2-${game.id}`}>
-                {game.team2}
-              </span>
+        <div className="grid grid-cols-[1fr,auto,1fr] items-center gap-6 py-2">
+          <div className="text-center space-y-4">
+            <div className="relative inline-block group-hover:scale-110 transition-transform duration-500">
+              <div className="absolute inset-0 bg-primary/10 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+              <TeamLogo teamName={game.team1} className="w-16 h-16 relative z-10 drop-shadow-2xl" />
             </div>
-            <span className={`text-4xl font-black tabular-nums flex-shrink-0 ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary' : ''}`} data-testid={`text-team2-score-${game.id}`}>
-              {game.team2Score}
-            </span>
+            <p className="font-black italic text-[11px] uppercase tracking-wider text-foreground/80">{game.team1}</p>
           </div>
 
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              {team1Logo && <img src={team1Logo} alt={game.team1} className="w-8 h-8 object-contain flex-shrink-0" />}
-              <span className={`text-lg font-bold truncate ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary' : ''}`} data-testid={`text-team1-${game.id}`}>
-                {game.team1}
-              </span>
+          <div className="text-center">
+            <div className="text-3xl font-black italic tracking-tighter tabular-nums flex flex-col items-center gap-1">
+              {game.isLive || game.isFinal ? (
+                <div className="flex items-center gap-4">
+                  <span className={game.team1Score! > game.team2Score! ? 'text-primary scale-110' : 'text-foreground/50'}>{game.team1Score}</span>
+                  <span className="text-muted-foreground/20 text-lg not-italic font-light">-</span>
+                  <span className={game.team2Score! > game.team1Score! ? 'text-primary scale-110' : 'text-foreground/50'}>{game.team2Score}</span>
+                </div>
+              ) : (
+                <div className="w-10 h-10 rounded-full border border-border/50 flex items-center justify-center">
+                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-black not-italic opacity-40">VS</span>
+                </div>
+              )}
             </div>
-            <span className={`text-4xl font-black tabular-nums flex-shrink-0 ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary' : ''}`} data-testid={`text-team1-score-${game.id}`}>
-              {game.team1Score}
-            </span>
+          </div>
+
+          <div className="text-center space-y-4">
+            <div className="relative inline-block group-hover:scale-110 transition-transform duration-500">
+              <div className="absolute inset-0 bg-primary/10 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+              <TeamLogo teamName={game.team2} className="w-16 h-16 relative z-10 drop-shadow-2xl" />
+            </div>
+            <p className="font-black italic text-[11px] uppercase tracking-wider text-foreground/80">{game.team2}</p>
           </div>
         </div>
 
-        {game.location && (
-          <div className="text-sm text-muted-foreground" data-testid={`text-location-${game.id}`}>
-            {game.location}
-          </div>
-        )}
-
-        {game.streamLink && (
-          <div className="pt-3 border-t">
+        <div className="pt-4 flex flex-col items-center gap-3 border-t border-border/20">
+          {!game.isFinal && !game.isLive ? (
+             <p className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-[0.25em]">
+               {game.gameTime ? formatInTimeZone(new Date(game.gameTime), "America/New_York", "EEE, MMM d • h:mm a 'EST'") : "Time TBD"}
+             </p>
+          ) : game.streamLink && (
             <Button 
               size="sm" 
-              variant="outline" 
-              className="w-full gap-2"
+              className="w-full bg-primary/10 hover:bg-primary text-primary hover:text-white border-none font-black uppercase tracking-widest text-[10px] h-8 transition-all duration-300"
               onClick={(e) => {
                 e.stopPropagation();
-                if (!game.streamLink) return;
-                const url = game.streamLink.startsWith('http://') || game.streamLink.startsWith('https://') 
-                  ? game.streamLink 
-                  : `https://${game.streamLink}`;
+                const url = game.streamLink!.startsWith('http') ? game.streamLink! : `https://${game.streamLink}`;
                 window.open(url, '_blank');
               }}
             >
-              <Video className="w-4 h-4" />
-              Watch Stream
+              <Video className="w-3 h-3 mr-2" />
+              Watch Live
             </Button>
-          </div>
-        )}
+          )}
+          {game.location && (
+            <p className="text-[9px] font-bold text-muted-foreground/30 uppercase tracking-widest">{game.location}</p>
+          )}
+        </div>
       </div>
     </Card>
   );

@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, GripVertical } from "lucide-react";
+import { Trash2, GripVertical, Trophy, Shield, Star } from "lucide-react";
 import { TEAMS } from "@/lib/teams";
+import { Badge } from "@/components/ui/badge";
 
 interface StandingsEntry {
   id: string;
@@ -30,10 +31,9 @@ interface DropZone {
 
 const AVAILABLE_TEAMS = Object.keys(TEAMS);
 
-const DIVISIONS = ["AFC_D1", "AFC_D2", "NFC_D1", "NFC_D2"] as const;
 const CONFERENCES = [
-  { name: "AFC", divisions: [{ id: "AFC_D1", label: "Division 1" }, { id: "AFC_D2", label: "Division 2" }] },
-  { name: "NFC", divisions: [{ id: "NFC_D1", label: "Division 1" }, { id: "NFC_D2", label: "Division 2" }] },
+  { name: "AFC", color: "text-blue-500", bg: "bg-blue-500/5", divisions: [{ id: "AFC_D1", label: "Division 1" }, { id: "AFC_D2", label: "Division 2" }] },
+  { name: "NFC", color: "text-red-500", bg: "bg-red-500/5", divisions: [{ id: "NFC_D1", label: "Division 1" }, { id: "NFC_D2", label: "Division 2" }] },
 ];
 
 export default function Standings() {
@@ -42,8 +42,8 @@ export default function Standings() {
   const isAdmin = isAuthenticated && (user as any)?.role === "admin";
   const [standings, setStandings] = useState<StandingsEntry[]>([]);
   const [newTeam, setNewTeam] = useState("");
-  const [newDivision, setNewDivision] = useState<"AFC_D1" | "AFC_D2" | "NFC_D1" | "NFC_D2">("AFC_D1");
-  const [editingPD, setEditingPD] = useState<Record<string, string>>({});
+  const [newDivision, setNewDivision] = useState<"AFC_D1" | "AFC_D2" | "NFC_D1" | "NFC_D2" | "">("");
+  const [editingPD, setEditingPD] = useState<Record<string, string | number>>({});
   const [draggedTeam, setDraggedTeam] = useState<string | null>(null);
   const [dropZone, setDropZone] = useState<DropZone | null>(null);
 
@@ -88,10 +88,6 @@ export default function Standings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/standings"] });
     },
-    onError: (error: any) => {
-      const errorMessage = error?.response?.data?.message || "Failed to save standing";
-      toast({ title: "Error", description: errorMessage, variant: "destructive" });
-    },
   });
 
   const deleteMutation = useMutation({
@@ -101,14 +97,10 @@ export default function Standings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/standings"] });
     },
-    onError: (error: any) => {
-      const errorMessage = error?.response?.data?.message || "Failed to delete standing";
-      toast({ title: "Error", description: errorMessage, variant: "destructive" });
-    },
   });
 
   const addTeam = () => {
-    if (!isAdmin || !newTeam.trim()) return;
+    if (!isAdmin || !newTeam.trim() || !newDivision) return;
     const divisionTeams = standings.filter(s => s.division === newDivision);
     const maxOrder = divisionTeams.length > 0 
       ? Math.max(...divisionTeams.map(s => s.manualOrder ?? -1)) 
@@ -120,7 +112,7 @@ export default function Standings() {
       wins: 0,
       losses: 0,
       pointDifferential: 0,
-      division: newDivision,
+      division: newDivision as any,
       manualOrder: maxOrder + 1,
     };
     setStandings([...standings, newEntry]);
@@ -163,29 +155,18 @@ export default function Standings() {
 
   const handleDragOver = (e: React.DragEvent, targetTeamId: string) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-    
     if (!draggedTeam || draggedTeam === targetTeamId) return;
     
-    const draggedEntry = standings.find(s => s.id === draggedTeam);
     const targetEntry = standings.find(s => s.id === targetTeamId);
-    
-    if (!draggedEntry || !targetEntry || draggedEntry.division !== targetEntry.division) return;
-    
-    // Determine drop position based on mouse Y position
+    if (!targetEntry) return;
+
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const midpoint = rect.top + rect.height / 2;
-    const position = e.clientY < midpoint ? 'above' : 'below';
-    
     setDropZone({
       divisionId: targetEntry.division,
-      position,
+      position: e.clientY < midpoint ? 'above' : 'below',
       targetId: targetTeamId,
     });
-  };
-
-  const handleDragLeave = () => {
-    setDropZone(null);
   };
 
   const handleDrop = (e: React.DragEvent, targetTeamId: string) => {
@@ -196,271 +177,188 @@ export default function Standings() {
     const targetEntry = standings.find(e => e.id === targetTeamId);
     
     if (!draggedEntry || !targetEntry || draggedEntry.division !== targetEntry.division) {
-      setDraggedTeam(null);
       setDropZone(null);
       return;
     }
 
-    // Get all items in this division, sorted by order
     const divisionItems = getDivisionStandings(draggedEntry.division);
-    
-    // Remove dragged item from its position
     const filteredItems = divisionItems.filter(item => item.id !== draggedTeam);
-    
-    // Find target index
     const targetIndex = filteredItems.findIndex(item => item.id === targetTeamId);
+    let insertIndex = dropZone?.position === 'below' ? targetIndex + 1 : targetIndex;
     
-    // Determine insertion index based on drop position
-    let insertIndex = targetIndex;
-    if (dropZone?.position === 'below') {
-      insertIndex = targetIndex + 1;
-    }
-    
-    // Insert dragged item at new position
     filteredItems.splice(insertIndex, 0, draggedEntry);
     
-    // Renumber all items with clean sequential order
     const reorderedItems = filteredItems.map((item, idx) => ({
       ...item,
       manualOrder: idx,
     }));
     
-    // Update all standings - keep other divisions unchanged
-    const newStandings = standings.map(entry => {
-      const reordered = reorderedItems.find(r => r.id === entry.id);
-      return reordered || entry;
-    });
-
-    setStandings(newStandings);
-    
-    // Save all affected entries
-    reorderedItems.forEach(item => {
-      upsertMutation.mutate(item);
-    });
-    
-    setDraggedTeam(null);
+    setStandings(standings.map(entry => reorderedItems.find(r => r.id === entry.id) || entry));
+    reorderedItems.forEach(item => upsertMutation.mutate(item));
     setDropZone(null);
   };
-
-  const handleDragEnd = () => {
-    setDraggedTeam(null);
-    setDropZone(null);
-  };
-
-  const availableTeams = AVAILABLE_TEAMS;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-black mb-4" data-testid="text-page-title">
-            Standings
-          </h1>
-          <p className="text-muted-foreground text-lg">URFL Season 2 Standings</p>
-        </div>
+    <div className="min-h-screen bg-background p-6 md:p-10 max-w-7xl mx-auto space-y-12">
+      <div className="space-y-4">
+        <Badge className="bg-primary/10 text-primary border-none font-black uppercase tracking-[0.2em] text-[10px] px-4 py-1.5 rounded-full">
+          League Rankings
+        </Badge>
+        <h1 className="text-5xl md:text-6xl font-black italic uppercase tracking-tighter leading-none">
+          Standings <span className="text-muted-foreground/20">S2</span>
+        </h1>
       </div>
+
       {isAdmin && (
-        <Card className="p-6 mb-8">
-          <h2 className="text-xl font-bold mb-4">Add Team</h2>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="team-select">Team Name</Label>
-                <Select value={newTeam} onValueChange={setNewTeam}>
-                  <SelectTrigger id="team-select" data-testid="select-team">
-                    <SelectValue placeholder="Select team" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableTeams.map((team) => (
-                      <SelectItem key={team} value={team}>
-                        <div className="flex items-center gap-2">
-                          <img src={TEAMS[team as keyof typeof TEAMS]} alt={team} className="w-4 h-4 object-contain" />
-                          <span>{team}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="division-select">Division</Label>
-                <Select value={newDivision} onValueChange={(v) => setNewDivision(v as "AFC_D1" | "AFC_D2" | "NFC_D1" | "NFC_D2")}>
-                  <SelectTrigger id="division-select" data-testid="select-division">
-                    <SelectValue placeholder="Select division" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CONFERENCES.map((conf) => (
-                      <div key={conf.name}>
-                        <div className="font-bold text-sm px-2 py-2 text-muted-foreground">{conf.name}</div>
-                        {conf.divisions.map((div) => (
-                          <SelectItem key={div.id} value={div.id}>
-                            {div.label}
-                          </SelectItem>
-                        ))}
+        <Card className="p-8 bg-card/40 backdrop-blur-xl border-border/40 rounded-[32px] space-y-8 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+            <Shield className="w-24 h-24" />
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-1.5 h-6 bg-accent rounded-full" />
+            <h2 className="text-xl font-black italic uppercase tracking-tight">Add Team to Rank</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Team Selection</Label>
+              <Select value={newTeam} onValueChange={setNewTeam}>
+                <SelectTrigger className="h-12 bg-white/5 border-white/10 rounded-2xl">
+                  <SelectValue placeholder="Select Team" />
+                </SelectTrigger>
+                <SelectContent className="rounded-2xl border-border/40">
+                  {AVAILABLE_TEAMS.map((team) => (
+                    <SelectItem key={team} value={team} className="rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <img src={TEAMS[team as keyof typeof TEAMS]} className="w-5 h-5 object-contain" />
+                        <span className="font-bold">{team}</span>
                       </div>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-end">
-                <Button onClick={addTeam} className="w-full" data-testid="button-add-team">
-                  Add Team
-                </Button>
-              </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Conference Division</Label>
+              <Select value={newDivision} onValueChange={(v) => setNewDivision(v as any)}>
+                <SelectTrigger className="h-12 bg-white/5 border-white/10 rounded-2xl">
+                  <SelectValue placeholder="Select Division" />
+                </SelectTrigger>
+                <SelectContent className="rounded-2xl border-border/40">
+                  {CONFERENCES.map((conf) => (
+                    <div key={conf.name}>
+                      <div className={`text-[10px] font-black uppercase tracking-[0.2em] px-4 py-3 ${conf.color}`}>{conf.name}</div>
+                      {conf.divisions.map((div) => (
+                        <SelectItem key={div.id} value={div.id} className="rounded-xl">{div.label}</SelectItem>
+                      ))}
+                    </div>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-end">
+              <Button onClick={addTeam} className="w-full h-12 bg-primary hover:scale-105 transition-transform rounded-2xl font-black uppercase tracking-widest text-xs">
+                Add to Rankings
+              </Button>
             </div>
           </div>
         </Card>
       )}
-      <div className="space-y-8">
+
+      <div className="grid gap-16">
         {CONFERENCES.map((conference) => (
-          <div key={conference.name}>
-            <h2 className="text-3xl font-bold mb-6 text-primary">{conference.name}</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div key={conference.name} className="space-y-8">
+            <div className="flex items-center gap-6">
+              <h2 className={`text-4xl font-black italic uppercase tracking-tighter ${conference.color}`}>{conference.name} <span className="text-foreground/20">Conference</span></h2>
+              <div className="flex-1 h-px bg-gradient-to-r from-border/50 to-transparent" />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {conference.divisions.map((division) => {
                 const divisionStandings = getDivisionStandings(division.id);
                 return (
-                  <div key={division.id}>
-                    <h3 className="text-xl font-bold mb-4">{division.label}</h3>
-              {divisionStandings.length > 0 ? (
-                <Card className="overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-muted border-b">
-                        <tr>
-                          <th className="px-2 py-3 text-center text-sm font-semibold w-10"></th>
-                          <th className="px-4 py-3 text-left text-sm font-semibold">Rank</th>
-                          <th className="px-6 py-3 text-left text-sm font-semibold">Team</th>
-                          <th className="px-6 py-3 text-center text-sm font-semibold">Wins</th>
-                          <th className="px-6 py-3 text-center text-sm font-semibold">Losses</th>
-                          <th className="px-6 py-3 text-center text-sm font-semibold">PD</th>
-                          {isAdmin && <th className="px-6 py-3 text-center text-sm font-semibold">Actions</th>}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        {divisionStandings.map((entry, index) => (
-                          <tr 
-                            key={entry.id} 
-                            data-testid={`row-team-${entry.id}`}
-                            onDragOver={(e) => handleDragOver(e, entry.id)}
-                            onDragLeave={handleDragLeave}
-                            onDrop={(e) => handleDrop(e, entry.id)}
-                            className={`transition-all relative ${
-                              draggedTeam === entry.id ? 'opacity-50 bg-muted' : ''
-                            } ${
-                              draggedTeam && draggedTeam !== entry.id ? 'hover:bg-accent/30' : ''
-                            } ${
-                              dropZone?.targetId === entry.id ? 'bg-accent/20' : ''
-                            }`}
-                          >
-                            {dropZone?.targetId === entry.id && (
-                              <div 
-                                className={`absolute left-0 right-0 h-0.5 bg-primary pointer-events-none ${
-                                  dropZone.position === 'above' ? 'top-0' : 'bottom-0'
-                                }`}
-                              />
-                            )}
-                            <td className="px-2 py-4 text-center">
-                              {isAdmin && (
-                                <div 
-                                  draggable
-                                  onDragStart={(e) => handleDragStart(e, entry.id)}
-                                  onDragEnd={handleDragEnd}
-                                  className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center hover:text-primary transition-colors"
-                                  data-testid={`drag-handle-${entry.id}`}
-                                >
-                                  <GripVertical className="w-5 h-5" />
-                                </div>
-                              )}
-                            </td>
-                            <td className="px-4 py-4 text-sm font-bold">{index + 1}</td>
-                            <td className="px-6 py-4 text-sm font-semibold">
-                              <div className="flex items-center gap-3">
-                                {TEAMS[entry.team as keyof typeof TEAMS] && (
-                                  <img src={TEAMS[entry.team as keyof typeof TEAMS]} alt={entry.team} className="w-6 h-6 object-contain" />
+                  <div key={division.id} className="space-y-4">
+                    <div className="flex items-center gap-3 px-4">
+                      <Star className={`w-4 h-4 ${conference.color} fill-current`} />
+                      <h3 className="text-sm font-black uppercase tracking-[0.3em] text-muted-foreground">{division.label}</h3>
+                    </div>
+
+                    <Card className="bg-card/30 backdrop-blur-xl border-border/40 rounded-[32px] overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                          <thead>
+                            <tr className="border-b border-border/40 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground bg-white/5">
+                              <th className="px-6 py-4 w-16 text-center">#</th>
+                              <th className="px-6 py-4">Club</th>
+                              <th className="px-6 py-4 text-center">W-L</th>
+                              <th className="px-6 py-4 text-center">PD</th>
+                              {isAdmin && <th className="px-6 py-4 text-center">Ops</th>}
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border/20">
+                            {divisionStandings.map((entry, idx) => (
+                              <tr 
+                                key={entry.id}
+                                draggable={isAdmin}
+                                onDragStart={(e) => handleDragStart(e, entry.id)}
+                                onDragOver={(e) => handleDragOver(e, entry.id)}
+                                onDrop={(e) => handleDrop(e, entry.id)}
+                                className={`group hover:bg-white/5 transition-colors relative ${dropZone?.targetId === entry.id ? 'bg-primary/5' : ''}`}
+                              >
+                                <td className="px-6 py-5 text-center font-black italic text-lg text-muted-foreground/30">
+                                  {isAdmin ? <GripVertical className="w-4 h-4 mx-auto opacity-0 group-hover:opacity-100 transition-opacity cursor-grab" /> : idx + 1}
+                                </td>
+                                <td className="px-6 py-5">
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
+                                      <img src={TEAMS[entry.team as keyof typeof TEAMS]} className="w-full h-full object-contain drop-shadow-lg" />
+                                    </div>
+                                    <span className="font-black italic uppercase tracking-tight text-sm">{entry.team}</span>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-5 text-center">
+                                  {isAdmin ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                      <Input type="number" value={entry.wins} onChange={(e) => updateEntry(entry.id, "wins", parseInt(e.target.value) || 0)} className="w-12 h-8 text-center bg-white/5 border-none font-bold p-0" />
+                                      <span className="text-muted-foreground opacity-30">/</span>
+                                      <Input type="number" value={entry.losses} onChange={(e) => updateEntry(entry.id, "losses", parseInt(e.target.value) || 0)} className="w-12 h-8 text-center bg-white/5 border-none font-bold p-0" />
+                                    </div>
+                                  ) : (
+                                    <span className="font-black tabular-nums">{entry.wins}-{entry.losses}</span>
+                                  )}
+                                </td>
+                                <td className="px-6 py-5 text-center">
+                                  {isAdmin ? (
+                                    <Input 
+                                      type="text" 
+                                      value={editingPD[entry.id] ?? entry.pointDifferential ?? 0}
+                                      onChange={(e) => setEditingPD({ ...editingPD, [entry.id]: e.target.value })}
+                                      onBlur={(e) => {
+                                      updateEntry(entry.id, "pointDifferential", val);
+                                      const newEditingPD = { ...editingPD };
+                                      delete newEditingPD[entry.id];
+                                      setEditingPD(newEditingPD);
+                                    }}
+                                      className="w-14 h-8 mx-auto text-center bg-white/5 border-none font-bold p-0"
+                                    />
+                                  ) : (
+                                    <span className={`font-bold tabular-nums text-xs ${entry.pointDifferential! >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                      {entry.pointDifferential! > 0 ? '+' : ''}{entry.pointDifferential}
+                                    </span>
+                                  )}
+                                </td>
+                                {isAdmin && (
+                                  <td className="px-6 py-5 text-center">
+                                    <Button variant="ghost" size="icon" onClick={() => deleteEntry(entry.id)} className="text-muted-foreground hover:text-destructive transition-colors">
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </td>
                                 )}
-                                <span>{entry.team}</span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-sm">
-                              {isAdmin ? (
-                                <Input
-                                  type="number"
-                                  min="0"
-                                  value={entry.wins}
-                                  onChange={(e) =>
-                                    updateEntry(entry.id, "wins", parseInt(e.target.value) || 0)
-                                  }
-                                  className="w-16 text-center"
-                                  data-testid={`input-wins-${entry.id}`}
-                                />
-                              ) : (
-                                <div className="text-center">{entry.wins}</div>
-                              )}
-                            </td>
-                            <td className="px-6 py-4 text-sm">
-                              {isAdmin ? (
-                                <Input
-                                  type="number"
-                                  min="0"
-                                  value={entry.losses}
-                                  onChange={(e) =>
-                                    updateEntry(entry.id, "losses", parseInt(e.target.value) || 0)
-                                  }
-                                  className="w-16 text-center"
-                                  data-testid={`input-losses-${entry.id}`}
-                                />
-                              ) : (
-                                <div className="text-center">{entry.losses}</div>
-                              )}
-                            </td>
-                            <td className="px-6 py-4 text-sm">
-                              {isAdmin ? (
-                                <Input
-                                  type="text"
-                                  inputMode="numeric"
-                                  value={editingPD[entry.id] !== undefined ? editingPD[entry.id] : (entry.pointDifferential || 0).toString()}
-                                  onChange={(e) => {
-                                    setEditingPD({ ...editingPD, [entry.id]: e.target.value });
-                                  }}
-                                  onBlur={(e) => {
-                                    const val = e.target.value;
-                                    const numVal = val === '' || val === '-' ? 0 : parseInt(val);
-                                    if (!isNaN(numVal)) {
-                                      updateEntry(entry.id, "pointDifferential", numVal);
-                                    }
-                                    setEditingPD({ ...editingPD, [entry.id]: undefined });
-                                  }}
-                                  className="w-16 text-center"
-                                  data-testid={`input-pd-${entry.id}`}
-                                />
-                              ) : (
-                                <div className="text-center">{entry.pointDifferential || 0}</div>
-                              )}
-                            </td>
-                            {isAdmin && (
-                              <td className="px-6 py-4 text-sm text-center">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => deleteEntry(entry.id)}
-                                  data-testid={`button-delete-${entry.id}`}
-                                  disabled={deleteMutation.isPending}
-                                >
-                                  <Trash2 className="w-4 h-4 text-destructive" />
-                                </Button>
-                              </td>
-                            )}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </Card>
-                ) : (
-                  <Card className="p-8 text-center">
-                    <p className="text-muted-foreground">No teams in this division yet.</p>
-                  </Card>
-                )}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </Card>
                   </div>
                 );
               })}
