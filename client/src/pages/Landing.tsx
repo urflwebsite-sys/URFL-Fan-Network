@@ -18,7 +18,12 @@ export default function Landing() {
   const [selectedSeason, setSelectedSeason] = useState("2");
 
   const { data: games, isLoading: gamesLoading } = useQuery<Game[]>({
-    queryKey: ["/api/games/current", { season: selectedSeason }],
+    queryKey: ["/api/games/current", selectedSeason],
+    queryFn: async () => {
+      const res = await fetch(`/api/games/current?season=${selectedSeason}`);
+      if (!res.ok) throw new Error("Failed to fetch games");
+      return res.json();
+    }
   });
 
   const { data: news, isLoading: newsLoading } = useQuery<NewsType[]>({

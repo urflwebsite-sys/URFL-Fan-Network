@@ -49,7 +49,12 @@ export default function Standings() {
   const [dropZone, setDropZone] = useState<DropZone | null>(null);
 
   const { data: dbStandings, isLoading } = useQuery({
-    queryKey: ["/api/standings", { season: selectedSeason }],
+    queryKey: ["/api/standings", selectedSeason],
+    queryFn: async () => {
+      const res = await fetch(`/api/standings?season=${selectedSeason}`);
+      if (!res.ok) throw new Error("Failed to fetch standings");
+      return res.json();
+    }
   });
 
   useEffect(() => {
