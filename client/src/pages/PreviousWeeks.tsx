@@ -11,23 +11,22 @@ import { AlertCircle } from "lucide-react";
 import { Link } from "wouter";
 
 export default function PreviousWeeks() {
-  const [selectedSeason, setSelectedSeason] = useState("2");
   const [selectedWeek, setSelectedWeek] = useState(1);
   const [, setLocation] = useLocation();
 
   const { data: games, isLoading, error } = useQuery<Game[]>({
-    queryKey: ["/api/games/week", selectedWeek, selectedSeason],
+    queryKey: ["/api/games/week", selectedWeek],
     queryFn: async () => {
-      const res = await fetch(`/api/games/week/${selectedWeek}?season=${selectedSeason}`);
+      const res = await fetch(`/api/games/week/${selectedWeek}?season=1`);
       if (!res.ok) throw new Error("Failed to fetch games");
       return res.json();
     }
   });
 
   const { data: allGames, isLoading: allGamesLoading } = useQuery<Game[]>({
-    queryKey: ["/api/games/all", selectedSeason],
+    queryKey: ["/api/games/all"],
     queryFn: async () => {
-      const res = await fetch(`/api/games/all?season=${selectedSeason}`);
+      const res = await fetch(`/api/games/all?season=1`);
       if (!res.ok) throw new Error("Failed to fetch games");
       return res.json();
     }
@@ -100,19 +99,8 @@ export default function PreviousWeeks() {
             Previous Weeks
           </h1>
           <p className="text-muted-foreground text-lg mb-6">
-            Browse final scores from Season {selectedSeason}
+            Browse final scores from Season 1
           </p>
-        </div>
-        <div className="flex items-center gap-2 mb-6">
-          <span className="text-sm font-medium text-muted-foreground">Season:</span>
-          <select 
-            value={selectedSeason} 
-            onChange={(e) => setSelectedSeason(e.target.value)}
-            className="bg-background border-2 border-primary/20 rounded-md px-2 py-1 text-sm font-bold focus:outline-none focus:border-primary transition-colors"
-          >
-            <option value="1">Season 1</option>
-            <option value="2">Season 2</option>
-          </select>
         </div>
       </div>
 
@@ -153,7 +141,7 @@ export default function PreviousWeeks() {
       ) : (
         <div className="text-center py-16">
           <p className="text-muted-foreground text-lg">
-            No games found for Week {selectedWeek} in Season {selectedSeason}
+            No games found for Week {selectedWeek} in Season 1
           </p>
         </div>
       )}

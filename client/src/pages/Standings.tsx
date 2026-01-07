@@ -41,7 +41,6 @@ export default function Standings() {
   const { toast } = useToast();
   const isAdmin = isAuthenticated && (user as any)?.role === "admin";
   const [standings, setStandings] = useState<StandingsEntry[]>([]);
-  const [selectedSeason, setSelectedSeason] = useState("2");
   const [newTeam, setNewTeam] = useState("");
   const [newDivision, setNewDivision] = useState<"AFC_D1" | "AFC_D2" | "NFC_D1" | "NFC_D2">("AFC_D1");
   const [editingPD, setEditingPD] = useState<Record<string, string>>({});
@@ -49,9 +48,9 @@ export default function Standings() {
   const [dropZone, setDropZone] = useState<DropZone | null>(null);
 
   const { data: dbStandings, isLoading } = useQuery({
-    queryKey: ["/api/standings", selectedSeason],
+    queryKey: ["/api/standings"],
     queryFn: async () => {
-      const res = await fetch(`/api/standings?season=${selectedSeason}`);
+      const res = await fetch(`/api/standings?season=1`);
       if (!res.ok) throw new Error("Failed to fetch standings");
       return res.json();
     }
@@ -83,11 +82,11 @@ export default function Standings() {
         losses: entry.losses,
         pointDifferential: entry.pointDifferential,
         manualOrder: entry.manualOrder,
-        season: parseInt(selectedSeason),
+        season: 1,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/standings", { season: selectedSeason }] });
+      queryClient.invalidateQueries({ queryKey: ["/api/standings"] });
     },
     onError: (error: any) => {
       const errorMessage = error?.response?.data?.message || "Failed to save standing";
@@ -257,19 +256,7 @@ export default function Standings() {
           <h1 className="text-4xl md:text-5xl font-black mb-4" data-testid="text-page-title">
             Standings
           </h1>
-          <p className="text-muted-foreground text-lg">URFL Season {selectedSeason} Standings</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Label htmlFor="season-select" className="shrink-0">Season:</Label>
-          <Select value={selectedSeason} onValueChange={setSelectedSeason}>
-            <SelectTrigger id="season-select" className="w-[120px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">Season 1</SelectItem>
-              <SelectItem value="2">Season 2</SelectItem>
-            </SelectContent>
-          </Select>
+          <p className="text-muted-foreground text-lg">URFL Season 1 Standings</p>
         </div>
       </div>
       {isAdmin && (

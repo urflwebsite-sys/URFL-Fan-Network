@@ -15,14 +15,13 @@ import { useState } from "react";
 export default function LiveScores() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSeason, setSelectedSeason] = useState("2");
   const [primetimeFilter, setPrimetimeFilter] = useState<"all" | "primetime" | "regular">("all");
   const preferences = useUserPreferences();
   
   const { data: games, isLoading, error } = useQuery<Game[]>({
-    queryKey: ["/api/games/current", selectedSeason],
+    queryKey: ["/api/games/current"],
     queryFn: async () => {
-      const res = await fetch(`/api/games/current?season=${selectedSeason}`);
+      const res = await fetch(`/api/games/current?season=1`);
       if (!res.ok) throw new Error("Failed to fetch games");
       return res.json();
     },
@@ -73,22 +72,10 @@ export default function LiveScores() {
               Live Scores
             </h1>
             <p className="text-muted-foreground text-lg">
-              Follow all the action as it happens in Season {selectedSeason}
+              Follow all the action as it happens in Season 1
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Label htmlFor="season-select" className="shrink-0 text-sm font-medium text-muted-foreground">Season:</Label>
-              <Select value={selectedSeason} onValueChange={setSelectedSeason}>
-                <SelectTrigger id="season-select" className="w-[120px] bg-background border-2 border-primary/20 font-bold">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Season 1</SelectItem>
-                  <SelectItem value="2">Season 2</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <Badge variant="outline" className="text-lg px-4 py-2 bg-primary/5 text-primary border-primary/20" data-testid="badge-current-week">
               Week {currentWeek}
             </Badge>

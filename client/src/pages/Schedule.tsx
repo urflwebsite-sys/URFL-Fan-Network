@@ -16,15 +16,14 @@ import { useState } from "react";
 
 export default function Schedule() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSeason, setSelectedSeason] = useState("2");
   const [primetimeFilter, setPrimetimeFilter] = useState<"all" | "primetime" | "regular">("all");
   const preferences = useUserPreferences();
   const showLogos = preferences.showTeamLogos !== false;
   
   const { data: allGames, isLoading, error } = useQuery<Game[]>({
-    queryKey: ["/api/games/all", selectedSeason],
+    queryKey: ["/api/games/all"],
     queryFn: async () => {
-      const res = await fetch(`/api/games/all?season=${selectedSeason}`);
+      const res = await fetch(`/api/games/all?season=1`);
       if (!res.ok) throw new Error("Failed to fetch games");
       return res.json();
     }
@@ -72,20 +71,8 @@ export default function Schedule() {
             Full Schedule
           </h1>
           <p className="text-muted-foreground text-lg mb-4">
-            Complete Season {selectedSeason} schedule with dates, times, and locations
+            Complete Season 1 schedule with dates, times, and locations
           </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Label htmlFor="season-select" className="shrink-0">Season:</Label>
-          <Select value={selectedSeason} onValueChange={setSelectedSeason}>
-            <SelectTrigger id="season-select" className="w-[120px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">Season 1</SelectItem>
-              <SelectItem value="2">Season 2</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
       <div className="mb-8 space-y-3">

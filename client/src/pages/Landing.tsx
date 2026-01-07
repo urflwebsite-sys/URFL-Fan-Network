@@ -15,12 +15,11 @@ import { SiteTour } from "@/components/SiteTour";
 export default function Landing() {
   const [, setLocation] = useLocation();
   const { user, isAuthenticated } = useAuth();
-  const [selectedSeason, setSelectedSeason] = useState("2");
 
   const { data: games, isLoading: gamesLoading } = useQuery<Game[]>({
-    queryKey: ["/api/games/current", selectedSeason],
+    queryKey: ["/api/games/current"],
     queryFn: async () => {
-      const res = await fetch(`/api/games/current?season=${selectedSeason}`);
+      const res = await fetch(`/api/games/current?season=1`);
       if (!res.ok) throw new Error("Failed to fetch games");
       return res.json();
     }
@@ -96,17 +95,6 @@ export default function Landing() {
             <p className="text-muted-foreground text-sm">Your destination for all things URFL</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-muted-foreground">Season:</span>
-          <select 
-            value={selectedSeason} 
-            onChange={(e) => setSelectedSeason(e.target.value)}
-            className="bg-background border-2 border-primary/20 rounded-md px-2 py-1 text-sm font-bold focus:outline-none focus:border-primary transition-colors"
-          >
-            <option value="1">Season 1</option>
-            <option value="2">Season 2</option>
-          </select>
-        </div>
       </div>
       
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8 mt-8">
@@ -114,10 +102,10 @@ export default function Landing() {
           <Card className="p-6 overflow-hidden relative">
             
             <div className="relative z-10">
-              <Badge className="mb-4">
-                <Sparkles className="w-3 h-3 mr-1" />
-                Season {selectedSeason} Highlights
-              </Badge>
+            <Badge className="mb-4">
+              <Sparkles className="w-3 h-3 mr-1" />
+              Season 1 Highlights
+            </Badge>
               
               <h2 className="text-3xl md:text-4xl font-black mb-4 leading-tight">
                 Week {currentWeek} is Here!
