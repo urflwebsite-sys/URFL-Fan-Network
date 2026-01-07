@@ -22,7 +22,12 @@ export default function Schedule() {
   const showLogos = preferences.showTeamLogos !== false;
   
   const { data: allGames, isLoading, error } = useQuery<Game[]>({
-    queryKey: ["/api/games/all", { season: selectedSeason }],
+    queryKey: ["/api/games/all", selectedSeason],
+    queryFn: async () => {
+      const res = await fetch(`/api/games/all?season=${selectedSeason}`);
+      if (!res.ok) throw new Error("Failed to fetch games");
+      return res.json();
+    }
   });
 
   if (error) {
