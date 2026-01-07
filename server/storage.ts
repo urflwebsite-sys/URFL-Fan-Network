@@ -233,7 +233,7 @@ export class DatabaseStorage implements IStorage {
     if (allGames.length === 0) return [];
     
     // Find games for the current week of the latest season
-    const latestSeason = Math.max(...allGames.map(g => g.season || 1));
+    const latestSeason = 1;
     const seasonGames = allGames.filter(g => (g.season || 1) === latestSeason);
     
     const liveGames = seasonGames.filter(g => g.isLive);
