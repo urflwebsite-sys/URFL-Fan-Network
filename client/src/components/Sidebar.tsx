@@ -47,11 +47,11 @@ export function Sidebar() {
     { path: "/teams", label: "Teams", icon: Shirt },
     { path: "/news", label: "News", icon: Newspaper },
     { path: "/betting", label: "Betting", icon: Target },
+    { path: "/previous-weeks", label: "Archives", icon: Clock },
+    { path: "/update-planner", label: "Planner", icon: Clock },
   ];
 
   const secondaryItems = [
-    { path: "/previous-weeks", label: "Archives", icon: Clock },
-    { path: "/update-planner", label: "Planner", icon: Clock },
     { path: "/partners", label: "Partners", icon: Users },
     { path: "/settings", label: "Settings", icon: Settings },
   ];
@@ -99,7 +99,7 @@ export function Sidebar() {
         <div className="flex items-center gap-2">
           {/* Secondary Nav Items */}
           <div className="hidden sm:flex items-center gap-1 mr-2 pr-2 border-r border-border/40">
-            {secondaryItems.slice(0, 2).map((item) => {
+            {secondaryItems.map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path;
               return (
