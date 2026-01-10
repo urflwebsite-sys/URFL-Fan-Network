@@ -36,7 +36,7 @@ export function Header() {
             </div>
           </Link>
 
-          <nav className="hidden xl:flex items-center gap-1">
+          <nav className="hidden xl:flex items-center justify-center flex-1 gap-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path;
