@@ -21,6 +21,8 @@ export function Header() {
     { path: "/betting", label: "Betting", icon: Target },
     { path: "/partners", label: "Partners", icon: Users },
     { path: "/changelogs", label: "Updates", icon: BookOpen },
+    { path: "/admin", label: "Admin", icon: Shield },
+    { path: "/api/logout", label: "Logout", icon: X },
   ];
 
   return (
@@ -106,8 +108,12 @@ export function Header() {
         </div>
 
         {/* Mobile horizontal scrollable nav - Always visible on mobile below lg breakpoint */}
-        <div className="lg:hidden flex overflow-x-auto no-scrollbar py-2 -mx-4 px-4 gap-2 border-t border-primary/10 bg-background/50">
-          {navItems.map((item) => {
+        <div className="lg:hidden flex overflow-x-auto no-scrollbar py-2 px-4 gap-2 border-t border-primary/10 bg-background/50 sticky top-[64px] z-40">
+          {navItems.filter(item => {
+            if (item.path === "/admin") return isAuthenticated;
+            if (item.path === "/api/logout") return isAuthenticated;
+            return true;
+          }).map((item) => {
             const Icon = item.icon;
             const isActive = location === item.path;
             return (
@@ -115,9 +121,9 @@ export function Header() {
                 <Button
                   variant={isActive ? "default" : "ghost"}
                   size="sm"
-                  className={`h-8 text-xs gap-1.5 transition-all whitespace-nowrap ${isActive ? 'shadow-md shadow-primary/20' : 'hover:bg-primary/10'}`}
+                  className={`h-9 px-4 text-sm font-medium gap-2 transition-all whitespace-nowrap ${isActive ? 'shadow-md shadow-primary/20' : 'hover:bg-primary/10'}`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-4 h-4" />
                   {item.label}
                 </Button>
               </Link>
