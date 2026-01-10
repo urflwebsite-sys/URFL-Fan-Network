@@ -237,6 +237,16 @@ export default function GameDetail() {
     }
   }, [gameId]);
 
+  const updateQuarterMutation = useMutation({
+    mutationFn: async (newQuarter: string) => {
+      return await apiRequest("PATCH", `/api/games/${gameId}`, { quarter: newQuarter });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/games", gameId] });
+      toast({ title: "Quarter Updated", description: `Game is now in ${game.quarter}` });
+    },
+  });
+
   const handleSendMessage = (username: string, message: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(
@@ -527,14 +537,26 @@ export default function GameDetail() {
               <div className="grid gap-3">
                 {[
                   { icon: Calendar, label: "Schedule", value: `Week ${game.week}`, bg: "bg-accent/5", text: "text-accent" },
-                  { icon: PlayCircle, label: "Quarter", value: game.quarter || "Scheduled", bg: "bg-white/5", text: "text-foreground" },
+                  { icon: PlayCircle, label: "Quarter", value: game.quarter || "Scheduled", bg: "bg-white/5", text: "text-foreground", isSelect: true },
                 ].map((item, i) => (
                   <div key={i} className={`p-6 flex items-center justify-between rounded-[32px] border border-border/40 ${item.bg}`}>
                     <div className="flex items-center gap-4">
                       <item.icon className={`w-5 h-5 ${item.text}`} />
                       <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{item.label}</span>
                     </div>
-                    <span className="text-sm font-black italic">{item.value}</span>
+                    {item.isSelect && currentUser?.role === 'admin' ? (
+                      <select 
+                        value={game.quarter || "Scheduled"}
+                        onChange={(e) => updateQuarterMutation.mutate(e.target.value)}
+                        className="bg-transparent text-sm font-black italic uppercase tracking-tighter text-foreground outline-none cursor-pointer"
+                      >
+                        {["Scheduled", "Q1", "Q2", "Q3", "Q4", "FINAL"].map(q => (
+                          <option key={q} value={q} className="bg-background text-foreground">{q}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className="text-sm font-black italic">{item.value}</span>
+                    )}
                   </div>
                 ))}
               </div>
