@@ -515,7 +515,7 @@ export default function GameDetail() {
                   gameId={gameId}
                   messages={chatMessages}
                   onSendMessage={handleSendMessage}
-                  username={user?.username}
+                  username={user?.username || undefined}
                   isAuthenticated={!!user}
                 />
               </div>
