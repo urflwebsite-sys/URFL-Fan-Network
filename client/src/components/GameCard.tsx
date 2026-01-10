@@ -48,24 +48,24 @@ export function GameCard({ game, onClick }: GameCardProps) {
           <span className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.3em] italic">Week {game.week}</span>
         </div>
 
-        <div className="grid grid-cols-[1fr,auto,1fr] items-center gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr,auto,1fr] items-center gap-4 sm:gap-8">
           <div className="text-center space-y-4">
             <div className="relative inline-block group-hover:scale-110 transition-transform duration-700">
               <div className="absolute -inset-4 bg-primary/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-              <TeamLogo teamName={game.team1} className="w-20 h-20 relative z-10 drop-shadow-2xl" />
+              <TeamLogo teamName={game.team1} className="w-16 h-16 sm:w-20 sm:h-20 relative z-10 drop-shadow-2xl" />
             </div>
             <p className="font-black italic text-sm uppercase tracking-tighter text-foreground/90 leading-none">{game.team1}</p>
           </div>
 
           <div className="text-center flex flex-col items-center gap-2">
             {game.isLive || game.isFinal ? (
-              <div className="text-4xl font-black italic tracking-tighter tabular-nums flex items-center gap-4">
+              <div className="text-3xl sm:text-4xl font-black italic tracking-tighter tabular-nums flex items-center gap-4">
                 <span className={game.team1Score! > game.team2Score! ? 'text-primary scale-110' : 'text-foreground/40'}>{game.team1Score}</span>
                 <span className="text-muted-foreground/10 text-xl not-italic font-light">-</span>
                 <span className={game.team2Score! > game.team1Score! ? 'text-primary scale-110' : 'text-foreground/40'}>{game.team2Score}</span>
               </div>
             ) : (
-              <div className="w-12 h-12 rounded-full border border-border/40 flex items-center justify-center bg-white/5">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-border/40 flex items-center justify-center bg-white/5">
                 <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/40 font-black not-italic">VS</span>
               </div>
             )}
@@ -74,7 +74,7 @@ export function GameCard({ game, onClick }: GameCardProps) {
           <div className="text-center space-y-4">
             <div className="relative inline-block group-hover:scale-110 transition-transform duration-700">
               <div className="absolute -inset-4 bg-primary/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-              <TeamLogo teamName={game.team2} className="w-20 h-20 relative z-10 drop-shadow-2xl" />
+              <TeamLogo teamName={game.team2} className="w-16 h-16 sm:w-20 sm:h-20 relative z-10 drop-shadow-2xl" />
             </div>
             <p className="font-black italic text-sm uppercase tracking-tighter text-foreground/90 leading-none">{game.team2}</p>
           </div>

@@ -77,18 +77,18 @@ export default function Landing() {
                   <Sparkles className="w-3.5 h-3.5 mr-2" />
                   Season 2 Live Now
                 </Badge>
-                <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-[0.9] text-foreground">
+                <h1 className="text-4xl sm:text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-[0.9] text-foreground">
                   The Hub <br /><span className="text-primary">of URFL</span>
                 </h1>
-                <p className="text-lg text-muted-foreground font-medium max-w-md leading-relaxed">
+                <p className="text-base md:text-lg text-muted-foreground font-medium max-w-md leading-relaxed">
                   Experience football like never before. Real-time scores, deep analytics, and the best community in the league.
                 </p>
-                <div className="flex flex-wrap gap-4">
-                  <Button size="lg" onClick={() => setLocation("/scores")} className="h-14 px-8 rounded-full font-black uppercase tracking-widest text-xs bg-primary hover:scale-105 transition-transform">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button size="lg" onClick={() => setLocation("/scores")} className="h-14 px-8 rounded-full font-black uppercase tracking-widest text-xs bg-primary hover:scale-105 transition-transform w-full sm:w-auto">
                     <Zap className="w-4 h-4 mr-2" />
                     Live Scores
                   </Button>
-                  <Button size="lg" variant="outline" onClick={() => setLocation("/schedule")} className="h-14 px-8 rounded-full font-black uppercase tracking-widest text-xs border-white/10 hover:bg-white/5 transition-all">
+                  <Button size="lg" variant="outline" onClick={() => setLocation("/schedule")} className="h-14 px-8 rounded-full font-black uppercase tracking-widest text-xs border-white/10 hover:bg-white/5 transition-all w-full sm:w-auto">
                     Full Schedule
                   </Button>
                 </div>

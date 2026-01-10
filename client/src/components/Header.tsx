@@ -26,11 +26,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 border-primary/20 bg-background/95 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex h-16 items-center justify-between gap-4">
+        <div className="flex h-16 items-center justify-between gap-2 md:gap-4">
           <Link href="/" data-testid="link-home" className="flex-shrink-0 group">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold">⚡</span>
-              <h1 className="text-xl md:text-2xl font-black text-foreground group-hover:text-primary transition-colors px-2 py-1 rounded-lg whitespace-nowrap">
+            <div className="flex items-center gap-1 md:gap-2">
+              <span className="text-xl md:text-2xl font-bold">⚡</span>
+              <h1 className="text-lg md:text-xl lg:text-2xl font-black text-foreground group-hover:text-primary transition-colors px-1 md:px-2 py-1 rounded-lg whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px] xs:max-w-[180px] sm:max-w-none">
                 URFL Fan Hub
               </h1>
             </div>
