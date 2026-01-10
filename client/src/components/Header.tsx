@@ -36,7 +36,7 @@ export function Header() {
             </div>
           </Link>
 
-          <nav className="hidden xl:flex items-center justify-start flex-1 ml-8 gap-1">
+          <nav className="hidden lg:flex items-center justify-start flex-1 ml-4 md:ml-8 gap-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path;
@@ -81,13 +81,13 @@ export function Header() {
 
             {isAuthenticated ? (
               <a href="/api/logout" data-testid="link-logout">
-                <Button variant="outline" size="sm" className="hidden md:flex border-destructive/30 hover:border-destructive hover:bg-destructive/10">
+                <Button variant="outline" size="sm" className="hidden lg:flex border-destructive/30 hover:border-destructive hover:bg-destructive/10">
                   Logout
                 </Button>
               </a>
             ) : (
               <a href="/login" data-testid="link-login">
-                <Button size="sm" className="hidden md:flex gap-2 shadow-lg shadow-primary/25">
+                <Button size="sm" className="hidden lg:flex gap-2 shadow-lg shadow-primary/25">
                   Login
                 </Button>
               </a>
@@ -96,7 +96,7 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="xl:hidden"
+              className="lg:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               data-testid="button-mobile-menu"
             >
@@ -106,7 +106,7 @@ export function Header() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="xl:hidden pb-4 pt-2 space-y-1 border-t border-primary/10 animate-in slide-in-from-top-2 duration-200 bg-background/95 backdrop-blur-md">
+          <div className="lg:hidden pb-4 pt-2 space-y-1 border-t border-primary/10 animate-in slide-in-from-top-2 duration-200 bg-background/95 backdrop-blur-md">
             <div className="max-h-[70vh] overflow-y-auto px-2">
               {navItems.map((item) => {
               const Icon = item.icon;
