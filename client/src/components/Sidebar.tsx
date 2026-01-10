@@ -73,27 +73,29 @@ export function Sidebar() {
         </Link>
 
         {/* Main Navigation - Desktop Only */}
-        <nav className="hidden lg:flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location === item.path;
-            return (
-              <Link key={item.path} href={item.path}>
-                <Button
-                  variant="ghost"
-                  className={`h-9 px-4 font-black uppercase tracking-widest text-[10px] rounded-xl transition-all duration-300 ${
-                    isActive 
-                      ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-white/10'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5 mr-2" />
-                  {item.label}
-                </Button>
-              </Link>
-            );
-          })}
-        </nav>
+        <div className="hidden lg:flex flex-1 justify-center">
+          <nav className="flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location === item.path;
+              return (
+                <Link key={item.path} href={item.path}>
+                  <Button
+                    variant="ghost"
+                    className={`h-9 px-4 font-black uppercase tracking-widest text-[10px] rounded-xl transition-all duration-300 ${
+                      isActive 
+                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
+                        : 'text-muted-foreground hover:text-foreground hover:bg-white/10'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5 mr-2" />
+                    {item.label}
+                  </Button>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
 
         {/* Actions Section */}
         <div className="flex items-center gap-2">
@@ -170,15 +172,15 @@ function MobileNav({ navItems, isAuthenticated, isAdmin }: { navItems: Array<{ p
   const [location] = useLocation();
 
   return (
-    <nav className="fixed bottom-4 left-4 right-4 h-16 bg-background/80 backdrop-blur-2xl border border-border/40 rounded-2xl z-[100] lg:hidden shadow-2xl overflow-hidden">
+    <nav className="fixed bottom-4 left-4 right-4 h-16 bg-background/90 backdrop-blur-2xl border border-border/40 rounded-2xl z-[100] lg:hidden shadow-2xl overflow-hidden pointer-events-auto">
       <div className="flex items-center justify-around h-full px-2">
         {navItems.slice(0, 5).map((item) => {
           const Icon = item.icon;
           const isActive = location === item.path;
           return (
-            <Link key={item.path} href={item.path}>
+            <Link key={item.path} href={item.path} className="flex-1 h-full">
               <button
-                className={`flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all ${
+                className={`flex flex-col items-center justify-center w-full h-full rounded-xl transition-all ${
                   isActive 
                     ? 'text-primary' 
                     : 'text-muted-foreground'
