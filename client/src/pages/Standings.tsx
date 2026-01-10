@@ -333,11 +333,12 @@ export default function Standings() {
                                       value={editingPD[entry.id] ?? entry.pointDifferential ?? 0}
                                       onChange={(e) => setEditingPD({ ...editingPD, [entry.id]: e.target.value })}
                                       onBlur={(e) => {
-                                      updateEntry(entry.id, "pointDifferential", val);
-                                      const newEditingPD = { ...editingPD };
-                                      delete newEditingPD[entry.id];
-                                      setEditingPD(newEditingPD);
-                                    }}
+                                        const val = parseInt(e.target.value) || 0;
+                                        updateEntry(entry.id, "pointDifferential", val);
+                                        const newEditingPD = { ...editingPD };
+                                        delete newEditingPD[entry.id];
+                                        setEditingPD(newEditingPD);
+                                      }}
                                       className="w-14 h-8 mx-auto text-center bg-white/5 border-none font-bold p-0"
                                     />
                                   ) : (
