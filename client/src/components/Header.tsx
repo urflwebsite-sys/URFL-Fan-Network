@@ -105,6 +105,26 @@ export function Header() {
           </div>
         </div>
 
+        {/* Mobile horizontal scrollable nav - Always visible on mobile below lg breakpoint */}
+        <div className="lg:hidden flex overflow-x-auto no-scrollbar py-2 -mx-4 px-4 gap-2 border-t border-primary/10 bg-background/50">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location === item.path;
+            return (
+              <Link key={item.path} href={item.path} className="flex-shrink-0">
+                <Button
+                  variant={isActive ? "default" : "ghost"}
+                  size="sm"
+                  className={`h-8 text-xs gap-1.5 transition-all whitespace-nowrap ${isActive ? 'shadow-md shadow-primary/20' : 'hover:bg-primary/10'}`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {item.label}
+                </Button>
+              </Link>
+            );
+          })}
+        </div>
+
         {mobileMenuOpen && (
           <div className="lg:hidden pb-4 pt-2 space-y-1 border-t border-primary/10 animate-in slide-in-from-top-2 duration-200 bg-background/95 backdrop-blur-md">
             <div className="max-h-[70vh] overflow-y-auto px-2">
