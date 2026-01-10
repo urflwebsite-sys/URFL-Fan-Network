@@ -288,7 +288,7 @@ export default function Standings() {
                           <thead>
                             <tr className="border-b border-border/40 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground bg-white/5">
                               <th className="px-6 py-4 w-16 text-center">#</th>
-                              <th className="px-6 py-4">Club</th>
+                              <th className="px-6 py-4">Team</th>
                               <th className="px-6 py-4 text-center">W-L</th>
                               <th className="px-6 py-4 text-center">PD</th>
                               {isAdmin && <th className="px-6 py-4 text-center">Ops</th>}
@@ -305,7 +305,12 @@ export default function Standings() {
                                 className={`group hover:bg-white/5 transition-colors relative ${dropZone?.targetId === entry.id ? 'bg-primary/5' : ''}`}
                               >
                                 <td className="px-6 py-5 text-center font-black italic text-lg text-muted-foreground/30">
-                                  {isAdmin ? <GripVertical className="w-4 h-4 mx-auto opacity-0 group-hover:opacity-100 transition-opacity cursor-grab" /> : idx + 1}
+                                  {isAdmin ? (
+                                    <div className="flex flex-col items-center gap-1">
+                                      <span className="text-xs not-italic">{idx + 1}</span>
+                                      <GripVertical className="w-4 h-4 mx-auto opacity-0 group-hover:opacity-100 transition-opacity cursor-grab" />
+                                    </div>
+                                  ) : idx + 1}
                                 </td>
                                 <td className="px-6 py-5">
                                   <div className="flex items-center gap-4">
