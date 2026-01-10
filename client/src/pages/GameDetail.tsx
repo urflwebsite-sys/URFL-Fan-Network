@@ -126,8 +126,20 @@ export default function GameDetail() {
       });
     },
     onSuccess: () => {
-      refetchPredictions();
+      queryClient.invalidateQueries({ queryKey: ["/api/predictions", gameId] });
+      toast({ 
+        title: "Prediction Saved", 
+        description: "Your prediction has been recorded!" 
+      });
     },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to submit prediction";
+      toast({ 
+        title: "Prediction Failed", 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
+    }
   });
 
   useEffect(() => {
@@ -321,62 +333,70 @@ export default function GameDetail() {
           <Card className="relative overflow-hidden border-none bg-card/40 backdrop-blur-3xl p-8 md:p-12 lg:p-16 rounded-[40px]">
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12 text-center md:text-left">
               
-              {/* Team 2 */}
-              <div className="flex-1 flex flex-col items-center md:items-start gap-6 w-full">
-                <div className="relative group/logo">
-                  <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full scale-0 group-hover/logo:scale-100 transition-transform duration-500" />
-                  {preferences.showTeamLogos !== false && TEAMS[game.team2 as keyof typeof TEAMS] ? (
-                    <img src={TEAMS[game.team2 as keyof typeof TEAMS]} alt={game.team2} className="w-24 h-24 md:w-32 md:h-32 object-contain relative z-10 drop-shadow-2xl transition-transform group-hover/logo:scale-110" />
-                  ) : (
-                    <div className="w-24 h-24 md:w-32 md:h-32 bg-white/5 rounded-full flex items-center justify-center relative z-10">
-                      <Trophy className="w-12 h-12 text-muted-foreground/20" />
+                    {/* Team 2 */}
+                    <div className="flex-1 flex flex-col items-center md:items-start gap-6 w-full">
+                      <div className="relative group/logo">
+                        <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full scale-0 group-hover/logo:scale-100 transition-transform duration-500" />
+                        {preferences.showTeamLogos !== false && TEAMS[game.team2 as keyof typeof TEAMS] ? (
+                          <img src={TEAMS[game.team2 as keyof typeof TEAMS]} alt={game.team2} className="w-24 h-24 md:w-32 md:h-32 object-contain relative z-10 drop-shadow-2xl transition-transform group-hover/logo:scale-110" />
+                        ) : (
+                          <div className="w-24 h-24 md:w-32 md:h-32 bg-white/5 rounded-full flex items-center justify-center relative z-10">
+                            <Trophy className="w-12 h-12 text-muted-foreground/20" />
+                          </div>
+                        )}
+                        {/* Prediction Count Badge */}
+                        <div className="absolute -top-2 -right-2 z-20 bg-primary text-primary-foreground text-[10px] font-black px-2 py-1 rounded-full shadow-lg border-2 border-background">
+                          {predictions?.filter(p => p.votedFor === game.team2).length || 0}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h2 className={`text-3xl md:text-5xl font-black italic uppercase tracking-tighter ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary' : 'text-foreground'}`}>
+                          {game.team2}
+                        </h2>
+                      </div>
                     </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <h2 className={`text-3xl md:text-5xl font-black italic uppercase tracking-tighter ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary' : 'text-foreground'}`}>
-                    {game.team2}
-                  </h2>
-                </div>
-              </div>
 
-              {/* Score Display */}
-              <div className="flex flex-col items-center gap-6 flex-shrink-0 bg-white/5 backdrop-blur-md px-10 py-8 rounded-[40px] border border-white/10 min-w-[200px]">
-                <div className="flex items-center gap-8">
-                  <span className={`text-6xl md:text-8xl font-black italic tabular-nums tracking-tighter ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary drop-shadow-[0_0_20px_rgba(var(--primary),0.5)]' : ''}`}>
-                    {game.team2Score}
-                  </span>
-                  <div className="w-1 h-12 bg-white/10 rounded-full" />
-                  <span className={`text-6xl md:text-8xl font-black italic tabular-nums tracking-tighter ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary drop-shadow-[0_0_20px_rgba(var(--primary),0.5)]' : ''}`}>
-                    {game.team1Score}
-                  </span>
-                </div>
-                <Badge className={`px-6 py-2 rounded-full font-black uppercase tracking-[0.2em] text-[10px] ${game.isLive ? 'bg-primary text-primary-foreground animate-pulse' : 'bg-white/10 text-muted-foreground'}`}>
-                  {game.isLive ? `LIVE • ${game.quarter}` : game.isFinal ? 'FINAL' : 'SCHEDULED'}
-                </Badge>
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                  {game.gameTime ? formatInTimeZone(new Date(game.gameTime), "America/New_York", "MMM d • h:mm a") : "Time TBD"}
-                </p>
-              </div>
-
-              {/* Team 1 */}
-              <div className="flex-1 flex flex-col items-center md:items-end gap-6 w-full text-center md:text-right">
-                <div className="relative group/logo">
-                  <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full scale-0 group-hover/logo:scale-100 transition-transform duration-500" />
-                  {preferences.showTeamLogos !== false && TEAMS[game.team1 as keyof typeof TEAMS] ? (
-                    <img src={TEAMS[game.team1 as keyof typeof TEAMS]} alt={game.team1} className="w-24 h-24 md:w-32 md:h-32 object-contain relative z-10 drop-shadow-2xl transition-transform group-hover/logo:scale-110" />
-                  ) : (
-                    <div className="w-24 h-24 md:w-32 md:h-32 bg-white/5 rounded-full flex items-center justify-center relative z-10">
-                      <Trophy className="w-12 h-12 text-muted-foreground/20" />
+                    {/* Score Display */}
+                    <div className="flex flex-col items-center gap-6 flex-shrink-0 bg-white/5 backdrop-blur-md px-10 py-8 rounded-[40px] border border-white/10 min-w-[200px]">
+                      <div className="flex items-center gap-8">
+                        <span className={`text-6xl md:text-8xl font-black italic tabular-nums tracking-tighter ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary drop-shadow-[0_0_20px_rgba(var(--primary),0.5)]' : ''}`}>
+                          {game.team2Score}
+                        </span>
+                        <div className="w-1 h-12 bg-white/10 rounded-full" />
+                        <span className={`text-6xl md:text-8xl font-black italic tabular-nums tracking-tighter ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary drop-shadow-[0_0_20px_rgba(var(--primary),0.5)]' : ''}`}>
+                          {game.team1Score}
+                        </span>
+                      </div>
+                      <Badge className={`px-6 py-2 rounded-full font-black uppercase tracking-[0.2em] text-[10px] ${game.isLive ? 'bg-primary text-primary-foreground animate-pulse' : 'bg-white/10 text-muted-foreground'}`}>
+                        {game.isLive ? `LIVE • ${game.quarter}` : game.isFinal ? 'FINAL' : 'SCHEDULED'}
+                      </Badge>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                        {game.gameTime ? formatInTimeZone(new Date(game.gameTime), "America/New_York", "MMM d • h:mm a") : "Time TBD"}
+                      </p>
                     </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <h2 className={`text-3xl md:text-5xl font-black italic uppercase tracking-tighter ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary' : 'text-foreground'}`}>
-                    {game.team1}
-                  </h2>
-                </div>
-              </div>
+
+                    {/* Team 1 */}
+                    <div className="flex-1 flex flex-col items-center md:items-end gap-6 w-full text-center md:text-right">
+                      <div className="relative group/logo">
+                        <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full scale-0 group-hover/logo:scale-100 transition-transform duration-500" />
+                        {preferences.showTeamLogos !== false && TEAMS[game.team1 as keyof typeof TEAMS] ? (
+                          <img src={TEAMS[game.team1 as keyof typeof TEAMS]} alt={game.team1} className="w-24 h-24 md:w-32 md:h-32 object-contain relative z-10 drop-shadow-2xl transition-transform group-hover/logo:scale-110" />
+                        ) : (
+                          <div className="w-24 h-24 md:w-32 md:h-32 bg-white/5 rounded-full flex items-center justify-center relative z-10">
+                            <Trophy className="w-12 h-12 text-muted-foreground/20" />
+                          </div>
+                        )}
+                        {/* Prediction Count Badge */}
+                        <div className="absolute -top-2 -left-2 z-20 bg-primary text-primary-foreground text-[10px] font-black px-2 py-1 rounded-full shadow-lg border-2 border-background">
+                          {predictions?.filter(p => p.votedFor === game.team1).length || 0}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h2 className={`text-3xl md:text-5xl font-black italic uppercase tracking-tighter ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary' : 'text-foreground'}`}>
+                          {game.team1}
+                        </h2>
+                      </div>
+                    </div>
 
             </div>
             <div className="absolute -bottom-24 -right-24 text-[300px] opacity-[0.02] select-none font-black italic pointer-events-none">GAME</div>
@@ -448,10 +468,14 @@ export default function GameDetail() {
                       </div>
                       <Button 
                         onClick={() => voteMutation.mutate(stat.team)} 
-                        disabled={voteMutation.isPending}
+                        disabled={voteMutation.isPending || !!predictions?.find(p => p.userId === user?.id)}
                         className="w-full h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-transform"
                       >
-                        Predict Winner
+                        {predictions?.find(p => p.userId === user?.id)?.votedFor === stat.team 
+                          ? "Prediction Placed" 
+                          : predictions?.find(p => p.userId === user?.id)
+                            ? "Prediction Locked"
+                            : "Predict Winner"}
                       </Button>
                     </Card>
                   ))}
