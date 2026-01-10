@@ -91,9 +91,6 @@ export function GameCard({ game, onClick }: GameCardProps) {
                </p>
              </div>
           ) : null}
-          {game.location && (
-            <p className="text-[9px] font-black text-muted-foreground/20 uppercase tracking-[0.3em]">{game.location}</p>
-          )}
         </div>
       </div>
     </Card>

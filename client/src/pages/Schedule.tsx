@@ -133,12 +133,6 @@ export default function Schedule() {
                               <Badge className={`text-[9px] font-black uppercase tracking-widest h-5 ${game.isLive ? 'bg-primary' : 'bg-muted/50 border-none'}`}>
                                 {game.isLive ? 'Live' : game.isFinal ? 'Final' : isUpcoming ? 'Scheduled' : 'Past'}
                               </Badge>
-                              {game.location && (
-                                <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest flex items-center gap-1">
-                                  <MapPin className="w-3 h-3" />
-                                  {game.location}
-                                </span>
-                              )}
                             </div>
                           </div>
                         </div>

@@ -526,7 +526,6 @@ export default function GameDetail() {
               <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground px-4">Game Information</h4>
               <div className="grid gap-3">
                 {[
-                  { icon: Target, label: "Location", value: game.location || "TBD", bg: "bg-primary/5", text: "text-primary" },
                   { icon: Calendar, label: "Schedule", value: `Week ${game.week}`, bg: "bg-accent/5", text: "text-accent" },
                   { icon: PlayCircle, label: "Quarter", value: game.quarter || "Scheduled", bg: "bg-white/5", text: "text-foreground" },
                 ].map((item, i) => (
