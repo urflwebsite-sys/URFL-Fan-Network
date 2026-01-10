@@ -45,7 +45,6 @@ export function Sidebar() {
     { path: "/schedule", label: "Schedule", icon: Calendar },
     { path: "/playoffs", label: "Playoffs", icon: Trophy },
     { path: "/standings", label: "Standings", icon: BarChart3 },
-    { path: "/stats", label: "Stats & Data", icon: BarChart3 },
     { path: "/teams", label: "Teams", icon: Shirt },
     { path: "/previous-weeks", label: "Archives", icon: Calendar },
     { path: "/news", label: "News", icon: Newspaper },

@@ -91,7 +91,6 @@ function MainContent() {
               <Route path="/schedule" component={Schedule} />
               <Route path="/playoffs" component={Playoffs} />
               <Route path="/standings" component={Standings} />
-              <Route path="/stats" component={Stats} />
               <Route path="/teams" component={Teams} />
               <Route path="/teams/:name" component={TeamDetail} />
               <Route path="/news" component={News} />

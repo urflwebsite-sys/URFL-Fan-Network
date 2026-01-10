@@ -160,7 +160,6 @@ export default function TeamDetail() {
           <TabsList className="flex flex-wrap h-auto gap-2 bg-transparent p-0 mb-8">
             {[
               { value: "roster", label: "Active Roster", icon: Users },
-              { value: "stats", label: "Player Stats", icon: BarChart3 },
               { value: "schedule", label: "Recent History", icon: Calendar },
             ].map((tab) => (
               <TabsTrigger
@@ -205,44 +204,6 @@ export default function TeamDetail() {
                 </Card>
               ))}
             </div>
-          </TabsContent>
-
-          <TabsContent value="stats" className="space-y-8">
-            <Card className="p-8 bg-card/40 backdrop-blur-3xl border-border/40 rounded-[40px]">
-              <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-8 flex items-center gap-3">
-                <div className="w-1.5 h-8 bg-primary rounded-full" />
-                Player Analytics
-              </h3>
-              <div className="space-y-6">
-                {teamRoster.filter(p => ["QB", "RB", "WR"].includes(p.position || "")).map((player) => {
-                  const stats = player.stats;
-                  const yards = (stats?.passingYards || 0) + (stats?.rushingYards || 0) + (stats?.receivingYards || 0);
-                  const tds = (stats?.passingTouchdowns || 0) + (stats?.rushingTouchdowns || 0) + (stats?.receivingTouchdowns || 0);
-
-                  return (
-                    <div key={player.id} className="flex flex-col md:flex-row md:items-center justify-between p-6 bg-white/5 rounded-3xl border border-white/5 gap-6 hover:bg-white/10 transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center font-black text-primary italic">#{player.number || '00'}</div>
-                        <div>
-                          <p className="text-lg font-black uppercase tracking-tight">{player.name}</p>
-                          <Badge variant="outline" className="p-0 border-none text-[10px] font-black text-muted-foreground uppercase tracking-widest">{player.position}</Badge>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-8 text-center flex-1 max-w-xs">
-                        <div>
-                          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Total YDS</p>
-                          <p className="text-2xl font-black italic tabular-nums">{yards}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Total TDS</p>
-                          <p className="text-2xl font-black italic tabular-nums text-primary">{tds}</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
           </TabsContent>
         </Tabs>
       </div>
