@@ -19,17 +19,17 @@ export function Header() {
     { path: "/previous-weeks", label: "Archives", icon: Calendar },
     { path: "/news", label: "News", icon: Newspaper },
     { path: "/betting", label: "Betting", icon: Target },
-    { path: "/partners", label: "Partners", icon: Users },
     { path: "/changelogs", label: "Updates", icon: BookOpen },
+    { path: "/partners", label: "Partners", icon: Users },
     { path: "/admin", label: "Admin", icon: Shield },
     { path: "/api/logout", label: "Logout", icon: X },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 border-primary/20 bg-background/95 backdrop-blur-md">
-      <div className="mx-auto px-4 w-full">
-        <div className="flex h-16 items-center justify-between gap-2 md:gap-4">
-          <Link href="/" data-testid="link-home" className="flex-shrink-0 group">
+      <div className="px-4 w-full">
+        <div className="flex h-16 items-center justify-start gap-2 md:gap-4">
+          <Link href="/" data-testid="link-home" className="flex-shrink-0 group mr-4">
             <div className="flex items-center gap-1 md:gap-2">
               <span className="text-xl md:text-2xl font-bold">⚡</span>
               <h1 className="text-lg md:text-xl lg:text-2xl font-black text-foreground group-hover:text-primary transition-colors px-1 md:px-2 py-1 rounded-lg whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px] xs:max-w-[180px] sm:max-w-none">
