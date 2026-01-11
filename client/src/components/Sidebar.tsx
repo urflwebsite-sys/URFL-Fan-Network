@@ -74,7 +74,7 @@ export function Sidebar() {
 
         {/* Main Navigation - Desktop Only */}
         <div className="hidden lg:flex flex-1 justify-center">
-          <nav className="flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
+          <nav className="flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5 pl-[1px] pr-[1px] pt-[4px] pb-[4px]">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path;
