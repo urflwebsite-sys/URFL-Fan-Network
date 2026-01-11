@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { Menu, X, Shield, Moon, Sun, Zap, Calendar, Trophy, BarChart3, Newspaper, Target, Users, BookOpen } from "lucide-react";
+import { Menu, X, Shield, Moon, Sun, Zap, Calendar, Trophy, BarChart3, Newspaper, Target, Users, BookOpen, Settings } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 
@@ -20,6 +20,7 @@ export function Header() {
     { path: "/news", label: "News", icon: Newspaper },
     { path: "/betting", label: "Betting", icon: Target },
     { path: "/partners", label: "Partners", icon: Users },
+    { path: "/settings", label: "Settings", icon: Settings },
     { path: "/changelogs", label: "Updates", icon: BookOpen },
     { path: "/admin", label: "Admin", icon: Shield },
     { path: "/api/logout", label: "Logout", icon: X },
@@ -27,9 +28,9 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 border-primary/20 bg-background/95 backdrop-blur-md">
-      <div className="w-full pl-0 pr-4">
-        <div className="flex h-16 items-center justify-start gap-2 md:gap-4">
-          <Link href="/" data-testid="link-home" className="flex-shrink-0 group mr-4">
+      <div className="w-full flex justify-start pl-0 pr-4">
+        <div className="flex h-16 items-center justify-start gap-2 md:gap-4 w-full">
+          <Link href="/" data-testid="link-home" className="flex-shrink-0 group">
             <div className="flex items-center gap-1 md:gap-2">
               <span className="text-xl md:text-2xl font-bold">⚡</span>
               <h1 className="text-lg md:text-xl lg:text-2xl font-black text-foreground group-hover:text-primary transition-colors px-1 md:px-2 py-1 rounded-lg whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px] xs:max-w-[180px] sm:max-w-none">
@@ -38,7 +39,7 @@ export function Header() {
             </div>
           </Link>
 
-          <nav className="hidden lg:flex items-center justify-start flex-1 ml-4 md:ml-8 gap-1">
+          <nav className="hidden lg:flex items-center justify-start flex-1 gap-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path;
@@ -57,7 +58,7 @@ export function Header() {
             })}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-auto">
             <Button
               variant="ghost"
               size="icon"
