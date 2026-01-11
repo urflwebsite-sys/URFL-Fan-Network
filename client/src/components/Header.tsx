@@ -39,7 +39,7 @@ export function Header() {
             </div>
           </Link>
 
-          <nav className="hidden lg:flex items-center justify-start flex-1 gap-1">
+          <nav className="hidden lg:flex items-center justify-start flex-1 gap-1 h-12 bg-muted/30 rounded-full px-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path;
@@ -48,7 +48,7 @@ export function Header() {
                   <Button
                     variant={isActive ? "default" : "ghost"}
                     size="sm"
-                    className={`font-medium gap-1.5 transition-all ${isActive ? 'shadow-lg shadow-primary/25' : 'hover:bg-primary/10'}`}
+                    className={`font-medium gap-1.5 transition-all rounded-full ${isActive ? 'shadow-lg shadow-primary/25' : 'hover:bg-primary/10'}`}
                   >
                     <Icon className="w-4 h-4" />
                     {item.label}
