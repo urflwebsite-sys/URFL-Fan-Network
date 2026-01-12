@@ -73,9 +73,9 @@ export function Sidebar() {
               <Link key={item.path} href={item.path}>
                 <Button
                   variant="ghost"
-                  className={`h-9 px-4 font-bold uppercase tracking-wider text-[11px] rounded-lg transition-all ${
+                  className={`h-9 px-4 font-bold uppercase tracking-wider text-[11px] rounded-full transition-all ${
                     isActive 
-                      ? 'text-primary bg-primary/10' 
+                      ? 'text-primary bg-primary/10 border border-primary/20' 
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                   }`}
                 >
