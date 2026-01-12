@@ -65,26 +65,28 @@ export function Sidebar() {
         </Link>
 
         {/* Navigation */}
-        <nav className="flex items-center gap-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location === item.path;
-            return (
-              <Link key={item.path} href={item.path}>
-                <Button
-                  variant="ghost"
-                  className={`h-9 px-4 font-bold uppercase tracking-wider text-[11px] rounded-lg transition-all ${
-                    isActive 
-                      ? 'text-primary bg-primary/10' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                  }`}
-                >
-                  <Icon className="w-4 h-4 mr-2" />
-                  {item.label}
-                </Button>
-              </Link>
-            );
-          })}
+        <nav className="flex-1 flex items-center overflow-x-auto no-scrollbar gap-1 pr-4">
+          <div className="flex items-center gap-1 min-w-max">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location === item.path;
+              return (
+                <Link key={item.path} href={item.path}>
+                  <Button
+                    variant="ghost"
+                    className={`h-9 px-4 font-bold uppercase tracking-wider text-[11px] rounded-lg transition-all flex-shrink-0 ${
+                      isActive 
+                        ? 'text-primary bg-primary/10' 
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4 mr-2" />
+                    {item.label}
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
         {/* Actions Section */}
