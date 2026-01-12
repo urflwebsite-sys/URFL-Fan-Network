@@ -48,9 +48,11 @@ export default function TeamDetail() {
     enabled: !!teamName,
   });
 
-  const { data: games = [] } = useQuery<GameResult[]>({
-    queryKey: ["/api/games/all"],
+  const { data: standings = [] } = useQuery<Standings[]>({
+    queryKey: ["/api/standings"],
   });
+
+  const teamStatsFromStandings = standings.find(s => s.team === teamName);
 
   // Get team roster from the new players table
   const teamRoster = (teamPlayers as (Player & { stats?: PlayerStat })[])
@@ -70,37 +72,9 @@ export default function TeamDetail() {
   const kPlayers = getPlayersByPosition("K");
   const defPlayers = getPlayersByPosition("DEF");
 
-  // Get team stats from games
-  const calculateTeamStats = (): TeamStats => {
-    let wins = 0,
-      losses = 0;
-    let pointsFor = 0,
-      pointsAgainst = 0;
-
-    games.forEach((game) => {
-      if (game.isFinal) {
-        if (game.team1 === teamName) {
-          pointsFor += game.team1Score ?? 0;
-          pointsAgainst += game.team2Score ?? 0;
-          if ((game.team1Score ?? 0) > (game.team2Score ?? 0)) wins++;
-          else if ((game.team1Score ?? 0) < (game.team2Score ?? 0)) losses++;
-        } else if (game.team2 === teamName) {
-          pointsFor += game.team2Score ?? 0;
-          pointsAgainst += game.team1Score ?? 0;
-          if ((game.team2Score ?? 0) > (game.team1Score ?? 0)) wins++;
-          else if ((game.team2Score ?? 0) < (game.team1Score ?? 0)) losses++;
-        }
-      }
-    });
-
-    return {
-      wins,
-      losses,
-      pointDifferential: pointsFor - pointsAgainst,
-    };
-  };
-
-  const teamStats = calculateTeamStats();
+  const { data: games = [] } = useQuery<GameResult[]>({
+    queryKey: ["/api/games/all"],
+  });
 
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-background to-background">
@@ -141,9 +115,9 @@ export default function TeamDetail() {
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                   {[
-                    { label: "Wins", value: teamStats.wins, color: "text-primary" },
-                    { label: "Losses", value: teamStats.losses, color: "text-destructive" },
-                    { label: "Diff", value: `${teamStats.pointDifferential > 0 ? '+' : ''}${teamStats.pointDifferential}`, color: teamStats.pointDifferential >= 0 ? 'text-green-500' : 'text-red-500' },
+                    { label: "Wins", value: teamStatsFromStandings?.wins || 0, color: "text-primary" },
+                    { label: "Losses", value: teamStatsFromStandings?.losses || 0, color: "text-destructive" },
+                    { label: "Diff", value: `${(teamStatsFromStandings?.pointDifferential || 0) > 0 ? '+' : ''}${teamStatsFromStandings?.pointDifferential || 0}`, color: (teamStatsFromStandings?.pointDifferential || 0) >= 0 ? 'text-green-500' : 'text-red-500' },
                   ].map((stat, i) => (
                     <div key={i} className="p-6 bg-white/5 backdrop-blur-md rounded-3xl border border-white/5">
                       <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">{stat.label}</p>
