@@ -463,7 +463,7 @@ export default function GameDetail() {
                         <div className="bg-primary h-full transition-all duration-1000" style={{ width: `${stat.percent}%` }} />
                       </div>
                       <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Rank Factor</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Ranking</span>
                         <span className="text-sm font-black italic">{getConferenceRanking(stat.team, standings || [])}</span>
                       </div>
                       <Button 
