@@ -65,8 +65,8 @@ export function Sidebar() {
         </Link>
 
         {/* Navigation */}
-        <nav className="flex-1 flex items-center overflow-x-auto no-scrollbar gap-1 pr-4">
-          <div className="flex items-center gap-1 min-w-max">
+        <nav className="flex-1 lg:flex-none flex items-center overflow-x-auto lg:overflow-visible no-scrollbar gap-1 pr-4 lg:pr-0">
+          <div className="flex items-center gap-1 min-w-max lg:min-w-0">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path;
@@ -74,7 +74,7 @@ export function Sidebar() {
                 <Link key={item.path} href={item.path}>
                   <Button
                     variant="ghost"
-                    className={`h-9 px-4 font-bold uppercase tracking-wider text-[11px] rounded-lg transition-all flex-shrink-0 ${
+                    className={`h-9 px-4 font-bold uppercase tracking-wider text-[11px] rounded-lg transition-all flex-shrink-0 lg:flex-shrink ${
                       isActive 
                         ? 'text-primary bg-primary/10' 
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted'
