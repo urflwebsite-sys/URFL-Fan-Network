@@ -75,7 +75,7 @@ export function Sidebar() {
         {/* Main Navigation - Desktop Only */}
         <div className="hidden lg:flex flex-1 justify-center">
           <nav className="flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5 pl-[1px] pr-[1px] pt-[4px] pb-[4px]">
-            {navItems.map((item) => {
+            {[...navItems, ...secondaryItems].map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path;
               return (
@@ -99,28 +99,6 @@ export function Sidebar() {
 
         {/* Actions Section */}
         <div className="flex items-center gap-2">
-          {/* Secondary Nav Items */}
-          <div className="hidden sm:flex items-center gap-1 mr-2 pr-2 border-r border-border/40">
-            {secondaryItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location === item.path;
-              return (
-                <Link key={item.path} href={item.path}>
-                  <Button
-                    variant="ghost"
-                    className={`h-9 px-3 font-black uppercase tracking-widest text-[9px] rounded-xl transition-all duration-300 ${
-                      isActive 
-                        ? 'bg-primary/10 text-primary' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5 mr-2" />
-                    {item.label}
-                  </Button>
-                </Link>
-              );
-            })}
-          </div>
 
           {isAdmin && (
             <Link href="/admin">
