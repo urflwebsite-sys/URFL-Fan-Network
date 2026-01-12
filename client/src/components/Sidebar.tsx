@@ -51,62 +51,50 @@ export function Sidebar() {
     { path: "/update-planner", label: "Planner", icon: Clock },
   ];
 
-  const secondaryItems = [
-    { path: "/partners", label: "Partners", icon: Users },
-    { path: "/settings", label: "Settings", icon: Settings },
-  ];
-
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-background/60 backdrop-blur-2xl border-b border-border/40 z-[100] transition-all duration-300">
-      <div className="max-w-screen-2xl mx-auto h-full px-4 md:px-8 flex items-center justify-between gap-4">
+    <header className="fixed top-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-xl border-b border-border/50 z-[100]">
+      <div className="h-full px-6 flex items-center gap-8">
         {/* Logo Section */}
         <Link href="/">
-          <div className="flex items-center gap-3 cursor-pointer group">
-            <div className="relative">
-              <div className="absolute -inset-1 bg-primary/20 blur-md rounded-full group-hover:bg-primary/40 transition-all duration-500" />
-              <Zap className="relative w-7 h-7 text-primary fill-primary/10 transition-transform group-hover:scale-110 duration-300" />
+          <div className="flex items-center gap-2 cursor-pointer group">
+            <div className="p-1.5 bg-primary rounded-lg shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+              <Zap className="w-5 h-5 text-primary-foreground fill-primary-foreground" />
             </div>
-            <div className="hidden sm:block">
-              <h1 className="text-xl font-black tracking-tighter group-hover:text-primary transition-colors uppercase italic leading-none">URFL</h1>
-            </div>
+            <h1 className="text-xl font-black tracking-tight uppercase italic">URFL</h1>
           </div>
         </Link>
 
-        {/* Main Navigation - Desktop Only */}
-        <div className="hidden lg:flex flex-1 justify-center">
-          <nav className="flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5 pt-[4px] pb-[4px] pl-[4px] pr-[4px]">
-            {[...navItems, ...secondaryItems].map((item) => {
-              const Icon = item.icon;
-              const isActive = location === item.path;
-              return (
-                <Link key={item.path} href={item.path}>
-                  <Button
-                    variant="ghost"
-                    className={`h-9 px-4 font-black uppercase tracking-widest text-[10px] rounded-xl transition-all duration-300 ${
-                      isActive 
-                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-white/10'
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5 mr-2" />
-                    {item.label}
-                  </Button>
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
+        {/* Navigation */}
+        <nav className="flex items-center gap-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location === item.path;
+            return (
+              <Link key={item.path} href={item.path}>
+                <Button
+                  variant="ghost"
+                  className={`h-9 px-4 font-bold uppercase tracking-wider text-[11px] rounded-lg transition-all ${
+                    isActive 
+                      ? 'text-primary bg-primary/10' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  }`}
+                >
+                  <Icon className="w-4 h-4 mr-2" />
+                  {item.label}
+                </Button>
+              </Link>
+            );
+          })}
+        </nav>
 
         {/* Actions Section */}
-        <div className="flex items-center gap-2">
-
+        <div className="flex items-center gap-3 ml-auto">
           {isAdmin && (
             <Link href="/admin">
               <Button
                 variant="outline"
-                className={`h-9 px-4 font-black uppercase tracking-widest text-[9px] rounded-xl border-accent/20 text-accent hover:bg-accent/5 ${
-                  location === '/admin' ? 'bg-accent/10 border-accent/40' : ''
-                }`}
+                size="sm"
+                className="font-bold uppercase tracking-wider text-[10px] border-primary/20 hover:bg-primary/5"
               >
                 <Shield className="w-3.5 h-3.5 mr-2" />
                 Admin
@@ -117,25 +105,19 @@ export function Sidebar() {
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
               <Link href="/settings">
-                <Button variant="ghost" size="icon" className="w-9 h-9 rounded-xl hover:bg-white/5">
+                <Button variant="ghost" size="icon" className="w-9 h-9 rounded-lg">
                   <Settings className="w-4 h-4 text-muted-foreground" />
                 </Button>
               </Link>
               <a href="/api/logout">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-9 h-9 text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-xl"
-                >
+                <Button variant="ghost" size="icon" className="w-9 h-9 text-muted-foreground hover:text-destructive rounded-lg">
                   <LogOut className="w-4 h-4" />
                 </Button>
               </a>
             </div>
           ) : (
             <a href="/login">
-              <Button
-                className="h-9 px-6 bg-primary text-primary-foreground font-black uppercase tracking-widest text-[10px] rounded-xl shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
-              >
+              <Button className="h-9 px-6 font-bold uppercase tracking-wider text-[11px] rounded-lg shadow-lg shadow-primary/20">
                 Login
               </Button>
             </a>
