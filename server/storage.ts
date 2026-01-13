@@ -664,6 +664,20 @@ export class DatabaseStorage implements IStorage {
     await db.delete(playerStats).where(eq(playerStats.id, id));
   }
 
+  async getBracketImages(): Promise<BracketImage[]> {
+    return await db.select().from(bracketImages).orderBy(bracketImages.updatedAt);
+  }
+
+  async createBracketImage(imageData: InsertBracketImage): Promise<BracketImage> {
+    const cleanData = cleanObject(imageData);
+    const [image] = await db.insert(bracketImages).values(cleanData as InsertBracketImage).returning();
+    return image;
+  }
+
+  async deleteBracketImage(id: string): Promise<void> {
+    await db.delete(bracketImages).where(eq(bracketImages.id, id));
+  }
+
   async upsertUpdatePlan(planData: InsertUpdatePlan): Promise<UpdatePlan> {
     const cleanData = cleanObject(planData);
     const existing = await db.select().from(updatePlans).where(eq(updatePlans.updateDate, cleanData.updateDate as string));
