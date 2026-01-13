@@ -752,15 +752,15 @@ function CoinsManager() {
   const [amount, setAmount] = useState<number>(0);
 
   const { data: users } = useQuery<User[]>({
-    queryKey: ["/api/users"],
+    queryKey: ["/api/users/all"],
   });
 
   const addCoinsMutation = useMutation({
     mutationFn: async (data: { userId: string; amount: number }) => {
-      await apiRequest("POST", "/api/admin/add-coins", data);
+      return await apiRequest("POST", "/api/admin/add-coins", data);
     },
     onSuccess: (data: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/users/all"] });
       queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
       toast({ title: "Success", description: `Added coins. New balance: ${data.newBalance}` });
       setAmount(0);
@@ -772,10 +772,10 @@ function CoinsManager() {
 
   const removeCoinsMutation = useMutation({
     mutationFn: async (data: { userId: string; amount: number }) => {
-      await apiRequest("POST", "/api/admin/remove-coins", data);
+      return await apiRequest("POST", "/api/admin/remove-coins", data);
     },
     onSuccess: (data: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/users/all"] });
       queryClient.invalidateQueries({ queryKey: ["/api/balance"] });
       toast({ title: "Success", description: `Removed coins. New balance: ${data.newBalance}` });
       setAmount(0);
