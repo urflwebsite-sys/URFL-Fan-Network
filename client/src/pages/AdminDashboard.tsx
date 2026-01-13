@@ -873,6 +873,7 @@ function BracketManager() {
       const data = await res.json();
       await apiRequest("POST", "/api/bracket-images", { imageUrl: data.url });
       queryClient.invalidateQueries({ queryKey: ["/api/bracket-images"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/bracket-image"] });
       toast({ title: "Success", description: "Bracket image uploaded" });
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -975,14 +976,15 @@ function ChangelogManager() {
     if (logs && logs.length > 0) {
       const latest = logs[0].version;
       const parts = latest.split('.').map(Number);
-      if (parts.length === 3 && !isNaN(parts[2])) {
-        parts[2] += 1;
-        setVersion(parts.join('.'));
+      if (parts.length >= 2) {
+        parts[1] += 1;
+        // Keep only major and minor for 1.1, 1.2 format
+        setVersion(`${parts[0]}.${parts[1]}`);
       } else {
         setVersion(latest + ".1");
       }
     } else {
-      setVersion("1.0.0");
+      setVersion("1.1");
     }
   }, [logs]);
 
