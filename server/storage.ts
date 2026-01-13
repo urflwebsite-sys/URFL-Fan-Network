@@ -153,6 +153,10 @@ export interface IStorage {
   getUserBalance(userId: string): Promise<number>;
   updateUserBalance(userId: string, amount: number): Promise<User>;
   
+  getBracketImages(): Promise<BracketImage[]>;
+  createBracketImage(image: InsertBracketImage): Promise<BracketImage>;
+  deleteBracketImage(id: string): Promise<void>;
+
   // Roster management
   getAllTeams(): Promise<Team[]>;
   getTeamPlayers(teamId: string): Promise<Player[]>;

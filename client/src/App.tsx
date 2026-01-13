@@ -77,7 +77,7 @@ function MainContent() {
       <BreakingNewsBanner />
       {showSidebar && <Sidebar />}
       
-      <main className={`min-h-screen pt-[160px] lg:pt-24 pb-20 md:pb-0 ${preferences.reduceAnimations ? '' : 'transition-all duration-300'}`}>
+      <main className={`min-h-screen pt-[200px] lg:pt-36 pb-20 md:pb-0 ${preferences.reduceAnimations ? '' : 'transition-all duration-300'}`}>
         <Switch>
           <Route path="/" component={Landing} />
           <Route path="/login" component={Login} />
