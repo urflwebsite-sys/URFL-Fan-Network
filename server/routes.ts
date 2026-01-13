@@ -21,6 +21,7 @@ import {
   insertPlayerStatsSchema,
   insertGamePlaySchema,
   insertPlayerSchema,
+  insertPartnersSchema,
 } from "@shared/schema";
 import { playerStats, gamePlays, players, teams } from "@shared/schema";
 import { db } from "./db";

@@ -603,7 +603,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPartner(partnerData: InsertPartners): Promise<Partner> {
-    const [partner] = await db.insert(partners).values(cleanObject(partnerData) as InsertPartners).returning();
+    const cleanData = cleanObject(partnerData);
+    // Explicitly handle null for imageUrl if it's missing or undefined
+    const finalData = {
+      ...cleanData,
+      imageUrl: cleanData.imageUrl || null
+    };
+    const [partner] = await db.insert(partners).values(finalData as InsertPartners).returning();
     return partner;
   }
 
