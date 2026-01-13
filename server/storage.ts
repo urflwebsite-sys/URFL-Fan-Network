@@ -731,6 +731,30 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async addCoins(userId: string, amount: number): Promise<User> {
+    const user = await this.getUser(userId);
+    if (!user) throw new Error("User not found");
+
+    const [updatedUser] = await db
+      .update(users)
+      .set({ coins: (user.coins || 0) + amount })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
+  }
+
+  async removeCoins(userId: string, amount: number): Promise<User> {
+    const user = await this.getUser(userId);
+    if (!user) throw new Error("User not found");
+
+    const [updatedUser] = await db
+      .update(users)
+      .set({ coins: Math.max(0, (user.coins || 0) - amount) })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
+  }
+
   async resolveBetsForGame(gameId: string): Promise<void> {
     try {
       const game = await this.getGame(gameId);

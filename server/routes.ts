@@ -847,6 +847,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User management endpoints (admin only)
+  app.patch("/api/users/:id/coins", isAuthenticated, async (req: any, res) => {
+    try {
+      if (req.session?.role !== "admin") {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const { id } = req.params;
+      const { amount, action } = req.body;
+      
+      let user;
+      if (action === "add") {
+        user = await storage.addCoins(id, amount);
+      } else if (action === "remove") {
+        user = await storage.removeCoins(id, amount);
+      } else {
+        user = await storage.updateUserBalance(id, amount);
+      }
+      
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating user coins:", error);
+      res.status(400).json({ message: "Failed to update user coins" });
+    }
+  });
+
   app.get("/api/users/all", isAuthenticated, async (req: any, res) => {
     try {
       const role = req.session?.role;
