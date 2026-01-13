@@ -1448,7 +1448,7 @@ function UsersManager() {
 function PartnersManager() {
   const { toast } = useToast();
   const [name, setName] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [quote, setQuote] = useState("");
 
   const { data: partners } = useQuery<Partner[]>({
@@ -1456,16 +1456,22 @@ function PartnersManager() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: FormData) => {
       await apiRequest("POST", "/api/partners", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/partners"] });
       toast({ title: "Success", description: "Partner added" });
       setName("");
-      setImageUrl("");
+      setImageFile(null);
       setQuote("");
+      // Reset file input
+      const fileInput = document.getElementById("partner-logo") as HTMLInputElement;
+      if (fileInput) fileInput.value = "";
     },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message || "Failed to add partner", variant: "destructive" });
+    }
   });
 
   const deleteMutation = useMutation({
@@ -1485,7 +1491,13 @@ function PartnersManager() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            createMutation.mutate({ name, imageUrl, quote });
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("quote", quote);
+            if (imageFile) {
+              formData.append("image", imageFile);
+            }
+            createMutation.mutate(formData);
           }}
           className="space-y-4"
         >
@@ -1495,8 +1507,14 @@ function PartnersManager() {
               <Input id="partner-name" value={name} onChange={(e) => setName(e.target.value)} required data-testid="input-partner-name" />
             </div>
             <div>
-              <Label htmlFor="partner-logo">Image URL</Label>
-              <Input id="partner-logo" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} required data-testid="input-partner-logo" />
+              <Label htmlFor="partner-logo">Logo Image (Optional)</Label>
+              <Input 
+                id="partner-logo" 
+                type="file" 
+                accept="image/*"
+                onChange={(e) => setImageFile(e.target.files?.[0] || null)} 
+                data-testid="input-partner-logo" 
+              />
             </div>
             <div className="md:col-span-2">
               <Label htmlFor="partner-quote">Quote</Label>
@@ -1504,7 +1522,7 @@ function PartnersManager() {
             </div>
           </div>
           <Button type="submit" className="w-full" disabled={createMutation.isPending} data-testid="button-add-partner">
-            Add Partner
+            {createMutation.isPending ? "Adding..." : "Add Partner"}
           </Button>
         </form>
       </Card>

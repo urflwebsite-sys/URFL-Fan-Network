@@ -289,7 +289,7 @@ export const partners = pgTable("partners", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: varchar("name", { length: 200 }).notNull(),
   quote: text("quote").notNull(),
-  imageUrl: text("image_url"),
+  imageUrl: text("image_url"), // Now optional in Zod schema
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -298,6 +298,8 @@ export const insertPartnersSchema = createInsertSchema(partners).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  imageUrl: z.string().optional().nullable(),
 });
 
 export type InsertPartners = z.infer<typeof insertPartnersSchema>;
