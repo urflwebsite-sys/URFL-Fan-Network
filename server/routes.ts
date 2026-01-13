@@ -847,6 +847,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User management endpoints (admin only)
+  app.get("/api/users/all", isAuthenticated, async (req: any, res) => {
+    try {
+      const role = req.session?.role;
+      if (role !== "admin") {
+        return res.status(403).json({ message: "Only admins can view users" });
+      }
+      
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
   app.get("/api/users", isAuthenticated, async (req: any, res) => {
     try {
       const role = req.session?.role;

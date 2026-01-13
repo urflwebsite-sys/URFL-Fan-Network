@@ -803,18 +803,16 @@ function CoinsManager() {
                     <SelectValue placeholder="Select a user" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Users</SelectLabel>
-                      {users && users.length > 0 ? (
-                        users.map((u) => (
-                          <SelectItem key={u.id} value={u.id}>
-                            {u.username} ({u.coins || 0} coins)
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="none" disabled>No users found</SelectItem>
-                      )}
-                    </SelectGroup>
+                  <SelectLabel>Users</SelectLabel>
+                  {users && users.length > 0 ? (
+                    users.map((u) => (
+                      <SelectItem key={u.id} value={u.id}>
+                        {u.username} ({u.coins || 0} coins)
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-users" disabled>No users found</SelectItem>
+                  )}
                   </SelectContent>
                 </Select>
               </div>
