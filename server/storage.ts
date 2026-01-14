@@ -217,6 +217,11 @@ export class DatabaseStorage implements IStorage {
     }
     
     // With id, use upsert
+    // Force coins to be a number if it exists
+    if (cleanData.coins !== undefined && cleanData.coins !== null) {
+      cleanData.coins = Number(cleanData.coins);
+    }
+
     const [user] = await db
       .insert(users)
       .values(cleanData as UpsertUser)
@@ -749,14 +754,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUserBalance(userId: string, amount: number): Promise<User> {
+    const numericAmount = Number(amount);
     const [user] = await db
       .update(users)
-      .set({ coins: amount })
+      .set({ coins: numericAmount })
       .where(eq(users.id, userId))
       .returning();
     
     // If the user being updated is popfork1, ensure it's synced
-    console.log(`[STORAGE] Updated balance for ${userId} to ${amount}`);
+    console.log(`[STORAGE] Updated balance for ${userId} to ${numericAmount}`);
     return user;
   }
 

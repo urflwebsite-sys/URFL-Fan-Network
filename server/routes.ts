@@ -1337,13 +1337,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      const currentBalance = user.coins ?? 0;
-      if (currentBalance < betData.amount) {
+      const currentBalance = Number(user.coins ?? 0);
+      const betAmount = Number(betData.amount);
+
+      if (currentBalance < betAmount) {
         return res.status(400).json({ message: "Insufficient balance" });
       }
 
       // Deduct coins first
-      const newBalance = currentBalance - betData.amount;
+      const newBalance = currentBalance - betAmount;
       const updatedUser = await storage.updateUserBalance(userId, newBalance);
       console.log(`[API] User balance updated in DB: ${updatedUser.coins}`);
 
@@ -1355,7 +1357,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const wss = (app as any).wss;
       if (wss) {
         wss.clients.forEach((client: any) => {
-          if (client.readyState === WebSocket.OPEN) {
+          if (client.readyState === 1) { // WebSocket.OPEN
             client.send(JSON.stringify({
               type: "balance_update",
               userId,
