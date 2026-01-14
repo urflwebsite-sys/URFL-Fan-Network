@@ -743,8 +743,19 @@ export class DatabaseStorage implements IStorage {
 
   async placeBet(betData: InsertBet): Promise<Bet> {
     console.log("[STORAGE] Placing bet logic start:", betData);
+    const user = await this.getUser(betData.userId);
+    if (!user) throw new Error("User not found");
+    
+    if ((user.coins ?? 0) < betData.amount) {
+      throw new Error("Insufficient balance");
+    }
+
     const cleanData = cleanObject(betData);
     const [bet] = await db.insert(bets).values(cleanData as InsertBet).returning();
+    
+    // Deduct coins immediately
+    await this.updateUserBalance(betData.userId, (user.coins ?? 0) - betData.amount);
+    
     console.log("[STORAGE] Bet placed successfully in DB:", bet);
     return bet;
   }
