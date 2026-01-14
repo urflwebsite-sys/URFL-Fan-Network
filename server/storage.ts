@@ -742,7 +742,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserBalance(userId: string): Promise<number> {
-    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    const user = await this.getUser(userId);
     return user?.coins ?? 0;
   }
 

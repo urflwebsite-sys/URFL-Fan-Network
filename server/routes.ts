@@ -1306,25 +1306,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Player Stats endpoints
-  app.get("/api/player-stats", async (req, res) => {
+  app.get("/api/bets", isAuthenticated, async (req: any, res) => {
     try {
-      const stats = await db.select().from(playerStats);
-      res.json(stats);
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "User not identified" });
+      }
+      const bets = await storage.getUserBets(userId);
+      res.json(bets);
     } catch (error) {
-      console.error("Error fetching player stats:", error);
-      res.status(500).json({ message: "Failed to fetch player stats" });
+      console.error("Error fetching bets:", error);
+      res.status(500).json({ message: "Failed to fetch bets" });
     }
   });
 
-  app.post("/api/player-stats", isAuthenticated, async (req, res) => {
+  app.post("/api/bets", isAuthenticated, async (req: any, res) => {
     try {
-      const statData = insertPlayerStatsSchema.parse(req.body);
-      const stat = await db.insert(playerStats).values(statData).returning();
-      res.json(stat[0]);
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "User not identified" });
+      }
+
+      const betData = insertBetSchema.parse({
+        ...req.body,
+        userId,
+      });
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if ((user.coins || 0) < betData.amount) {
+        return res.status(400).json({ message: "Insufficient balance" });
+      }
+
+      // Deduct coins first
+      await storage.updateUserBalance(userId, (user.coins || 0) - betData.amount);
+
+      const bet = await storage.placeBet(betData);
+      
+      // Broadcast balance update
+      const wss = (app as any).wss;
+      if (wss) {
+        wss.clients.forEach((client: any) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+              type: "balance_update",
+              userId,
+              balance: (user.coins || 0) - betData.amount
+            }));
+          }
+        });
+      }
+      
+      res.json(bet);
     } catch (error) {
-      console.error("Error creating player stat:", error);
-      res.status(400).json({ message: "Failed to create player stat" });
+      console.error("Error placing bet:", error);
+      res.status(400).json({ message: "Failed to place bet" });
+    }
+  });
+
+  app.get("/api/balance", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "User not identified" });
+      }
+      const balance = await storage.getUserBalance(userId);
+      res.json({ balance });
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+      res.status(500).json({ message: "Failed to fetch balance" });
     }
   });
 
