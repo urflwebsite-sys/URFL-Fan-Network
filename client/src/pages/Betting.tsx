@@ -328,25 +328,58 @@ export default function Betting() {
             )}
           </TabsContent>
 
-          <TabsContent value="leaderboard">
+          <TabsContent value="my-bets">
             <Card className="p-8 bg-card/40 backdrop-blur-3xl border-border/40 rounded-[40px]">
               <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-8 flex items-center gap-3">
                 <div className="w-1.5 h-8 bg-primary rounded-full" />
-                Fan Rankings
+                Active Wagers
               </h3>
               <div className="space-y-4">
-                {leaderboard.map((u, i) => (
-                  <div key={u.id} className="flex items-center justify-between p-6 bg-white/5 hover:bg-white/10 rounded-3xl border border-white/5 transition-colors">
-                    <div className="flex items-center gap-6">
-                      <span className="text-3xl font-black italic text-muted-foreground/20 w-8">#{i + 1}</span>
-                      <span className="text-lg font-black uppercase tracking-tight">{u.username || 'Anonymous'}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-2xl font-black italic text-primary">
-                      <Coins className="w-6 h-6" />
-                      {u.coins.toLocaleString()}
-                    </div>
+                {userBets.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground font-medium italic">
+                    No active bets found. Start wagering to see them here!
                   </div>
-                ))}
+                ) : (
+                  userBets.map((bet) => {
+                    const game = allGames.find(g => g.id === bet.gameId);
+                    return (
+                      <div key={bet.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-white/5 hover:bg-white/10 rounded-3xl border border-white/5 transition-colors gap-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest border-primary/20 text-primary">
+                              {bet.status}
+                            </Badge>
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                              {bet.createdAt ? new Date(bet.createdAt).toLocaleDateString() : 'Date TBA'}
+                            </span>
+                          </div>
+                          <p className="text-lg font-black uppercase tracking-tight italic">
+                            {game ? `${game.team1} vs ${game.team2}` : 'Unknown Matchup'}
+                          </p>
+                          <p className="text-sm font-medium text-muted-foreground">
+                            Picked: <span className="text-foreground font-bold">{bet.pickedTeam}</span>
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-8">
+                          <div className="text-right">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Wager</p>
+                            <div className="flex items-center gap-2 text-xl font-black italic text-foreground">
+                              <Coins className="w-4 h-4 text-primary" />
+                              {bet.amount.toLocaleString()}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">To Win</p>
+                            <div className="flex items-center gap-2 text-xl font-black italic text-primary">
+                              <Zap className="w-4 h-4" />
+                              {Math.floor(bet.amount * (bet.multiplier ? bet.multiplier / 100 : (game ? calculateOdds(calculateWinProbability(game, bet.pickedTeam === game.team1 ? "team1" : "team2", standings, allGames)) : 1))).toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </Card>
           </TabsContent>
