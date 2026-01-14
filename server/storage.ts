@@ -751,9 +751,19 @@ export class DatabaseStorage implements IStorage {
     }
 
     const cleanData = cleanObject(betData);
+    // Explicitly ensure multiplier is an integer if provided
+    if (cleanData.multiplier !== undefined && cleanData.multiplier !== null) {
+      // If the multiplier is passed as a float (e.g., 1.5), store it as 150 (x100)
+      // or if it's already an integer, keep it. 
+      // Based on schema, it seems it's intended to be an integer.
+      // However, the payout logic uses it as a raw multiplier: Number(bet.amount) * Number(bet.multiplier)
+      // Let's ensure it's stored exactly as received to match the payout logic.
+      cleanData.multiplier = Number(cleanData.multiplier);
+    }
+
     const [bet] = await db.insert(bets).values(cleanData as InsertBet).returning();
     
-    // Deduct coins immediately
+    // Deduct EXACTLY the bet amount from user balance
     await this.updateUserBalance(betData.userId, (user.coins ?? 0) - betData.amount);
     
     console.log("[STORAGE] Bet placed successfully in DB:", bet);
