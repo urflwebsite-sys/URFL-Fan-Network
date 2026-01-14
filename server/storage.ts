@@ -811,10 +811,10 @@ export class DatabaseStorage implements IStorage {
             let newBalance = user.coins ?? 0;
 
             if (bet.status === "won" && newStatus === "lost") {
-              // Was a win, now a loss: Remove previous winnings
+              // Was a win, now a loss: Remove total amount paid out (bet + profit)
               newBalance = Math.max(0, newBalance - winnings);
             } else if ((bet.status === "lost" || bet.status === "pending") && newStatus === "won") {
-              // Was a loss or pending, now a win: Add winnings
+              // Was a loss or pending, now a win: Add total winnings (multiplier is already the total return factor)
               newBalance = newBalance + winnings;
             }
 
