@@ -832,15 +832,18 @@ export class DatabaseStorage implements IStorage {
           if (user) {
             const multiplier = Number(bet.multiplier);
             const oddsMultiplier = multiplier > 0 ? multiplier / 100 : 1;
-            const winnings = Math.floor(Number(bet.amount) * oddsMultiplier);
+            // Total payout = wager * odds (e.g., 100 * 1.5 = 150)
+            const totalPayout = Math.floor(Number(bet.amount) * oddsMultiplier);
             let newBalance = user.coins ?? 0;
 
             if (bet.status === "won" && newStatus === "lost") {
-              // Was a win, now a loss: Remove total amount paid out (bet + profit)
-              newBalance = Math.max(0, newBalance - winnings);
+              // Was a win, now a loss: Remove the entire payout that was previously added
+              newBalance = Math.max(0, newBalance - totalPayout);
+              console.log(`[BET RESOLUTION] Reversing payout for bet ${bet.id}: -${totalPayout}`);
             } else if ((bet.status === "lost" || bet.status === "pending") && newStatus === "won") {
-              // Was a loss or pending, now a win: Add total winnings (multiplier is already the total return factor)
-              newBalance = newBalance + winnings;
+              // Was a loss or pending, now a win: Add the entire payout
+              newBalance = newBalance + totalPayout;
+              console.log(`[BET RESOLUTION] Paying out bet ${bet.id}: +${totalPayout} (Amount: ${bet.amount}, Multiplier: ${multiplier})`);
             }
 
             await this.updateUserBalance(bet.userId, newBalance);
