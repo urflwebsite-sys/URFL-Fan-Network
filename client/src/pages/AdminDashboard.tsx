@@ -283,16 +283,25 @@ function GamesManager() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <Label htmlFor="week">Week</Label>
-            <Input
-              id="week"
-              type="number"
-              min="1"
-              max="15"
-              value={week}
-              onChange={(e) => setWeek(parseInt(e.target.value))}
-              required
-              data-testid="input-week"
-            />
+            <Select 
+              value={String(week)} 
+              onValueChange={(v) => setWeek(parseInt(v))}
+            >
+              <SelectTrigger id="week" data-testid="select-week">
+                <SelectValue placeholder="Select Week" />
+              </SelectTrigger>
+              <SelectContent>
+                {[...Array(15)].map((_, i) => (
+                  <SelectItem key={i + 1} value={String(i + 1)}>
+                    Week {i + 1}
+                  </SelectItem>
+                ))}
+                <SelectItem value="16">Wildcard</SelectItem>
+                <SelectItem value="17">Divisional</SelectItem>
+                <SelectItem value="18">Conference</SelectItem>
+                <SelectItem value="19">Super Bowl</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-4">
@@ -415,6 +424,10 @@ function GamesManager() {
                     Week {i + 1}
                   </SelectItem>
                 ))}
+                <SelectItem value="16">Wildcard</SelectItem>
+                <SelectItem value="17">Divisional</SelectItem>
+                <SelectItem value="18">Conference</SelectItem>
+                <SelectItem value="19">Super Bowl</SelectItem>
               </SelectContent>
             </Select>
           </div>
