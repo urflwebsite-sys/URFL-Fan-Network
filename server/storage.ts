@@ -241,23 +241,35 @@ export class DatabaseStorage implements IStorage {
     const allGames = await db.select().from(games).orderBy(desc(games.week));
     if (allGames.length === 0) return [];
     
-    // Find games for the current week of the latest season
     const latestSeason = 2;
     const seasonGames = allGames.filter(g => (g.season ?? 1) === latestSeason);
-    
+    if (seasonGames.length === 0) return [];
+
     // 1. If there are live games, show those
     const liveGames = seasonGames.filter(g => g.isLive);
     if (liveGames.length > 0) return liveGames;
 
-    // 2. If there are upcoming games (not final, not live), find the earliest week among them
-    const upcomingGames = seasonGames.filter(g => !g.isFinal && !g.isLive);
-    if (upcomingGames.length > 0) {
-      const minWeek = Math.min(...upcomingGames.map(g => g.week));
-      return seasonGames.filter(g => g.week === minWeek);
+    // 2. Find the current status of each week
+    const weekStatus = seasonGames.reduce((acc, game) => {
+      const week = game.week;
+      if (!acc[week]) {
+        acc[week] = { allFinal: true, anyStarted: false, week };
+      }
+      if (!game.isFinal) acc[week].allFinal = false;
+      if (game.isLive || game.isFinal) acc[week].anyStarted = true;
+      return acc;
+    }, {} as Record<number, { allFinal: boolean; anyStarted: boolean; week: number }>);
+
+    const weeks = Object.values(weekStatus).sort((a, b) => a.week - b.week);
+
+    // 3. Find the first week that isn't fully completed
+    const activeWeek = weeks.find(w => !w.allFinal);
+    if (activeWeek) {
+      return seasonGames.filter(g => g.week === activeWeek.week);
     }
 
-    // 3. If everything is final, show the very last week's results
-    const maxWeek = Math.max(...seasonGames.map(g => g.week));
+    // 4. If all scheduled weeks are final, show the latest one
+    const maxWeek = Math.max(...weeks.map(w => w.week));
     return seasonGames.filter(g => g.week === maxWeek);
   }
 
