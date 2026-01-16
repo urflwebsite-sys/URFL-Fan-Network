@@ -139,7 +139,10 @@ export default function Betting() {
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-[0.9] text-foreground">
               Place Your <span className="text-primary">Bets</span>
             </h1>
-            <p className="text-base md:text-lg text-muted-foreground font-medium max-w-md leading-relaxed">
+            <p className="text-base md:text-lg text-primary font-bold max-w-md leading-relaxed animate-pulse">
+              Note: The betting system is undergoing maintenance and will be fully updated in the next project update.
+            </p>
+            <p className="text-sm text-muted-foreground font-medium max-w-md leading-relaxed">
               Wager your coins on Season 2 matchups and climb the global fan leaderboard.
             </p>
           </div>
