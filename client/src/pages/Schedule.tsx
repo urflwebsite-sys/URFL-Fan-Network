@@ -50,14 +50,21 @@ export default function Schedule() {
   }) : [];
 
   const gamesByWeek = filteredGames?.reduce((acc, game) => {
-    if (game.week <= 15 && !acc[game.week]) {
+    if (!acc[game.week]) {
       acc[game.week] = [];
     }
-    if (game.week <= 15) {
-      acc[game.week].push(game);
-    }
+    acc[game.week].push(game);
     return acc;
   }, {} as Record<number, Game[]>) || {};
+
+  const weekLabels: Record<number, string> = {
+    16: "Wildcard",
+    17: "Divisional",
+    18: "Conference",
+    19: "Super Bowl",
+  };
+
+  const getWeekLabel = (w: number) => weekLabels[w] || `Week ${w}`;
 
   const weeks = Object.keys(gamesByWeek).map(Number).sort((a, b) => a - b);
 
@@ -104,7 +111,7 @@ export default function Schedule() {
           {weeks.map((week) => (
             <div key={week} className="space-y-8">
               <div className="flex items-center gap-6">
-                <h2 className="text-3xl font-black italic uppercase tracking-tighter text-primary">Week {week}</h2>
+                <h2 className="text-3xl font-black italic uppercase tracking-tighter text-primary">{getWeekLabel(week)}</h2>
                 <div className="flex-1 h-px bg-gradient-to-r from-primary/20 to-transparent" />
               </div>
               
