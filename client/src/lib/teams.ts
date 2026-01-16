@@ -2,7 +2,7 @@ export const TEAMS = {
   "Baltimore Ravens": "https://a.espncdn.com/i/teamlogos/nfl/500/bal.png",
   "Buffalo Bills": "https://a.espncdn.com/i/teamlogos/nfl/500/buf.png",
   "Carolina Panthers": "https://a.espncdn.com/i/teamlogos/nfl/500/car.png",
-  "Chicago Grizzlies": "https://a.espncdn.com/i/teamlogos/nfl/500/chi.png",
+  "Chicago Grizzlies": "/logos/chicago-grizzlies.webp",
   "Cleveland Browns": "https://a.espncdn.com/i/teamlogos/nfl/500/cle.png",
   "Dallas Cowboys": "https://a.espncdn.com/i/teamlogos/nfl/500/dal.png",
   "Denver Broncos": "https://a.espncdn.com/i/teamlogos/nfl/500/den.png",
