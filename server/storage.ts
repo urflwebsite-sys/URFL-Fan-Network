@@ -245,15 +245,18 @@ export class DatabaseStorage implements IStorage {
     const latestSeason = 2;
     const seasonGames = allGames.filter(g => (g.season ?? 1) === latestSeason);
     
+    // 1. If there are live games, show those
     const liveGames = seasonGames.filter(g => g.isLive);
     if (liveGames.length > 0) return liveGames;
 
-    const upcomingGames = seasonGames.filter(g => !g.isFinal);
+    // 2. If there are upcoming games (not final, not live), find the earliest week among them
+    const upcomingGames = seasonGames.filter(g => !g.isFinal && !g.isLive);
     if (upcomingGames.length > 0) {
       const minWeek = Math.min(...upcomingGames.map(g => g.week));
       return seasonGames.filter(g => g.week === minWeek);
     }
 
+    // 3. If everything is final, show the very last week's results
     const maxWeek = Math.max(...seasonGames.map(g => g.week));
     return seasonGames.filter(g => g.week === maxWeek);
   }
