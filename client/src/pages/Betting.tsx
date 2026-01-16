@@ -25,18 +25,6 @@ export default function Betting() {
           </p>
         </div>
 
-        <Card className="p-8 bg-card/40 backdrop-blur-3xl border-border/40 rounded-[40px] border-2 border-dashed">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Coins className="w-6 h-6 text-primary" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-black uppercase tracking-widest text-foreground">Coming Soon</p>
-              <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">Global Fan Leaderboard Refresh</p>
-            </div>
-          </div>
-        </Card>
-
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">
           Check back after the next update
         </p>
