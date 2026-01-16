@@ -19,7 +19,7 @@ import { formatInTimeZone } from "date-fns-tz";
 import { Plus, Trash2, Edit, Save, Wrench, Users, LayoutDashboard, ShieldCheck, Zap, Newspaper, Coins, Trophy, Calendar, UserPlus, Settings, Heart, Minus, FileUp } from "lucide-react";
 import { TEAMS } from "@/lib/teams";
 
-const AVAILABLE_TEAMS = Object.keys(TEAMS);
+const AVAILABLE_TEAMS = Object.keys(TEAMS).sort();
 
 export default function AdminDashboard() {
   const { toast } = useToast();

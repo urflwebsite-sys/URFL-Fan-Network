@@ -12,7 +12,7 @@ import { TEAMS } from "@/lib/teams";
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 
-const AVAILABLE_TEAMS = Object.keys(TEAMS);
+const AVAILABLE_TEAMS = Object.keys(TEAMS).sort();
 
 interface UserPreferences {
   id?: string;

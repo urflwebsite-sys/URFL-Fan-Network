@@ -29,7 +29,7 @@ interface DropZone {
   targetId: string;
 }
 
-const AVAILABLE_TEAMS = Object.keys(TEAMS);
+const AVAILABLE_TEAMS = Object.keys(TEAMS).sort();
 
 const CONFERENCES = [
   { name: "AFC", color: "text-blue-500", bg: "bg-blue-500/5", divisions: [{ id: "AFC_East", label: "East" }, { id: "AFC_West", label: "West" }] },
