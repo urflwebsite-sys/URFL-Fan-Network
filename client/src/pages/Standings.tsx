@@ -19,7 +19,7 @@ interface StandingsEntry {
   wins: number;
   losses: number;
   pointDifferential?: number;
-  division: "AFC_D1" | "AFC_D2" | "NFC_D1" | "NFC_D2";
+  division: "AFC_East" | "AFC_West" | "NFC_East" | "NFC_West";
   manualOrder?: number;
 }
 
@@ -32,8 +32,8 @@ interface DropZone {
 const AVAILABLE_TEAMS = Object.keys(TEAMS);
 
 const CONFERENCES = [
-  { name: "AFC", color: "text-blue-500", bg: "bg-blue-500/5", divisions: [{ id: "AFC_D1", label: "Division 1" }, { id: "AFC_D2", label: "Division 2" }] },
-  { name: "NFC", color: "text-red-500", bg: "bg-red-500/5", divisions: [{ id: "NFC_D1", label: "Division 1" }, { id: "NFC_D2", label: "Division 2" }] },
+  { name: "AFC", color: "text-blue-500", bg: "bg-blue-500/5", divisions: [{ id: "AFC_East", label: "East" }, { id: "AFC_West", label: "West" }] },
+  { name: "NFC", color: "text-red-500", bg: "bg-red-500/5", divisions: [{ id: "NFC_East", label: "East" }, { id: "NFC_West", label: "West" }] },
 ];
 
 export default function Standings() {
@@ -42,7 +42,7 @@ export default function Standings() {
   const isAdmin = isAuthenticated && (user as any)?.role === "admin";
   const [standings, setStandings] = useState<StandingsEntry[]>([]);
   const [newTeam, setNewTeam] = useState("");
-  const [newDivision, setNewDivision] = useState<"AFC_D1" | "AFC_D2" | "NFC_D1" | "NFC_D2" | "">("");
+  const [newDivision, setNewDivision] = useState<"AFC_East" | "AFC_West" | "NFC_East" | "NFC_West" | "">("");
   const [editingPD, setEditingPD] = useState<Record<string, string | number>>({});
   const [draggedTeam, setDraggedTeam] = useState<string | null>(null);
   const [dropZone, setDropZone] = useState<DropZone | null>(null);
