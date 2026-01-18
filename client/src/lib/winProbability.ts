@@ -21,7 +21,8 @@ interface TeamAnalysis {
 function calculateRankings(standings: Standings[]): Map<string, number> {
   const rankings = new Map<string, number>();
 
-  const sortedStandings = [...standings].sort((a, b) => {
+  const currentSeasonStandings = standings.filter(s => (s.season ?? 1) === 2);
+  const sortedStandings = [...currentSeasonStandings].sort((a, b) => {
     if (a.manualOrder !== null && b.manualOrder !== null && 
         a.manualOrder !== undefined && b.manualOrder !== undefined) {
       return a.manualOrder - b.manualOrder;
@@ -54,8 +55,9 @@ function calculateScheduleStrength(
   games: Game[],
   standings: Standings[]
 ): number {
+  const currentSeason = 2;
   const completedGames = games.filter(
-    g => g.isFinal && (g.team1 === teamName || g.team2 === teamName)
+    g => g.isFinal && (g.season ?? 1) === currentSeason && (g.team1 === teamName || g.team2 === teamName)
   );
   
   if (completedGames.length === 0) return 0.5;
@@ -91,7 +93,8 @@ function analyzeTeam(
   games: Game[],
   rankings: Map<string, number>
 ): TeamAnalysis {
-  const standing = standings.find(s => s.team === teamName);
+  const currentSeason = 2;
+  const standing = standings.find(s => s.team === teamName && (s.season ?? 1) === currentSeason);
   const wins = standing?.wins || 0;
   const losses = standing?.losses || 0;
   const totalGames = wins + losses;
@@ -190,12 +193,13 @@ export function getConferenceRanking(teamName: string, standings?: Standings[]):
     return "N/A";
   }
 
-  const teamStanding = standings.find(s => s.team === teamName);
+  const currentSeason = 2;
+  const teamStanding = standings.find(s => s.team === teamName && (s.season ?? 1) === currentSeason);
   if (!teamStanding) {
     return "N/A";
   }
 
-  const allTeams = [...standings].sort((a, b) => {
+  const allTeams = [...standings].filter(s => (s.season ?? 1) === currentSeason).sort((a, b) => {
     if (a.manualOrder !== null && b.manualOrder !== null && 
         a.manualOrder !== undefined && b.manualOrder !== undefined) {
       return a.manualOrder - b.manualOrder;
@@ -246,8 +250,9 @@ export function getWinProbabilityFactors(
   const team1Analysis = analyzeTeam(game.team1, standings, games, rankings);
   const team2Analysis = analyzeTeam(game.team2, standings, games, rankings);
 
-  const standing1 = standings.find(s => s.team === game.team1);
-  const standing2 = standings.find(s => s.team === game.team2);
+  const currentSeason = 2;
+  const standing1 = standings.find(s => s.team === game.team1 && (s.season ?? 1) === currentSeason);
+  const standing2 = standings.find(s => s.team === game.team2 && (s.season ?? 1) === currentSeason);
 
   return {
     team1: team1Analysis,
