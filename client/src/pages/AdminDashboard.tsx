@@ -141,6 +141,7 @@ function GamesManager() {
 
   const { data: games } = useQuery<Game[]>({
     queryKey: ["/api/games/all"],
+    select: (data) => data.filter(g => (g.season ?? 1) === 2)
   });
 
   const createMutation = useMutation({
@@ -547,6 +548,7 @@ function ScoresManager() {
   const [filterWeek, setFilterWeek] = useState<string>("all");
   const { data: games } = useQuery<Game[]>({
     queryKey: ["/api/games/all"],
+    select: (data) => data.filter(g => (g.season ?? 1) === 2)
   });
 
   const updateMutation = useMutation({
