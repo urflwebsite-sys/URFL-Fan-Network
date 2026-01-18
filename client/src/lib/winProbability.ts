@@ -103,7 +103,7 @@ function analyzeTeam(
   return {
     ranking: rankings.get(teamName) || standings.length,
     winPercentage: totalGames > 0 ? wins / totalGames : 0.5,
-    pointDifferential: standing?.pointDifferential || 0,
+    pointDifferential: standing?.pointDifferential ?? 0,
     scheduleStrength: calculateScheduleStrength(teamName, games, standings),
     totalGamesPlayed: totalGames
   };

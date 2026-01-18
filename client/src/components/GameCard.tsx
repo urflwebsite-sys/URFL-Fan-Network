@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Game } from "@shared/schema";
+import type { Game, Standings } from "@shared/schema";
 import { formatInTimeZone } from "date-fns-tz";
 import { TEAMS } from "@/lib/teams";
 import { Video } from "lucide-react";
