@@ -59,10 +59,20 @@ export default function GameDetail() {
 
   const { data: standings } = useQuery<Standings[]>({
     queryKey: ["/api/standings"],
+    queryFn: async () => {
+      const res = await fetch(`/api/standings?season=2`);
+      if (!res.ok) throw new Error("Failed to fetch standings");
+      return res.json();
+    }
   });
 
   const { data: allGames } = useQuery<Game[]>({
     queryKey: ["/api/games/all"],
+    queryFn: async () => {
+      const res = await fetch(`/api/games/all?season=2`);
+      if (!res.ok) throw new Error("Failed to fetch games");
+      return res.json();
+    }
   });
 
   const { data: streamRequests } = useQuery<StreamRequest[]>({
@@ -474,7 +484,7 @@ export default function GameDetail() {
                           <div className="grid grid-cols-1 gap-2">
                             {[
                               { label: "Record", team1: team1Factors.factors.record.team1Record, team2: team1Factors.factors.record.team2Record, key: 'record' },
-                              { label: "Point Diff", team1: (standings?.find(s => s.team === game.team1)?.pointDifferential || 0) > 0 ? `+${standings?.find(s => s.team === game.team1)?.pointDifferential}` : standings?.find(s => s.team === game.team1)?.pointDifferential || 0, team2: (standings?.find(s => s.team === game.team2)?.pointDifferential || 0) > 0 ? `+${standings?.find(s => s.team === game.team2)?.pointDifferential}` : standings?.find(s => s.team === game.team2)?.pointDifferential || 0, key: 'pointDiff' },
+                              { label: "Point Diff", team1: (standings?.find(s => s.team === game.team1 && (s.season ?? 1) === 2)?.pointDifferential ?? 0) > 0 ? `+${standings?.find(s => s.team === game.team1 && (s.season ?? 1) === 2)?.pointDifferential}` : standings?.find(s => s.team === game.team1 && (s.season ?? 1) === 2)?.pointDifferential ?? 0, team2: (standings?.find(s => s.team === game.team2 && (s.season ?? 1) === 2)?.pointDifferential ?? 0) > 0 ? `+${standings?.find(s => s.team === game.team2 && (s.season ?? 1) === 2)?.pointDifferential}` : standings?.find(s => s.team === game.team2 && (s.season ?? 1) === 2)?.pointDifferential ?? 0, key: 'pointDiff' },
                               { label: "Schedule", team1: team1Factors.factors.schedule.team1SOS + "%", team2: team1Factors.factors.schedule.team2SOS + "%", key: 'schedule' },
                             ].map((factor, idx) => (
                               <div key={idx} className="flex justify-between items-center p-3 bg-white/5 rounded-2xl border border-white/5">
