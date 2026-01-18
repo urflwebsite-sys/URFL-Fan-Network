@@ -244,13 +244,13 @@ export function getWinProbabilityFactors(
     return null;
   }
 
+  const currentSeason = 2;
   const games = allGames || [];
   const rankings = calculateRankings(standings);
 
   const team1Analysis = analyzeTeam(game.team1, standings, games, rankings);
   const team2Analysis = analyzeTeam(game.team2, standings, games, rankings);
 
-  const currentSeason = 2;
   const standing1 = standings.find(s => s.team === game.team1 && (s.season ?? 1) === currentSeason);
   const standing2 = standings.find(s => s.team === game.team2 && (s.season ?? 1) === currentSeason);
 
@@ -259,16 +259,16 @@ export function getWinProbabilityFactors(
     team2: team2Analysis,
     factors: {
       record: {
-        team1Record: `${standing1?.wins || 0}-${standing1?.losses || 0}`,
-        team2Record: `${standing2?.wins || 0}-${standing2?.losses || 0}`,
+        team1Record: `${standing1?.wins ?? 0}-${standing1?.losses ?? 0}`,
+        team2Record: `${standing2?.wins ?? 0}-${standing2?.losses ?? 0}`,
         advantage: team1Analysis.winPercentage > team2Analysis.winPercentage ? game.team1 :
                    team2Analysis.winPercentage > team1Analysis.winPercentage ? game.team2 : "Even"
       },
       pointDiff: {
-        team1PD: team1Analysis.pointDifferential,
-        team2PD: team2Analysis.pointDifferential,
-        advantage: team1Analysis.pointDifferential > team2Analysis.pointDifferential ? game.team1 :
-                   team2Analysis.pointDifferential > team1Analysis.pointDifferential ? game.team2 : "Even"
+        team1PD: standing1?.pointDifferential ?? 0,
+        team2PD: standing2?.pointDifferential ?? 0,
+        advantage: (standing1?.pointDifferential ?? 0) > (standing2?.pointDifferential ?? 0) ? game.team1 :
+                   (standing2?.pointDifferential ?? 0) > (standing1?.pointDifferential ?? 0) ? game.team2 : "Even"
       },
       schedule: (() => {
         const team1SOS = Math.round(team1Analysis.scheduleStrength * 100);
