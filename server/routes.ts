@@ -1356,26 +1356,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const play = await db.insert(gamePlays).values(playData).returning();
       
+      const firstPlay = play[0];
+      if (!firstPlay) {
+        throw new Error("Failed to create play");
+      }
+
       // Update game scores based on play points
-      if (play[0].pointsAdded > 0) {
+      if (firstPlay.pointsAdded > 0) {
         const game = await storage.getGame(req.params.gameId);
         if (game) {
           const currentTeam1Score = game.team1Score ?? 0;
           const currentTeam2Score = game.team2Score ?? 0;
           
-          if (play[0].team === game.team1) {
+          if (firstPlay.team === game.team1) {
             await storage.updateGame(req.params.gameId, {
-              team1Score: (currentTeam1Score as number) + play[0].pointsAdded,
+              team1Score: (currentTeam1Score as number) + firstPlay.pointsAdded,
             });
-          } else if (play[0].team === game.team2) {
+          } else if (firstPlay.team === game.team2) {
             await storage.updateGame(req.params.gameId, {
-              team2Score: (currentTeam2Score as number) + play[0].pointsAdded,
+              team2Score: (currentTeam2Score as number) + firstPlay.pointsAdded,
             });
           }
         }
       }
 
-      res.json(play[0]);
+      res.json(firstPlay);
     } catch (error) {
       console.error("Error creating game play:", error);
       res.status(400).json({ message: "Failed to create game play" });
