@@ -6,6 +6,7 @@ import { formatInTimeZone } from "date-fns-tz";
 import { TEAMS } from "@/lib/teams";
 import { Video } from "lucide-react";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { useQuery } from "@tanstack/react-query";
 
 interface GameCardProps {
   game: Game;
@@ -20,6 +21,34 @@ const TeamLogo = ({ teamName, className }: { teamName: string; className?: strin
 
 export function GameCard({ game, onClick }: GameCardProps) {
   const preferences = useUserPreferences();
+  
+  const { data: allGames } = useQuery<Game[]>({
+    queryKey: ["/api/games/all"],
+    queryFn: async () => {
+      const res = await fetch(`/api/games/all?season=${game.season ?? 1}`);
+      if (!res.ok) throw new Error("Failed to fetch games");
+      return res.json();
+    }
+  });
+
+  const getRecord = (teamName: string) => {
+    if (!allGames) return "0-0";
+    const teamGames = allGames.filter(g => 
+      g.isFinal && (g.team1 === teamName || g.team2 === teamName)
+    );
+    let wins = 0;
+    let losses = 0;
+    teamGames.forEach(g => {
+      if (g.team1 === teamName) {
+        if (g.team1Score! > g.team2Score!) wins++;
+        else if (g.team1Score! < g.team2Score!) losses++;
+      } else {
+        if (g.team2Score! > g.team1Score!) wins++;
+        else if (g.team2Score! < g.team1Score!) losses++;
+      }
+    });
+    return `${wins}-${losses}`;
+  };
 
   return (
     <Card 
@@ -62,6 +91,7 @@ export function GameCard({ game, onClick }: GameCardProps) {
               <TeamLogo teamName={game.team1} className="w-16 h-16 sm:w-20 sm:h-20 relative z-10 drop-shadow-2xl" />
             </div>
             <p className="font-black italic text-sm uppercase tracking-tighter text-foreground/90 leading-none">{game.team1}</p>
+            <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">{getRecord(game.team1)}</p>
           </div>
 
           <div className="text-center flex flex-col items-center gap-2">
@@ -84,6 +114,7 @@ export function GameCard({ game, onClick }: GameCardProps) {
               <TeamLogo teamName={game.team2} className="w-16 h-16 sm:w-20 sm:h-20 relative z-10 drop-shadow-2xl" />
             </div>
             <p className="font-black italic text-sm uppercase tracking-tighter text-foreground/90 leading-none">{game.team2}</p>
+            <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">{getRecord(game.team2)}</p>
           </div>
         </div>
 
