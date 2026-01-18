@@ -21,7 +21,8 @@ interface TeamAnalysis {
 function calculateRankings(standings: Standings[]): Map<string, number> {
   const rankings = new Map<string, number>();
 
-  const currentSeasonStandings = standings.filter(s => (s.season ?? 1) === 2);
+  const currentSeason = 2;
+  const currentSeasonStandings = standings.filter(s => (s.season ?? 1) === currentSeason);
   const sortedStandings = [...currentSeasonStandings].sort((a, b) => {
     if (a.manualOrder !== null && b.manualOrder !== null && 
         a.manualOrder !== undefined && b.manualOrder !== undefined) {
@@ -66,7 +67,7 @@ function calculateScheduleStrength(
   
   completedGames.forEach(game => {
     const opponent = game.team1 === teamName ? game.team2 : game.team1;
-    const opponentStanding = standings.find(s => s.team === opponent);
+    const opponentStanding = standings.find(s => s.team === opponent && (s.season ?? 1) === currentSeason);
     
     if (opponentStanding) {
       const wins = opponentStanding.wins || 0;

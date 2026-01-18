@@ -22,32 +22,20 @@ const TeamLogo = ({ teamName, className }: { teamName: string; className?: strin
 export function GameCard({ game, onClick }: GameCardProps) {
   const preferences = useUserPreferences();
   
-  const { data: allGames } = useQuery<Game[]>({
-    queryKey: ["/api/games/all"],
+  const { data: standings } = useQuery<Standings[]>({
+    queryKey: ["/api/standings"],
     queryFn: async () => {
-      const res = await fetch(`/api/games/all?season=${game.season ?? 1}`);
-      if (!res.ok) throw new Error("Failed to fetch games");
+      const res = await fetch(`/api/standings?season=${game.season ?? 1}`);
+      if (!res.ok) throw new Error("Failed to fetch standings");
       return res.json();
     }
   });
 
   const getRecord = (teamName: string) => {
-    if (!allGames) return "0-0";
-    const teamGames = allGames.filter(g => 
-      g.isFinal && (g.team1 === teamName || g.team2 === teamName)
-    );
-    let wins = 0;
-    let losses = 0;
-    teamGames.forEach(g => {
-      if (g.team1 === teamName) {
-        if (g.team1Score! > g.team2Score!) wins++;
-        else if (g.team1Score! < g.team2Score!) losses++;
-      } else {
-        if (g.team2Score! > g.team1Score!) wins++;
-        else if (g.team2Score! < g.team1Score!) losses++;
-      }
-    });
-    return `${wins}-${losses}`;
+    if (!standings) return "0-0";
+    const teamStanding = standings.find(s => s.team === teamName);
+    if (!teamStanding) return "0-0";
+    return `${teamStanding.wins}-${teamStanding.losses}`;
   };
 
   return (
