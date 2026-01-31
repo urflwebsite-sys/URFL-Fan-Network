@@ -71,6 +71,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Note: /api/auth/user is handled in simpleAuth.ts
 
+  // Maintenance mode status endpoint
+  app.get("/api/settings/maintenance-mode", (req, res) => {
+    res.json({ enabled: true });
+  });
+
   app.get("/api/games", async (req, res) => {
     try {
       const seasonStr = req.query.season as string;
