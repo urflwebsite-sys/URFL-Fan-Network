@@ -26,8 +26,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import SocialLinks from "@/pages/SocialLinks";
 import Changelogs from "@/pages/Changelogs";
 import UpdatePlanner from "@/pages/UpdatePlanner";
-import Login from "@/pages/Login";
-import NotFound from "@/pages/not-found";
+import Maintenance from "@/pages/Maintenance";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -71,6 +70,10 @@ function MainContent() {
   }
 
   const showSidebar = !maintenanceMode || isAdmin;
+
+  if (maintenanceStatus?.enabled && !isAdmin && location !== "/login") {
+    return <Maintenance />;
+  }
 
   return (
     <div className={`min-h-screen bg-background ${preferences.reduceAnimations ? 'reduce-motion' : ''}`}>
