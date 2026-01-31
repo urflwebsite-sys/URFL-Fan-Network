@@ -40,7 +40,6 @@ export default function Maintenance() {
           </div>
           
           <div className="bg-primary/5 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground mb-3">Want to be notified when we're back?</p>
             <div className="flex gap-2">
               <input 
                 type="email" 
